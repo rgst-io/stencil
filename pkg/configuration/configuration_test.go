@@ -7,7 +7,7 @@ package configuration_test
 import (
 	"fmt"
 
-	"github.com/getoutreach/stencil/pkg/configuration"
+	"github.com/rgst-io/stencil/pkg/configuration"
 )
 
 func ExampleValidateName() {

@@ -10,8 +10,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/getoutreach/stencil/pkg/configuration"
 	"github.com/pkg/errors"
+	"github.com/rgst-io/stencil/pkg/configuration"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v3"

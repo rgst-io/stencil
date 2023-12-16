@@ -16,8 +16,8 @@ import (
 	"github.com/Masterminds/semver/v3"
 	"github.com/getoutreach/gobox/pkg/cfg"
 	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
-	"github.com/getoutreach/stencil/pkg/configuration"
 	"github.com/pkg/errors"
+	"github.com/rgst-io/stencil/pkg/configuration"
 	"github.com/sirupsen/logrus"
 )
 

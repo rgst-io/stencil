@@ -3,8 +3,8 @@ package stenciltest
 import (
 	"testing"
 
-	"github.com/getoutreach/stencil/pkg/configuration"
 	"github.com/google/go-cmp/cmp"
+	"github.com/rgst-io/stencil/pkg/configuration"
 	"github.com/sirupsen/logrus"
 	"gotest.tools/v3/assert"
 )

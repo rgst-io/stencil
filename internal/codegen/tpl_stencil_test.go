@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/getoutreach/stencil/internal/modules/modulestest"
-	"github.com/getoutreach/stencil/pkg/configuration"
 	"github.com/go-git/go-billy/v5"
+	"github.com/rgst-io/stencil/internal/modules/modulestest"
+	"github.com/rgst-io/stencil/pkg/configuration"
 	"github.com/sirupsen/logrus"
 )
 

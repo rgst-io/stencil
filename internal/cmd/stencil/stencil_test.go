@@ -10,9 +10,9 @@ package stencil
 import (
 	"testing"
 
-	"github.com/getoutreach/stencil/pkg/configuration"
-	"github.com/getoutreach/stencil/pkg/stencil"
 	"github.com/google/go-cmp/cmp"
+	"github.com/rgst-io/stencil/pkg/configuration"
+	"github.com/rgst-io/stencil/pkg/stencil"
 	"github.com/sirupsen/logrus"
 )
 

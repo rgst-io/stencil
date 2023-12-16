@@ -8,7 +8,7 @@ package codegen
 import (
 	"text/template"
 
-	"github.com/getoutreach/stencil/pkg/extensions"
+	"github.com/rgst-io/stencil/pkg/extensions"
 	"github.com/sirupsen/logrus"
 )
 

@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/getoutreach/stencil/pkg/configuration"
+	"github.com/rgst-io/stencil/pkg/configuration"
 	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
 )
@@ -25,7 +25,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name:       "github.com/getoutreach/stencil-template-base",
+						Name:       "github.com/rgst-io/stencil-template-base",
 						Prerelease: false,
 					},
 				},
@@ -41,7 +41,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name:       "github.com/getoutreach/stencil-template-base",
+						Name:       "github.com/rgst-io/stencil-template-base",
 						Prerelease: false,
 					},
 				},
@@ -61,7 +61,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name:       "github.com/getoutreach/stencil-template-base",
+						Name:       "github.com/rgst-io/stencil-template-base",
 						Prerelease: false,
 					},
 				},
@@ -77,7 +77,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name:       "github.com/getoutreach/stencil-template-base",
+						Name:       "github.com/rgst-io/stencil-template-base",
 						Prerelease: false,
 					},
 				},
@@ -99,7 +99,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name:       "github.com/getoutreach/stencil-template-base",
+						Name:       "github.com/rgst-io/stencil-template-base",
 						Prerelease: false,
 					},
 				},
@@ -117,7 +117,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name:       "github.com/getoutreach/stencil-template-base",
+						Name:       "github.com/rgst-io/stencil-template-base",
 						Prerelease: false,
 					},
 				},

@@ -64,7 +64,7 @@ type ServiceManifest struct {
 	// Replacements is a list of module names to replace their URI.
 	// Expected format:
 	// - local file: file://path/to/module
-	// - remote file: https://github.com/getoutreach/stencil-base
+	// - remote file: https://github.com/rgst-io/stencil-base
 	Replacements map[string]string `yaml:"replacements,omitempty"`
 }
 

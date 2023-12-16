@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/getoutreach/stencil/pkg/extensions/apiv1"
 	"github.com/pkg/errors"
+	"github.com/rgst-io/stencil/pkg/extensions/apiv1"
 )
 
 // inprocExt wraps test-provided implementation and 'simulates' the transport layer between

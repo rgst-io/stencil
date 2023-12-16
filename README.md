@@ -5,7 +5,7 @@
 
 A modern repository templating engine
 
-**Note**: This has been forked from [getoutreach/stencil](https://github.com/getoutreach/stencil) and is currently
+**Note**: This has been forked from [getoutreach/stencil](https://github.com/rgst-io/stencil) and is currently
 under construction.
 
 ## Development

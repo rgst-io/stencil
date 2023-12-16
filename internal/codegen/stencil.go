@@ -13,14 +13,14 @@ import (
 	"sort"
 
 	"github.com/getoutreach/gobox/pkg/app"
-	"github.com/getoutreach/stencil/internal/modules"
-	"github.com/getoutreach/stencil/pkg/configuration"
-	"github.com/getoutreach/stencil/pkg/extensions"
-	"github.com/getoutreach/stencil/pkg/extensions/apiv1"
-	"github.com/getoutreach/stencil/pkg/stencil"
 	"github.com/go-git/go-billy/v5/util"
 	"github.com/mitchellh/hashstructure/v2"
 	"github.com/pkg/errors"
+	"github.com/rgst-io/stencil/internal/modules"
+	"github.com/rgst-io/stencil/pkg/configuration"
+	"github.com/rgst-io/stencil/pkg/extensions"
+	"github.com/rgst-io/stencil/pkg/extensions/apiv1"
+	"github.com/rgst-io/stencil/pkg/stencil"
 	"github.com/sirupsen/logrus"
 )
 

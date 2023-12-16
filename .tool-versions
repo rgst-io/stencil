@@ -2,3 +2,4 @@ golang 1.21.5
 shfmt 3.7.0
 golangci-lint 1.55.2
 task 3.32.0
+goreleaser latest

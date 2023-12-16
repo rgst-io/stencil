@@ -12,11 +12,11 @@ import (
 	"io"
 	"os"
 
-	"github.com/getoutreach/stencil/internal/modules"
-	"github.com/getoutreach/stencil/pkg/configuration"
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/pkg/errors"
+	"github.com/rgst-io/stencil/internal/modules"
+	"github.com/rgst-io/stencil/pkg/configuration"
 	"gopkg.in/yaml.v3"
 )
 

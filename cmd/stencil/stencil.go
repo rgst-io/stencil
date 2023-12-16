@@ -21,13 +21,13 @@ import (
 	"context"
 	"os"
 
-	oapp "github.com/getoutreach/gobox/pkg/app"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 
-	"github.com/getoutreach/stencil/internal/cmd/stencil"
-	"github.com/getoutreach/stencil/pkg/configuration"
 	"github.com/pkg/errors"
+	"github.com/rgst-io/stencil/internal/cmd/stencil"
+	"github.com/rgst-io/stencil/internal/version"
+	"github.com/rgst-io/stencil/pkg/configuration"
 )
 
 // main is the entrypoint for the stencil CLI.
@@ -38,11 +38,11 @@ func main() {
 	log := logrus.New()
 
 	app := cli.App{
-		Version:     oapp.Version,
+		Version:     version.Version,
 		Name:        "stencil",
 		Description: "a smart templating engine for service development",
 		Action: func(c *cli.Context) error {
-			log.Infof("stencil %s", oapp.Version)
+			log.Infof("stencil %s", c.App.Version)
 
 			if c.Bool("debug") {
 				log.SetLevel(logrus.DebugLevel)

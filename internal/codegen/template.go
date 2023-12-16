@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/getoutreach/stencil/internal/modules"
+	"github.com/rgst-io/stencil/internal/modules"
 	"github.com/sirupsen/logrus"
 )
 

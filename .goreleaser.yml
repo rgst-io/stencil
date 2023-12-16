@@ -11,7 +11,7 @@ builds:
     ldflags:
       - -s
       - -w
-      - -X main.Version={{ .Version }}
+      - -X github.com/rgst-io/stencil/internal/version.Version={{ .Version }}
     env:
       - CGO_ENABLED=0
     goarch:
@@ -23,7 +23,7 @@ builds:
       - darwin
 
 archives:
-  - format: tar.gz
+  - format: tar.xz
     # use zip for windows archives
     format_overrides:
       - goos: windows

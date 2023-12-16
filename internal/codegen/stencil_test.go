@@ -7,11 +7,11 @@ import (
 	"testing"
 
 	"github.com/getoutreach/gobox/pkg/app"
-	"github.com/getoutreach/stencil/internal/modules"
-	"github.com/getoutreach/stencil/internal/modules/modulestest"
-	"github.com/getoutreach/stencil/pkg/configuration"
-	"github.com/getoutreach/stencil/pkg/stencil"
 	"github.com/go-git/go-billy/v5/memfs"
+	"github.com/rgst-io/stencil/internal/modules"
+	"github.com/rgst-io/stencil/internal/modules/modulestest"
+	"github.com/rgst-io/stencil/pkg/configuration"
+	"github.com/rgst-io/stencil/pkg/stencil"
 	"github.com/sirupsen/logrus"
 	"gotest.tools/v3/assert"
 )

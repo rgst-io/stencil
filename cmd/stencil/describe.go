@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/getoutreach/stencil/pkg/stencil"
 	"github.com/pkg/errors"
+	"github.com/rgst-io/stencil/pkg/stencil"
 	"github.com/urfave/cli/v2"
 )
 

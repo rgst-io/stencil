@@ -7,7 +7,7 @@ package stencil_test
 import (
 	"fmt"
 
-	"github.com/getoutreach/stencil/pkg/stencil"
+	"github.com/rgst-io/stencil/pkg/stencil"
 )
 
 func ExampleLoadLockfile() {

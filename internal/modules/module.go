@@ -14,8 +14,6 @@ import (
 	"github.com/Masterminds/sprig/v3"
 	"github.com/getoutreach/gobox/pkg/cli/github"
 	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
-	"github.com/getoutreach/stencil/pkg/configuration"
-	"github.com/getoutreach/stencil/pkg/extensions"
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/go-git/go-billy/v5/osfs"
@@ -24,6 +22,8 @@ import (
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/pkg/errors"
+	"github.com/rgst-io/stencil/pkg/configuration"
+	"github.com/rgst-io/stencil/pkg/extensions"
 	"github.com/sirupsen/logrus"
 	giturls "github.com/whilp/git-urls"
 	"gopkg.in/yaml.v3"
@@ -41,7 +41,7 @@ type Module struct {
 	t *template.Template
 
 	// Name is the name of a module. This should be a valid go
-	// import path. For example: github.com/getoutreach/stencil-base
+	// import path. For example: github.com/rgst-io/stencil-base
 	Name string
 
 	// URI is the underlying URI being used to download this module
