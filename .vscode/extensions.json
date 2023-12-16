@@ -6,10 +6,5 @@
     "timonwong.shellcheck",
     "redhat.vscode-yaml",
     "foxundermoon.shell-format"
-
-    // Please consider contributing back all recommended
-    // extensions to stencil!
-    // <<Stencil::Block(extensions)>>
-    // <</Stencil::Block>>
   ]
 }
