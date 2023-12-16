@@ -36,6 +36,22 @@ task build
 task test
 ```
 
+### Releasing
+
+Create a tag locally:
+
+```bash
+git tag -a vX.Y.Z
+```
+
+Push the tag:
+
+```bash
+git push origin vX.Y.Z
+```
+
+Wait for CI to build and publish the release (Github Actions).
+
 ## License
 
 The original code, as of the fork, is licensed under the Apache 2.0
