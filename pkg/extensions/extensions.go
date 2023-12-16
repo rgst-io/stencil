@@ -80,7 +80,7 @@ func (h *Host) createFunctionFromTemplateFunction(extName string, ext apiv1.Impl
 
 // GetExtensionCaller returns an extension caller that's
 // aware of all extension functions
-func (h *Host) GetExtensionCaller(ctx context.Context) (*ExtensionCaller, error) {
+func (h *Host) GetExtensionCaller(_ context.Context) (*ExtensionCaller, error) {
 	// funcMap stores the extension functions discovered
 	funcMap := map[string]map[string]generatedTemplateFunc{}
 

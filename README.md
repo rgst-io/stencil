@@ -1,23 +1,47 @@
 # stencil
-[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/getoutreach/stencil)
-[![Generated via Bootstrap](https://img.shields.io/badge/Outreach-Bootstrap-%235951ff)](https://github.com/getoutreach/bootstrap)
-[![Coverage Status](https://coveralls.io/repos/github/getoutreach/stencil/badge.svg?branch=main)](https://coveralls.io/github//getoutreach/stencil?branch=main)
-<!-- <<Stencil::Block(extraBadges)>> -->
 
-<!-- <</Stencil::Block>> -->
+[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/rgst-io/stencil)
 
-microservice lifecycle manager
 
-## Contributing
+A modern repository templating engine
 
-Please read the [CONTRIBUTING.md](CONTRIBUTING.md) document for guidelines on developing and contributing changes.
+**Note**: This has been forked from [getoutreach/stencil](https://github.com/getoutreach/stencil) and is currently
+under construction.
 
-## High-level Overview
+## Development
 
-<!-- <<Stencil::Block(overview)>> -->
+### Prerequisites
 
-Stencil is a smart templating engine for service/library development aimed to reduce the use of boilerplate code.
+**Note**: If you opt to not use `rtx`, please install all dependencies
+from `.tool-versions` manually.
 
-Check out our [documentation](https://engineering.outreach.io/stencil/) for more information!
+- [rtx](https://github.com/jdx/rtx)
 
-<!-- <</Stencil::Block>> -->
+
+Install the dependencies:
+
+```bash
+rtx install
+```
+
+### Building
+
+```bash
+task build
+```
+
+### Testing
+
+```bash
+task test
+```
+
+## License
+
+The original code, as of the fork, is licensed under the Apache 2.0
+license which can be found (as it was) at
+[LICENSE.original](LICENSE.original). This applies to all code create
+before the commit ea98384ec4b1031ba032cedad90df4bb0451cdce.
+
+All code after that commit is licensed under AGPL 3.0. The license for
+this can be found at [LICENSE](LICENSE).

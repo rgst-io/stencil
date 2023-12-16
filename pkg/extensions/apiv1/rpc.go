@@ -24,6 +24,6 @@ func (p *ExtensionPlugin) Server(*plugin.MuxBroker) (interface{}, error) {
 }
 
 // Client serves a Implementation over net/rpc
-func (p *ExtensionPlugin) Client(b *plugin.MuxBroker, c *rpc.Client) (interface{}, error) {
+func (p *ExtensionPlugin) Client(_ *plugin.MuxBroker, c *rpc.Client) (interface{}, error) {
 	return &rpcTransportClient{p.log, c}, nil
 }

@@ -1,27 +1,40 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+project_name: stencil
 before:
   hooks:
-    - make dep
+    - go mod download
 builds:
-  - main: ./cmd/stencil
-    id: &name stencil
-    binary: *name
-    goos:
-      - linux
-      - darwin
+  - main: ./cmd/{{ .ProjectName }}
+    flags:
+      - -trimpath
+    ldflags:
+      - -s
+      - -w
+      - -X main.Version={{ .Version }}
+    env:
+      - CGO_ENABLED=0
     goarch:
       - amd64
       - arm64
-    ldflags:
-      - '-w -s -X "github.com/getoutreach/gobox/pkg/app.Version=v{{ .Version }}"'
-      - '-X "main.HoneycombTracingKey={{ .Env.HONEYCOMB_APIKEY }}"'
-      - '-X "main.TeleforkAPIKey={{ .Env.TELEFORK_APIKEY }}"'
-    env:
-      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
 
-archives: []
+archives:
+  - format: tar.gz
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        format: zip
 checksum:
   name_template: "checksums.txt"
-release:
-  # We handle releasing via semantic-release
-  disable: true
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"

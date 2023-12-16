@@ -65,7 +65,7 @@ func uriIsLocal(uri string) bool {
 //
 // uri is the URI for the module. If it is an empty string https://+name is used
 // instead.
-func New(ctx context.Context, uri string, tr *configuration.TemplateRepository) (*Module, error) {
+func New(_ context.Context, uri string, tr *configuration.TemplateRepository) (*Module, error) {
 	if uri == "" {
 		uri = "https://" + tr.Name
 	}
@@ -111,7 +111,7 @@ func (m *Module) GetTemplate() *template.Template {
 // by the given module. If the module is a local file
 // URI then extensions will be sourced from the `./bin`
 // directory of the base of the path.
-func (m *Module) RegisterExtensions(ctx context.Context, log logrus.FieldLogger, ext *extensions.Host) error {
+func (m *Module) RegisterExtensions(ctx context.Context, _ logrus.FieldLogger, ext *extensions.Host) error {
 	mf, err := m.Manifest(ctx)
 	if err != nil {
 		return err

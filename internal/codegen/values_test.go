@@ -61,6 +61,11 @@ func TestValues(t *testing.T) {
 	}
 
 	boxConf, _ := box.LoadBox()
+	if boxConf == nil {
+		// Allows this test to pass when a user doesn't have a box
+		// configuration setup.
+		boxConf = &box.Config{}
+	}
 
 	vals := NewValues(context.Background(), sm, []*modules.Module{
 		{

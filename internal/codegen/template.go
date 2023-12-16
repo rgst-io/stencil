@@ -69,7 +69,7 @@ func (t *Template) ImportPath() string {
 
 // Parse parses the provided template and makes it available to be Rendered
 // in the context of the current module.
-func (t *Template) Parse(st *Stencil) error {
+func (t *Template) Parse(_ *Stencil) error {
 	// Add the current template to the template object on the module that we're
 	// attached to. This enables us to call functions in other templates within our
 	// 'module context'.

@@ -16,14 +16,14 @@ type rpcTransportServer struct {
 }
 
 // GetConfig returns the config for this extension
-func (s *rpcTransportServer) GetConfig(args interface{}, resp **Config) error {
+func (s *rpcTransportServer) GetConfig(_ interface{}, resp **Config) error {
 	v, err := s.impl.GetConfig()
 	*resp = v
 	return err
 }
 
 // GetTemplateFunctions returns the template functions for this extension
-func (s *rpcTransportServer) GetTemplateFunctions(args interface{}, resp *[]*TemplateFunction) error {
+func (s *rpcTransportServer) GetTemplateFunctions(_ interface{}, resp *[]*TemplateFunction) error {
 	v, err := s.impl.GetTemplateFunctions()
 	*resp = v
 	return err
