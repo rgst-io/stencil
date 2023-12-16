@@ -7,7 +7,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/blang/semver/v4 v4.0.0
-	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
+	github.com/bradleyjkemp/cupaloy v2.8.0+incompatible
 	github.com/charmbracelet/glamour v0.6.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/getoutreach/gobox v1.85.1
