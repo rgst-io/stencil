@@ -65,10 +65,6 @@ type git struct {
 type config struct {
 	// Name is the name of this repository
 	Name string
-
-	// Deprecated: Versions should be treated as an argument via stencil.Arg instead
-	// Versions are versions of applications to be used over baked in defaults
-	Versions map[string]string
 }
 
 // module contains information about the current module that
@@ -154,8 +150,7 @@ func NewValues(ctx context.Context, sm *configuration.ServiceManifest, mods []*m
 			Modules:          modulesSlice{},
 		},
 		Config: config{
-			Name:     sm.Name,
-			Versions: sm.Versions,
+			Name: sm.Name,
 		},
 		Module:   module{},
 		Template: stencilTemplate{},

@@ -64,7 +64,7 @@ type ServiceManifest struct {
 	// Replacements is a list of module names to replace their URI.
 	// Expected format:
 	// - local file: file://path/to/module
-	// - remote file: https://github.com/rgst-io/stencil-base
+	// - remote file: https://github.com/getoutreach/stencil-base
 	Replacements map[string]string `yaml:"replacements,omitempty"`
 }
 
@@ -72,14 +72,6 @@ type ServiceManifest struct {
 type TemplateRepository struct {
 	// Name is the name of this module. This should be a valid go import path
 	Name string `yaml:"name"`
-
-	// Deprecated: Use 'channel' instead, prerelease sets 'channel' to 'rc'.
-	// Prerelease is a boolean indicating whether or not to consider prerelease versions
-	Prerelease bool `yaml:"prerelease"`
-
-	// Deprecated: Use name instead
-	// URL is a full URL for a given module
-	URL string `yaml:"url,omitempty"`
 
 	// Channel is the channel to use for updates to this module
 	// Defaults to "stable"
@@ -140,18 +132,6 @@ type Argument struct {
 
 	// Schema is a JSON schema, in YAML, for the argument.
 	Schema map[string]interface{} `yaml:"schema"`
-
-	// Deprecated fields below.
-
-	// Deprecated: Use schema instead
-	// Type declares the type of the argument. This is not implemented
-	// yet, so is likely to change in the future.
-	Type string `yaml:"type"`
-
-	// Deprecated: Use schema instead.
-	// Values is a list of possible values for this, if empty all input is
-	// considered valid.
-	Values []string `yaml:"values"`
 
 	// From is a reference to an argument in another module, if this is
 	// set, all other fields are ignored and instead the module referenced

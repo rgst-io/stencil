@@ -257,20 +257,6 @@ func TestTplStencil_Arg(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "should fallback to deprecated type when schema is not provided",
-			fields: fakeTemplate(t, map[string]interface{}{},
-				map[string]configuration.Argument{
-					"hello": {
-						Type: "string",
-					},
-				}),
-			args: args{
-				pth: "hello",
-			},
-			want:    "",
-			wantErr: false,
-		},
-		{
 			name: "should support from",
 			fields: fakeTemplateMultipleModules(t,
 				map[string]interface{}{

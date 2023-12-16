@@ -163,19 +163,6 @@ func (s *TplStencil) AddToModuleHook(module, name string, data interface{}) (out
 	return nil, nil
 }
 
-// Deprecated: Use Arg instead.
-// Args returns all arguments passed to stencil from the service's manifest
-//
-// Note: This doesn't set default values and is instead
-// representative of _all_ data passed in its raw form.
-//
-// This is deprecated and will be removed in a future release.
-//
-//	{{- (stencil.Args).name }}
-func (s *TplStencil) Args() map[string]interface{} {
-	return s.s.m.Arguments
-}
-
 // ReadFile reads a file from the current directory and returns it's contents
 //
 //	{{ stencil.ReadFile "myfile.txt" }}

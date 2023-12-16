@@ -22,14 +22,9 @@ import (
 // Arg returns the value of an argument in the service's manifest
 //
 //	{{- stencil.Arg "name" }}
-//
-// Note: Using `stencil.Arg` with no path returns all arguments
-// and is equivalent to `stencil.Args`. However, that is DEPRECATED
-// along with `stencil.Args` as it doesn't provide default types, or
-// check the JSON schema, or track which module calls what argument.
 func (s *TplStencil) Arg(pth string) (interface{}, error) {
 	if pth == "" {
-		return s.Args(), nil
+		return nil, fmt.Errorf("path cannot be empty")
 	}
 
 	// This is a TODO because I don't know if template functions
@@ -97,15 +92,8 @@ func (s *TplStencil) resolveDefault(pth string, arg *configuration.Argument) (in
 	// json schema convention is to define "type" as the top level key.
 	typ, ok := arg.Schema["type"]
 	if !ok {
-		// fallback to the deprecated arg.Type
-		typ = arg.Type //nolint:staticcheck // Why: Compat
-
-		// If arg.Type isn't set then we have no type information
-		// so return nothing. This is likely problematic so a linter
-		// should warn on this.
-		if arg.Type == "" { //nolint:staticcheck // Why: Compat
-			return nil, nil
-		}
+		// We don't know what type this should bem so return nothing.
+		return nil, nil
 	}
 	typs, ok := typ.(string)
 	if !ok {

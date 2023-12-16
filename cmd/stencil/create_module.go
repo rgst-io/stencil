@@ -83,7 +83,7 @@ func NewCreateModule() *cli.Command {
 				Modules: []*configuration.TemplateRepository{{
 					Name: "github.com/rgst-io/stencil-template-base",
 				}, {
-					Name: "github.com/rgst-io/stencil-base",
+					Name: "github.com/getoutreach/stencil-base",
 				}, {
 					Name: "github.com/rgst-io/stencil-circleci",
 				}},

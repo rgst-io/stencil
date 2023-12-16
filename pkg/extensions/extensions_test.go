@@ -21,13 +21,13 @@ func TestCanImportNativeExtension(t *testing.T) {
 	version := &resolver.Version{
 		Tag: "v1.3.0",
 	}
-	err := ext.RegisterExtension(ctx, "https://github.com/rgst-io/stencil-golang", "github.com/rgst-io/stencil-golang", version)
+	err := ext.RegisterExtension(ctx, "https://github.com/getoutreach/stencil-golang", "github.com/getoutreach/stencil-golang", version)
 	assert.NilError(t, err, "failed to register extension")
 
 	caller, err := ext.GetExtensionCaller(ctx)
 	assert.NilError(t, err, "failed to get extension caller")
 
-	resp, err := caller.Call("github.com/rgst-io/stencil-golang.ParseGoMod", "go.mod", "module test\n\ngo 1.19")
+	resp, err := caller.Call("github.com/getoutreach/stencil-golang.ParseGoMod", "go.mod", "module test\n\ngo 1.19")
 	assert.NilError(t, err, "failed to call extension")
 
 	moduleMap := resp.(map[string]interface{})["Module"].(map[string]interface{})

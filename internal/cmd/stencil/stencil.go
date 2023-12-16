@@ -59,21 +59,11 @@ type Command struct {
 
 // NewCommand creates a new stencil command
 func NewCommand(log logrus.FieldLogger, s *configuration.ServiceManifest,
-	dryRun, frozen, usePrerelease, allowMajorVersionUpgrades bool) *Command {
+	dryRun, frozen, allowMajorVersionUpgrades bool) *Command {
 	l, err := stencil.LoadLockfile("")
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		log.WithError(err).Warn("failed to load lockfile")
 	}
-
-	if usePrerelease {
-		//nolint:lll // Why: It's a long warning string :'(
-		log.Warn("Deprecated: --use-prerelease is deprecated. Set 'rc' as the channel on each module you want to use pre-releases for in the service.yaml instead")
-		for i := range s.Modules {
-			s.Modules[i].Channel = "rc"
-			s.Modules[i].Version = ""
-		}
-	}
-
 	token, err := github.GetToken()
 	if err != nil {
 		log.Warn("failed to get github token, using anonymous access")
@@ -209,11 +199,9 @@ func (c *Command) useModulesFromLock() error {
 		// to =<version> so the resolver only considers
 		// the version from the lockfile.
 		for _, m := range c.manifest.Modules {
-			// Set channel and pre-release to false to avoid accidentally
-			// de-selecting the version from the lockfile.
+			// Set channel to false to avoid accidentally de-selecting the
+			// version from the lockfile.
 			m.Channel = ""
-			//nolint:staticcheck // Why: Resetting value to false
-			m.Prerelease = false
 
 			if m.Name == l.Name {
 				m.Version = l.Version

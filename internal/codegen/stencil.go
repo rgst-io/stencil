@@ -287,18 +287,10 @@ func (s *Stencil) getTemplates(ctx context.Context, log logrus.FieldLogger) ([]*
 
 		log.Debugf("Discovering templates from module %q", m.Name)
 
-		// default to templates/, but if it's not present fallback to
-		// the root w/ a warning
-		// Note: This behaviour is deprecated and will be removed soon. Put templates
-		// into /templates instead.
-		if inf, err := fs.Stat("templates"); err != nil || !inf.IsDir() {
-			log.Warnf("Module %q has templates outside of templates/ directory, this is not recommended and is deprecated", m.Name)
-		} else {
-			var err error
-			fs, err = fs.Chroot("templates")
-			if err != nil {
-				return nil, errors.Wrap(err, "failed to chroot module filesystem to templates/")
-			}
+		// Only find templates in the templates/ directory
+		fs, err = fs.Chroot("templates")
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to chroot module filesystem to templates/ (does it exist?)")
 		}
 
 		err = util.Walk(fs, "", func(path string, inf os.FileInfo, err error) error {

@@ -25,7 +25,7 @@ func newLogger() logrus.FieldLogger {
 
 func TestCanFetchModule(t *testing.T) {
 	ctx := context.Background()
-	m, err := modules.New(ctx, "", &configuration.TemplateRepository{Name: "github.com/rgst-io/stencil-base", Version: "main"})
+	m, err := modules.New(ctx, "", &configuration.TemplateRepository{Name: "github.com/getoutreach/stencil-base", Version: "main"})
 	assert.NilError(t, err, "failed to call New()")
 
 	manifest, err := m.Manifest(ctx)
@@ -44,18 +44,18 @@ func TestReplacementLocalModule(t *testing.T) {
 		Name: "testing-service",
 		Modules: []*configuration.TemplateRepository{
 			{
-				Name: "github.com/rgst-io/stencil-base",
+				Name: "github.com/getoutreach/stencil-base",
 			},
 		},
 		Replacements: map[string]string{
-			"github.com/rgst-io/stencil-base": "file://testdata",
+			"github.com/getoutreach/stencil-base": "file://testdata",
 		},
 	}
 
 	mods, err := modules.GetModulesForService(context.Background(), &modules.ModuleResolveOptions{ServiceManifest: sm, Log: newLogger()})
 	assert.NilError(t, err, "expected GetModulesForService() to not error")
 	assert.Equal(t, len(mods), 1, "expected exactly one module to be returned")
-	assert.Equal(t, mods[0].URI, sm.Replacements["github.com/rgst-io/stencil-base"],
+	assert.Equal(t, mods[0].URI, sm.Replacements["github.com/getoutreach/stencil-base"],
 		"expected module to use replacement URI")
 }
 
@@ -66,7 +66,7 @@ func TestCanGetLatestVersion(t *testing.T) {
 			Name: "testing-service",
 			Modules: []*configuration.TemplateRepository{
 				{
-					Name: "github.com/rgst-io/stencil-base",
+					Name: "github.com/getoutreach/stencil-base",
 				},
 			},
 		},
@@ -83,7 +83,7 @@ func TestHandleMultipleConstraints(t *testing.T) {
 			Name: "testing-service",
 			Modules: []*configuration.TemplateRepository{
 				{
-					Name:    "github.com/rgst-io/stencil-base",
+					Name:    "github.com/getoutreach/stencil-base",
 					Version: "=<0.5.0",
 				},
 				{
@@ -102,7 +102,7 @@ func TestHandleMultipleConstraints(t *testing.T) {
 	// find stencil-base to validate version
 	index := -1
 	for i, m := range mods {
-		if m.Name == "github.com/rgst-io/stencil-base" {
+		if m.Name == "github.com/getoutreach/stencil-base" {
 			index = i
 			break
 		}
@@ -153,7 +153,7 @@ func TestFailOnIncompatibleConstraints(t *testing.T) {
 			Name: "testing-service",
 			Modules: []*configuration.TemplateRepository{
 				{
-					Name:    "github.com/rgst-io/stencil-base",
+					Name:    "github.com/getoutreach/stencil-base",
 					Version: ">=0.5.0",
 				},
 				{
@@ -169,7 +169,7 @@ func TestFailOnIncompatibleConstraints(t *testing.T) {
 	})
 	assert.Error(t, err,
 		//nolint:lll // Why: That's the error :(
-		"failed to resolve module 'github.com/rgst-io/stencil-base' with constraints\n└─ testing-service (top-level) wants >=0.5.0\n  └─ nested_constraint@v0.0.0-+ wants ~0.3.0\n: no version found matching criteria",
+		"failed to resolve module 'github.com/getoutreach/stencil-base' with constraints\n└─ testing-service (top-level) wants >=0.5.0\n  └─ nested_constraint@v0.0.0-+ wants ~0.3.0\n: no version found matching criteria",
 		"expected GetModulesForService() to error")
 }
 
@@ -180,7 +180,7 @@ func TestSupportChannelAndConstraint(t *testing.T) {
 			Name: "testing-service",
 			Modules: []*configuration.TemplateRepository{
 				{
-					Name:    "github.com/rgst-io/stencil-base",
+					Name:    "github.com/getoutreach/stencil-base",
 					Channel: "rc",
 					Version: "v0.6.0-rc.4",
 				},
@@ -200,7 +200,7 @@ func TestCanUseBranch(t *testing.T) {
 			Name: "testing-service",
 			Modules: []*configuration.TemplateRepository{
 				{
-					Name:    "github.com/rgst-io/stencil-base",
+					Name:    "github.com/getoutreach/stencil-base",
 					Channel: "main",
 				},
 			},
@@ -211,7 +211,7 @@ func TestCanUseBranch(t *testing.T) {
 
 	var mod *modules.Module
 	for _, m := range mods {
-		if m.Name == "github.com/rgst-io/stencil-base" {
+		if m.Name == "github.com/getoutreach/stencil-base" {
 			mod = m
 			break
 		}
@@ -231,7 +231,7 @@ func TestBranchAlwaysUsedOverDependency(t *testing.T) {
 		Name: "test",
 		Modules: []*configuration.TemplateRepository{
 			{
-				Name:    "github.com/rgst-io/stencil-base",
+				Name:    "github.com/getoutreach/stencil-base",
 				Version: ">=v0.0.0",
 			},
 		},
@@ -247,7 +247,7 @@ func TestBranchAlwaysUsedOverDependency(t *testing.T) {
 			Name: "testing-service",
 			Modules: []*configuration.TemplateRepository{
 				{
-					Name:    "github.com/rgst-io/stencil-base",
+					Name:    "github.com/getoutreach/stencil-base",
 					Version: "main",
 				},
 				{
@@ -261,7 +261,7 @@ func TestBranchAlwaysUsedOverDependency(t *testing.T) {
 
 	var mod *modules.Module
 	for _, m := range mods {
-		if m.Name == "github.com/rgst-io/stencil-base" {
+		if m.Name == "github.com/getoutreach/stencil-base" {
 			mod = m
 			break
 		}
@@ -281,11 +281,11 @@ func TestCanRespectChannels(t *testing.T) {
 			Name: "testing-service",
 			Modules: []*configuration.TemplateRepository{
 				{
-					Name:    "github.com/rgst-io/stencil-base",
+					Name:    "github.com/getoutreach/stencil-base",
 					Channel: "rc",
 				},
 				{
-					Name: "github.com/rgst-io/stencil-base",
+					Name: "github.com/getoutreach/stencil-base",
 				},
 			},
 		},
@@ -349,11 +349,11 @@ func TestShouldErrorOnTwoDifferentChannels(t *testing.T) {
 			Name: "testing-service",
 			Modules: []*configuration.TemplateRepository{
 				{
-					Name:    "github.com/rgst-io/stencil-base",
+					Name:    "github.com/getoutreach/stencil-base",
 					Channel: "rc",
 				},
 				{
-					Name:    "github.com/rgst-io/stencil-base",
+					Name:    "github.com/getoutreach/stencil-base",
 					Channel: "unstable",
 				},
 			},

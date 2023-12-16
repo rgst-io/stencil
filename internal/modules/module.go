@@ -41,7 +41,7 @@ type Module struct {
 	t *template.Template
 
 	// Name is the name of a module. This should be a valid go
-	// import path. For example: github.com/rgst-io/stencil-base
+	// import path. For example: github.com/getoutreach/stencil-base
 	Name string
 
 	// URI is the underlying URI being used to download this module

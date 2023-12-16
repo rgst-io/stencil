@@ -11,6 +11,7 @@ import (
 	"context"
 	"io"
 	"os"
+	"path/filepath"
 
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/memfs"
@@ -28,7 +29,7 @@ func addTemplateToFS(fs billy.Filesystem, tpl string) error {
 	}
 	defer srcFile.Close()
 
-	destF, err := fs.Create(tpl)
+	destF, err := fs.Create(filepath.Join("templates", tpl))
 	if err != nil {
 		return errors.Wrapf(err, "failed to create template %q in memfs", tpl)
 	}

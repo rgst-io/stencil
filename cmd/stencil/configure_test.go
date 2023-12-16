@@ -25,8 +25,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name:       "github.com/rgst-io/stencil-template-base",
-						Prerelease: false,
+						Name: "github.com/rgst-io/stencil-template-base",
 					},
 				},
 				Arguments: map[string]interface{}{
@@ -41,8 +40,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name:       "github.com/rgst-io/stencil-template-base",
-						Prerelease: false,
+						Name: "github.com/rgst-io/stencil-template-base",
 					},
 				},
 				Arguments: map[string]interface{}{
@@ -61,8 +59,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name:       "github.com/rgst-io/stencil-template-base",
-						Prerelease: false,
+						Name: "github.com/rgst-io/stencil-template-base",
 					},
 				},
 				Arguments: map[string]interface{}{
@@ -77,8 +74,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name:       "github.com/rgst-io/stencil-template-base",
-						Prerelease: false,
+						Name: "github.com/rgst-io/stencil-template-base",
 					},
 				},
 				Arguments: map[string]interface{}{
@@ -99,8 +95,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name:       "github.com/rgst-io/stencil-template-base",
-						Prerelease: false,
+						Name: "github.com/rgst-io/stencil-template-base",
 					},
 				},
 				Arguments: map[string]interface{}{
@@ -117,8 +112,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name:       "github.com/rgst-io/stencil-template-base",
-						Prerelease: false,
+						Name: "github.com/rgst-io/stencil-template-base",
 					},
 				},
 				Arguments: map[string]interface{}{

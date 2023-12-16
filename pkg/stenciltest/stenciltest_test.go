@@ -50,9 +50,7 @@ func TestArgs(t *testing.T) {
 		path:                "testdata/args.tpl",
 		additionalTemplates: make([]string, 0),
 		m: &configuration.TemplateRepositoryManifest{Name: "testing", Arguments: map[string]configuration.Argument{
-			"hello": {
-				Type: "string",
-			},
+			"hello": {},
 		}},
 		t:       t,
 		persist: false,
