@@ -41,13 +41,13 @@ task test
 Create a tag locally:
 
 ```bash
-git tag -a vX.Y.Z
+git tag -s vX.Y.Z
 ```
 
 Push the tag:
 
 ```bash
-git push origin vX.Y.Z
+git push origin refs/tags/vX.Y.Z
 ```
 
 Wait for CI to build and publish the release (Github Actions).
