@@ -11,6 +11,7 @@ permissions:
 jobs:
   gotest:
     name: go test
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: jdx/rtx-action@v1
@@ -28,6 +29,7 @@ jobs:
 
   golangci-lint:
     name: golangci-lint
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: jdx/rtx-action@v1
