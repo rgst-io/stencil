@@ -52,7 +52,7 @@ func fakeTemplate(t *testing.T, args map[string]interface{},
 		t.Fatal(err)
 	}
 
-	test.s = NewStencil(&configuration.ServiceManifest{
+	test.s = NewStencil(&configuration.Manifest{
 		Name:      "testing",
 		Arguments: args,
 		Modules:   []*configuration.TemplateRepository{{Name: m.Name}},
@@ -73,10 +73,10 @@ func fakeTemplate(t *testing.T, args map[string]interface{},
 }
 
 // fakeTemplateMultipleModules returns a faked struct suitable for testing
-// that has multiple modules in the service manifest, the first arguments list
+// that has multiple modules in the project manifest, the first arguments list
 // is for the first module, the second is for the second module, and so forth.
 // the first module will import all other modules
-func fakeTemplateMultipleModules(t *testing.T, serviceManifestArgs map[string]interface{},
+func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]interface{},
 	args ...map[string]configuration.Argument) *testTpl {
 	test := &testTpl{}
 	log := logrus.New()
@@ -120,9 +120,9 @@ func fakeTemplateMultipleModules(t *testing.T, serviceManifestArgs map[string]in
 		moduleTr[i] = &configuration.TemplateRepository{Name: mods[i].Name}
 	}
 
-	test.s = NewStencil(&configuration.ServiceManifest{
+	test.s = NewStencil(&configuration.Manifest{
 		Name:      "testing",
-		Arguments: serviceManifestArgs,
+		Arguments: manifestArgs,
 		Modules:   moduleTr,
 	}, mods, log)
 

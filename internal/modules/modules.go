@@ -1,10 +1,10 @@
 // Copyright 2022 Outreach Corporation. All Rights Reserved.
 
 // Description: This file implements fetching modules for a given
-// service manifest.
+// project manifest.
 
 // Package modules implements all logic needed for interacting
-// with stencil modules and their interaction with a service generated
+// with stencil modules and their interaction with a project generated
 // by stencil.
 package modules
 
@@ -74,12 +74,12 @@ type ModuleResolveOptions struct {
 	// Log is the logger to use
 	Log logrus.FieldLogger
 
-	// ServiceManifest is the manifest to resolve modules for.
+	// Manifest is the manifest to resolve modules for.
 	// This can only be supplied if Module is not set.
-	ServiceManifest *configuration.ServiceManifest
+	Manifest *configuration.Manifest
 
 	// Module is the module to resolve dependencies for.
-	// This can only be supplied if ServiceManifest is not
+	// This can only be supplied if Manifest is not
 	// set. This module is automatically added as a
 	// Replacement.
 	Module *Module
@@ -91,11 +91,11 @@ type ModuleResolveOptions struct {
 	Replacements map[string]*Module
 }
 
-// GetModulesForService returns a list of modules that have been resolved from the provided
-// service manifest, respecting constraints and channels as needed.
+// GetModulesForProject returns a list of modules that have been resolved from the provided
+// project manifest, respecting constraints and channels as needed.
 //
 //nolint:funlen // Why: Will be refactored in the future
-func GetModulesForService(ctx context.Context, opts *ModuleResolveOptions) ([]*Module, error) {
+func GetModulesForProject(ctx context.Context, opts *ModuleResolveOptions) ([]*Module, error) {
 	// start resolving the top-level modules
 	modulesToResolve := make([]resolveModule, 0)
 
@@ -107,10 +107,10 @@ func GetModulesForService(ctx context.Context, opts *ModuleResolveOptions) ([]*M
 	// to track previous resolutions/constraints for re-resolving modules.
 	resolved := make(map[string]*resolvedModule)
 
-	if opts.ServiceManifest != nil {
-		sm := opts.ServiceManifest
+	if opts.Manifest != nil {
+		sm := opts.Manifest
 
-		// for each module required by the service manifest
+		// for each module required by the project manifest
 		// add it to the list of module to be resolved
 		for i := range sm.Modules {
 			modulesToResolve = append(modulesToResolve, resolveModule{

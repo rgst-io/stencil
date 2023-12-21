@@ -41,7 +41,7 @@ func TestSingleFileRender(t *testing.T) {
 	tpl, err := NewTemplate(m, "virtual-file.tpl", 0o644, time.Now(), []byte("hello world!"), logrus.New())
 	assert.NilError(t, err, "failed to create basic template")
 
-	sm := &configuration.ServiceManifest{Name: "testing"}
+	sm := &configuration.Manifest{Name: "testing"}
 
 	st := NewStencil(sm, []*modules.Module{m}, logrus.New())
 	err = tpl.Render(st, NewValues(context.Background(), sm, nil))
@@ -61,7 +61,7 @@ func TestMultiFileRender(t *testing.T) {
 		time.Now(), []byte(multiFileTemplate), logrus.New())
 	assert.NilError(t, err, "failed to create template")
 
-	sm := &configuration.ServiceManifest{Name: "testing", Arguments: map[string]interface{}{
+	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{
 		"commands": []string{"hello", "world", "command"},
 	}}
 
@@ -87,7 +87,7 @@ func TestMultiFileWithInputRender(t *testing.T) {
 		time.Now(), []byte(multiFileInputTemplate), logrus.New())
 	assert.NilError(t, err, "failed to create template")
 
-	sm := &configuration.ServiceManifest{Name: "testing", Arguments: map[string]interface{}{
+	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{
 		"commands": []string{"hello", "world", "command"},
 	}}
 
@@ -113,7 +113,7 @@ func TestApplyTemplateArgumentPassthrough(t *testing.T) {
 		time.Now(), []byte(applyTemplatePassthroughTemplate), logrus.New())
 	assert.NilError(t, err, "failed to create template")
 
-	sm := &configuration.ServiceManifest{Name: "testing", Arguments: map[string]interface{}{
+	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{
 		"commands": []string{"hello", "world", "command"},
 	}}
 
@@ -134,7 +134,7 @@ func TestGeneratedBlock(t *testing.T) {
 	f.Write([]byte("name: testing\n"))
 	f.Close()
 
-	sm := &configuration.ServiceManifest{Name: "testing", Arguments: map[string]interface{}{}}
+	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{}}
 	m := modules.NewWithFS(context.Background(), "testing", fs)
 
 	st := NewStencil(sm, []*modules.Module{m}, logrus.New())

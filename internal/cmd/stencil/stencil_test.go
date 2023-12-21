@@ -19,7 +19,7 @@ import (
 func TestCommand_useModulesFromLock(t *testing.T) {
 	type fields struct {
 		lock                      *stencil.Lockfile
-		manifest                  *configuration.ServiceManifest
+		manifest                  *configuration.Manifest
 		dryRun                    bool
 		allowMajorVersionUpgrades bool
 	}
@@ -33,7 +33,7 @@ func TestCommand_useModulesFromLock(t *testing.T) {
 			name: "should fail if lockfile is nil",
 			fields: fields{
 				lock: nil,
-				manifest: &configuration.ServiceManifest{
+				manifest: &configuration.Manifest{
 					Modules: []*configuration.TemplateRepository{
 						{
 							Name: "testing",
@@ -54,7 +54,7 @@ func TestCommand_useModulesFromLock(t *testing.T) {
 						},
 					},
 				},
-				manifest: &configuration.ServiceManifest{
+				manifest: &configuration.Manifest{
 					Modules: []*configuration.TemplateRepository{
 						{
 							Name: "testing",
@@ -81,7 +81,7 @@ func TestCommand_useModulesFromLock(t *testing.T) {
 						},
 					},
 				},
-				manifest: &configuration.ServiceManifest{
+				manifest: &configuration.Manifest{
 					Modules: []*configuration.TemplateRepository{},
 				},
 			},
@@ -99,7 +99,7 @@ func TestCommand_useModulesFromLock(t *testing.T) {
 				lock: &stencil.Lockfile{
 					Modules: []*stencil.LockfileModuleEntry{},
 				},
-				manifest: &configuration.ServiceManifest{
+				manifest: &configuration.Manifest{
 					Modules: []*configuration.TemplateRepository{
 						{
 							Name: "testing",
@@ -120,7 +120,7 @@ func TestCommand_useModulesFromLock(t *testing.T) {
 						},
 					},
 				},
-				manifest: &configuration.ServiceManifest{
+				manifest: &configuration.Manifest{
 					Modules: []*configuration.TemplateRepository{
 						{
 							Name:    "testing",

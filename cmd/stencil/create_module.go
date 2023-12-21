@@ -32,7 +32,7 @@ func NewCreateModule() *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			var manifestFileName = "service.yaml"
+			var manifestFileName = "stencil.yaml"
 
 			// ensure we have a name
 			if c.NArg() != 1 {
@@ -78,7 +78,7 @@ func NewCreateModule() *cli.Command {
 				"enablePrereleases": true,
 			}
 
-			tm := &configuration.ServiceManifest{
+			tm := &configuration.Manifest{
 				Name: path.Base(c.Args().Get(0)),
 				Modules: []*configuration.TemplateRepository{{
 					Name: "github.com/rgst-io/stencil-template-base",

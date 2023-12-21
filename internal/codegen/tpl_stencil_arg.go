@@ -19,7 +19,7 @@ import (
 	"github.com/santhosh-tekuri/jsonschema/v5"
 )
 
-// Arg returns the value of an argument in the service's manifest
+// Arg returns the value of an argument in the project's manifest
 //
 //	{{- stencil.Arg "name" }}
 func (s *TplStencil) Arg(pth string) (interface{}, error) {

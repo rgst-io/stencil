@@ -61,7 +61,7 @@ func uriIsLocal(uri string) bool {
 
 // New creates a new module from a TemplateRepository. Version must be set and can
 // be obtained via the gobox/pkg/cli/updater/resolver package, or by using the
-// GetModulesForService function.
+// GetModulesForProject function.
 //
 // uri is the URI for the module. If it is an empty string https://+name is used
 // instead.

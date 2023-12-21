@@ -25,7 +25,7 @@ import (
 )
 
 // NewStencil creates a new, fully initialized Stencil renderer function
-func NewStencil(m *configuration.ServiceManifest, mods []*modules.Module, log logrus.FieldLogger) *Stencil {
+func NewStencil(m *configuration.Manifest, mods []*modules.Module, log logrus.FieldLogger) *Stencil {
 	return &Stencil{
 		log:         log,
 		m:           m,
@@ -40,7 +40,7 @@ func NewStencil(m *configuration.ServiceManifest, mods []*modules.Module, log lo
 // stencil templates
 type Stencil struct {
 	log logrus.FieldLogger
-	m   *configuration.ServiceManifest
+	m   *configuration.Manifest
 
 	ext       *extensions.Host
 	extCaller *extensions.ExtensionCaller
@@ -182,7 +182,7 @@ func (s *Stencil) sortModuleHooks() {
 	}
 }
 
-// Render renders all templates using the ServiceManifest that was
+// Render renders all templates using the Manifest that was
 // provided to stencil at creation time, returned is the templates
 // that were produced and their associated files.
 func (s *Stencil) Render(ctx context.Context, log logrus.FieldLogger) ([]*Template, error) {
@@ -238,7 +238,7 @@ func (s *Stencil) Render(ctx context.Context, log logrus.FieldLogger) ([]*Templa
 }
 
 // PostRun runs all post run commands specified in the modules that
-// this service depends on
+// this project depends on
 func (s *Stencil) PostRun(ctx context.Context, log logrus.FieldLogger) error {
 	log.Info("Running post-run command(s)")
 	for _, m := range s.modules {
