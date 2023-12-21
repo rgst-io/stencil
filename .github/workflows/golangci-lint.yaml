@@ -1,4 +1,4 @@
-name: golangci-lint
+name: tests
 on:
   push:
     branches:
@@ -9,8 +9,26 @@ permissions:
   contents: read
 
 jobs:
-  golangci:
-    name: lint
+  gotest:
+    name: go test
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/rtx-action@v1
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Run go test
+        run: |
+          go run gotest.tools/gotestsum@latest -- -coverprofile=cover.out ./...
+      - name: Upload test coverage
+        uses: codecov/codecov-action@v4.0.0-beta.3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./cover.out
+          fail_ci_if_error: true
+
+  golangci-lint:
+    name: golangci-lint
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
