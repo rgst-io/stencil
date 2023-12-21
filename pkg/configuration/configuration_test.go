@@ -24,8 +24,8 @@ func ExampleValidateName() {
 	// success: false
 }
 
-func ExampleNewServiceManifest() {
-	sm, err := configuration.NewServiceManifest("testdata/service.yaml")
+func ExampleNewManifest() {
+	sm, err := configuration.NewManifest("testdata/stencil.yaml")
 	if err != nil {
 		// handle the error
 		fmt.Println("error:", err)

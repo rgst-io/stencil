@@ -56,7 +56,7 @@ func TestValues(t *testing.T) {
 	})
 	assert.NilError(t, err, "expected worktree.Checkout() not to fail")
 
-	sm := &configuration.ServiceManifest{
+	sm := &configuration.Manifest{
 		Name: "testing",
 	}
 
@@ -106,7 +106,7 @@ func TestGeneratedValues(t *testing.T) {
 	m, err := modulestest.NewModuleFromTemplates(man, "testdata/values/values.tpl")
 	assert.NilError(t, err, "failed to create module")
 
-	st := NewStencil(&configuration.ServiceManifest{
+	st := NewStencil(&configuration.Manifest{
 		Name:      "testing",
 		Arguments: map[string]interface{}{},
 	}, []*modules.Module{m}, log)

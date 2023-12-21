@@ -2,7 +2,6 @@
 
 [![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/rgst-io/stencil)
 
-
 A modern repository templating engine
 
 **Note**: This has been forked from [getoutreach/stencil](https://github.com/getoutreach/stencil) and is currently
@@ -15,8 +14,7 @@ under construction.
 **Note**: If you opt to not use `rtx`, please install all dependencies
 from `.tool-versions` manually.
 
-- [rtx](https://github.com/jdx/rtx)
-
+- [rtx](https://github.com/jdx/rtx?tab=readme-ov-file#quickstart) - Ensure that you add the appropriate activations to your shell rc/profiles (details in the rtx README)
 
 Install the dependencies:
 

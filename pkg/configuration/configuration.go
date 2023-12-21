@@ -14,19 +14,19 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// ValidateNameRegexp is the regex used to validate the service's name
+// ValidateNameRegexp is the regex used to validate the project's name
 const ValidateNameRegexp = `^[_a-z][_a-z0-9-]*$`
 
-// NewServiceManifest reads a service manifest from disk at the
+// NewManifest reads a manifest from disk at the
 // specified path, parses it, and returns the output.
-func NewServiceManifest(path string) (*ServiceManifest, error) {
+func NewManifest(path string) (*Manifest, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 
-	var s *ServiceManifest
+	var s *Manifest
 	if err := yaml.NewDecoder(f).Decode(&s); err != nil {
 		return nil, err
 	}
@@ -38,19 +38,19 @@ func NewServiceManifest(path string) (*ServiceManifest, error) {
 	return s, nil
 }
 
-// NewDefaultServiceManifest returns a parsed service manifest
+// NewDefaultManifest returns a parsed project manifest
 // from a set default path on disk.
-func NewDefaultServiceManifest() (*ServiceManifest, error) {
-	return NewServiceManifest("service.yaml")
+func NewDefaultManifest() (*Manifest, error) {
+	return NewManifest("stencil.yaml")
 }
 
-// ServiceManifest is a manifest used to describe a service and impact
+// Manifest is a manifest used to describe a project and impact
 // what files are included
-type ServiceManifest struct {
-	// Name is the name of the service
+type Manifest struct {
+	// Name is the name of the project
 	Name string `yaml:"name"`
 
-	// Modules are the template modules that this service depends
+	// Modules are the template modules that this project depends
 	// on and utilizes
 	Modules []*TemplateRepository `yaml:"modules,omitempty"`
 
@@ -140,7 +140,7 @@ type Argument struct {
 	From string `yaml:"from"`
 }
 
-// ValidateName ensures that the name of a service in the manifest
+// ValidateName ensures that the name of a project in the manifest
 // fits the criteria we require.
 func ValidateName(name string) bool {
 	// This is more restrictive than the actual spec.  We're artificially

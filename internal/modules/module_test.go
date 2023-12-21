@@ -40,8 +40,8 @@ func TestCanFetchModule(t *testing.T) {
 }
 
 func TestReplacementLocalModule(t *testing.T) {
-	sm := &configuration.ServiceManifest{
-		Name: "testing-service",
+	sm := &configuration.Manifest{
+		Name: "testing-project",
 		Modules: []*configuration.TemplateRepository{
 			{
 				Name: "github.com/getoutreach/stencil-base",
@@ -52,8 +52,8 @@ func TestReplacementLocalModule(t *testing.T) {
 		},
 	}
 
-	mods, err := modules.GetModulesForService(context.Background(), &modules.ModuleResolveOptions{ServiceManifest: sm, Log: newLogger()})
-	assert.NilError(t, err, "expected GetModulesForService() to not error")
+	mods, err := modules.GetModulesForProject(context.Background(), &modules.ModuleResolveOptions{Manifest: sm, Log: newLogger()})
+	assert.NilError(t, err, "expected GetModulesForProject() to not error")
 	assert.Equal(t, len(mods), 1, "expected exactly one module to be returned")
 	assert.Equal(t, mods[0].URI, sm.Replacements["github.com/getoutreach/stencil-base"],
 		"expected module to use replacement URI")
@@ -61,9 +61,9 @@ func TestReplacementLocalModule(t *testing.T) {
 
 func TestCanGetLatestVersion(t *testing.T) {
 	ctx := context.Background()
-	mods, err := modules.GetModulesForService(ctx, &modules.ModuleResolveOptions{
-		ServiceManifest: &configuration.ServiceManifest{
-			Name: "testing-service",
+	mods, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
+		Manifest: &configuration.Manifest{
+			Name: "testing-project",
 			Modules: []*configuration.TemplateRepository{
 				{
 					Name: "github.com/getoutreach/stencil-base",
@@ -72,15 +72,15 @@ func TestCanGetLatestVersion(t *testing.T) {
 		},
 		Log: newLogger(),
 	})
-	assert.NilError(t, err, "failed to call GetModulesForService()")
+	assert.NilError(t, err, "failed to call GetModulesForProject()")
 	assert.Assert(t, len(mods) >= 1, "expected at least one module to be returned")
 }
 
 func TestHandleMultipleConstraints(t *testing.T) {
 	ctx := context.Background()
-	mods, err := modules.GetModulesForService(ctx, &modules.ModuleResolveOptions{
-		ServiceManifest: &configuration.ServiceManifest{
-			Name: "testing-service",
+	mods, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
+		Manifest: &configuration.Manifest{
+			Name: "testing-project",
 			Modules: []*configuration.TemplateRepository{
 				{
 					Name:    "github.com/getoutreach/stencil-base",
@@ -96,7 +96,7 @@ func TestHandleMultipleConstraints(t *testing.T) {
 		},
 		Log: newLogger(),
 	})
-	assert.NilError(t, err, "failed to call GetModulesForService()")
+	assert.NilError(t, err, "failed to call GetModulesForProject()")
 	assert.Equal(t, len(mods), 2, "expected exactly two modules to be returned")
 
 	// find stencil-base to validate version
@@ -115,9 +115,9 @@ func TestHandleMultipleConstraints(t *testing.T) {
 
 func TestHandleNestedModules(t *testing.T) {
 	ctx := context.Background()
-	mods, err := modules.GetModulesForService(ctx, &modules.ModuleResolveOptions{
-		ServiceManifest: &configuration.ServiceManifest{
-			Name: "testing-service",
+	mods, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
+		Manifest: &configuration.Manifest{
+			Name: "testing-project",
 			Modules: []*configuration.TemplateRepository{
 				{
 					Name: "a",
@@ -130,7 +130,7 @@ func TestHandleNestedModules(t *testing.T) {
 		},
 		Log: newLogger(),
 	})
-	assert.NilError(t, err, "failed to call GetModulesForService()")
+	assert.NilError(t, err, "failed to call GetModulesForProject()")
 
 	// ensure that a resolved b
 	assert.Equal(t, len(mods), 2, "expected exactly two modules to be returned")
@@ -148,9 +148,9 @@ func TestHandleNestedModules(t *testing.T) {
 
 func TestFailOnIncompatibleConstraints(t *testing.T) {
 	ctx := context.Background()
-	_, err := modules.GetModulesForService(ctx, &modules.ModuleResolveOptions{
-		ServiceManifest: &configuration.ServiceManifest{
-			Name: "testing-service",
+	_, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
+		Manifest: &configuration.Manifest{
+			Name: "testing-project",
 			Modules: []*configuration.TemplateRepository{
 				{
 					Name:    "github.com/getoutreach/stencil-base",
@@ -169,15 +169,15 @@ func TestFailOnIncompatibleConstraints(t *testing.T) {
 	})
 	assert.Error(t, err,
 		//nolint:lll // Why: That's the error :(
-		"failed to resolve module 'github.com/getoutreach/stencil-base' with constraints\n└─ testing-service (top-level) wants >=0.5.0\n  └─ nested_constraint@v0.0.0-+ wants ~0.3.0\n: no version found matching criteria",
-		"expected GetModulesForService() to error")
+		"failed to resolve module 'github.com/getoutreach/stencil-base' with constraints\n└─ testing-project (top-level) wants >=0.5.0\n  └─ nested_constraint@v0.0.0-+ wants ~0.3.0\n: no version found matching criteria",
+		"expected GetModulesForProject() to error")
 }
 
 func TestSupportChannelAndConstraint(t *testing.T) {
 	ctx := context.Background()
-	mods, err := modules.GetModulesForService(ctx, &modules.ModuleResolveOptions{
-		ServiceManifest: &configuration.ServiceManifest{
-			Name: "testing-service",
+	mods, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
+		Manifest: &configuration.Manifest{
+			Name: "testing-project",
 			Modules: []*configuration.TemplateRepository{
 				{
 					Name:    "github.com/getoutreach/stencil-base",
@@ -188,16 +188,16 @@ func TestSupportChannelAndConstraint(t *testing.T) {
 		},
 		Log: newLogger(),
 	})
-	assert.NilError(t, err, "failed to call GetModulesForService()")
+	assert.NilError(t, err, "failed to call GetModulesForProject()")
 	assert.Equal(t, len(mods), 1, "expected exactly one module to be returned")
 	assert.Equal(t, mods[0].Version, "v0.6.0-rc.4", "expected module to match")
 }
 
 func TestCanUseBranch(t *testing.T) {
 	ctx := context.Background()
-	mods, err := modules.GetModulesForService(ctx, &modules.ModuleResolveOptions{
-		ServiceManifest: &configuration.ServiceManifest{
-			Name: "testing-service",
+	mods, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
+		Manifest: &configuration.Manifest{
+			Name: "testing-project",
 			Modules: []*configuration.TemplateRepository{
 				{
 					Name:    "github.com/getoutreach/stencil-base",
@@ -207,7 +207,7 @@ func TestCanUseBranch(t *testing.T) {
 		},
 		Log: newLogger(),
 	})
-	assert.NilError(t, err, "failed to call GetModulesForService()")
+	assert.NilError(t, err, "failed to call GetModulesForProject()")
 
 	var mod *modules.Module
 	for _, m := range mods {
@@ -239,12 +239,12 @@ func TestBranchAlwaysUsedOverDependency(t *testing.T) {
 	mDep, err := modulestest.NewModuleFromTemplates(man)
 	assert.NilError(t, err, "failed to create dep module")
 
-	// Resolve a fake service that requires a branch of a dependency that the in-memory module also requires
+	// Resolve a fake project that requires a branch of a dependency that the in-memory module also requires
 	// but with a different version constraint
-	mods, err := modules.GetModulesForService(ctx, &modules.ModuleResolveOptions{
+	mods, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
 		Replacements: map[string]*modules.Module{"test-dep": mDep},
-		ServiceManifest: &configuration.ServiceManifest{
-			Name: "testing-service",
+		Manifest: &configuration.Manifest{
+			Name: "testing-project",
 			Modules: []*configuration.TemplateRepository{
 				{
 					Name:    "github.com/getoutreach/stencil-base",
@@ -257,7 +257,7 @@ func TestBranchAlwaysUsedOverDependency(t *testing.T) {
 		},
 		Log: newLogger(),
 	})
-	assert.NilError(t, err, "failed to call GetModulesForService()")
+	assert.NilError(t, err, "failed to call GetModulesForProject()")
 
 	var mod *modules.Module
 	for _, m := range mods {
@@ -276,9 +276,9 @@ func TestBranchAlwaysUsedOverDependency(t *testing.T) {
 func TestCanRespectChannels(t *testing.T) {
 	t.Skip("Breaks when a module isn't currently on an rc version")
 	ctx := context.Background()
-	mods, err := modules.GetModulesForService(ctx, &modules.ModuleResolveOptions{
-		ServiceManifest: &configuration.ServiceManifest{
-			Name: "testing-service",
+	mods, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
+		Manifest: &configuration.Manifest{
+			Name: "testing-project",
 			Modules: []*configuration.TemplateRepository{
 				{
 					Name:    "github.com/getoutreach/stencil-base",
@@ -291,7 +291,7 @@ func TestCanRespectChannels(t *testing.T) {
 		},
 		Log: newLogger(),
 	})
-	assert.NilError(t, err, "failed to call GetModulesForService()")
+	assert.NilError(t, err, "failed to call GetModulesForProject()")
 	assert.Equal(t, len(mods), 1, "expected exactly one module to be returned")
 	if !strings.Contains(mods[0].Version, "-rc.") {
 		t.Fatalf("expected module to be an RC, but got %s", mods[0].Version)
@@ -324,12 +324,12 @@ func TestShouldResolveInMemoryModule(t *testing.T) {
 	mDep, err := modulestest.NewModuleFromTemplates(man)
 	assert.NilError(t, err, "failed to create dep module")
 
-	mods, err := modules.GetModulesForService(ctx, &modules.ModuleResolveOptions{
+	mods, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
 		Module:       m,
 		Replacements: map[string]*modules.Module{"test-dep": mDep},
 		Log:          newLogger(),
 	})
-	assert.NilError(t, err, "failed to call GetModulesForService()")
+	assert.NilError(t, err, "failed to call GetModulesForProject()")
 	assert.Equal(t, len(mods), 2, "expected exactly two modules to be returned")
 
 	var mod *modules.Module
@@ -344,9 +344,9 @@ func TestShouldResolveInMemoryModule(t *testing.T) {
 
 func TestShouldErrorOnTwoDifferentChannels(t *testing.T) {
 	ctx := context.Background()
-	_, err := modules.GetModulesForService(ctx, &modules.ModuleResolveOptions{
-		ServiceManifest: &configuration.ServiceManifest{
-			Name: "testing-service",
+	_, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
+		Manifest: &configuration.Manifest{
+			Name: "testing-project",
 			Modules: []*configuration.TemplateRepository{
 				{
 					Name:    "github.com/getoutreach/stencil-base",
@@ -360,5 +360,5 @@ func TestShouldErrorOnTwoDifferentChannels(t *testing.T) {
 		},
 		Log: newLogger(),
 	})
-	assert.ErrorContains(t, err, "previously resolved with channel", "expected GetModulesForService() to error")
+	assert.ErrorContains(t, err, "previously resolved with channel", "expected GetModulesForProject() to error")
 }

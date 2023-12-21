@@ -31,7 +31,7 @@ func TestBasicE2ERender(t *testing.T) {
 	f.Write([]byte("{{ .Config.Name }}"))
 	f.Close()
 
-	st := NewStencil(&configuration.ServiceManifest{
+	st := NewStencil(&configuration.Manifest{
 		Name:      "test",
 		Arguments: map[string]interface{}{},
 	}, []*modules.Module{
@@ -83,7 +83,7 @@ func TestModuleHookRender(t *testing.T) {
 		t.Errorf("failed to create module 2: %v", err)
 	}
 
-	st := NewStencil(&configuration.ServiceManifest{
+	st := NewStencil(&configuration.Manifest{
 		Name:      "test",
 		Arguments: map[string]interface{}{},
 	}, []*modules.Module{m1, m2}, logrus.New())
@@ -107,7 +107,7 @@ func ExampleStencil_PostRun() {
 	nullLog := logrus.New()
 	nullLog.SetOutput(io.Discard)
 
-	st := NewStencil(&configuration.ServiceManifest{
+	st := NewStencil(&configuration.Manifest{
 		Name:      "test",
 		Arguments: map[string]interface{}{},
 	}, []*modules.Module{

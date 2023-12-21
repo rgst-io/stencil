@@ -31,8 +31,8 @@ func NewConfigureModuleCmd() *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			// Call readAndMergeServiceYaml to update the service yaml to add or remove the native-extension fields.
-			if err := readAndMergeServiceYaml("service.yaml", c.Bool("remove-native-extension"), "foo"); err != nil {
+			// Call readAndMergeStencilYaml to update the stencil.yaml to add or remove the native-extension fields.
+			if err := readAndMergeStencilYaml("stencil.yaml", c.Bool("remove-native-extension"), "foo"); err != nil {
 				if err.Error() == "no action" {
 					return nil
 				}
@@ -48,17 +48,17 @@ func NewConfigureModuleCmd() *cli.Command {
 	}
 }
 
-// readAndMergeServiceYaml takes a path and a bool and updates the service.yaml to create/remove fields
+// readAndMergeStencilYaml takes a path and a bool and updates the stencil.yaml to create/remove fields
 // associated with native-extensions.
-func readAndMergeServiceYaml(path string, removeNativeExtension bool, input string) error {
+func readAndMergeStencilYaml(path string, removeNativeExtension bool, input string) error {
 	log := logrus.New()
 	if path == "" {
-		path = "service.yaml"
+		path = "stencil.yaml"
 	}
-	var tm = &configuration.ServiceManifest{}
+	var tm = &configuration.Manifest{}
 
 	if _, err := os.Stat(path); err != nil {
-		return errors.Wrap(err, "service.yaml must exist")
+		return errors.Wrap(err, path+" must exist")
 	}
 
 	b, err := os.ReadFile(path)
@@ -76,7 +76,7 @@ func readAndMergeServiceYaml(path string, removeNativeExtension bool, input stri
 
 	if !removeNativeExtension {
 		// Note that for any additions to the configure command this line may need to be updated/removed.
-		// This section avoids removing any comments in the service.yaml file by overwriting it if there's no action to be taken.
+		// This section avoids removing any comments in the stencil.yaml file by overwriting it if there's no action to be taken.
 		if tm.Arguments["plugin"] == true && releaseOpts["force"] == true {
 			log.Info("The module is already a native extension, no action taken.")
 			return errors.New("no action")
@@ -85,7 +85,7 @@ func readAndMergeServiceYaml(path string, removeNativeExtension bool, input stri
 		releaseOpts["force"] = true
 	} else {
 		// Note that for any additions to the configure command this line may need to be updated/removed.
-		// This section avoids removing any comments in the service.yaml file by overwriting it if there's no action to be taken.
+		// This section avoids removing any comments in the stencil.yaml file by overwriting it if there's no action to be taken.
 		_, ok := tm.Arguments["plugin"]
 		if !ok {
 			log.Info("The module is already not a native extension, no action taken.")
@@ -97,10 +97,10 @@ func readAndMergeServiceYaml(path string, removeNativeExtension bool, input stri
 
 	if input != "" {
 		reader := bufio.NewReader(os.Stdin)
-		log.Info("This will remove any comments in your service.yaml, are you sure you want to proceed? y/N")
+		log.Info("This will remove any comments in your stencil.yaml, are you sure you want to proceed? y/N")
 		text, err := reader.ReadString('\n')
 		if err != nil {
-			return errors.Wrap(err, "failed to get user input for overwriting service.yaml")
+			return errors.Wrap(err, "failed to get user input for overwriting stencil.yaml")
 		}
 		if strings.TrimSpace(text) != "y" {
 			log.Info("No action taken")

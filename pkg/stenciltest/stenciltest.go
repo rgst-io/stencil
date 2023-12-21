@@ -130,7 +130,7 @@ func (t *Template) getModuleDependencies(ctx context.Context, m *modules.Module)
 		fmt.Fprintf(os.Stderr, "Warning: failed to get github token: %v", err)
 	}
 
-	mods, err := modules.GetModulesForService(ctx, &modules.ModuleResolveOptions{
+	mods, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
 		Token:  token,
 		Module: m,
 		Log:    t.log,
@@ -152,7 +152,7 @@ func (t *Template) Run(save bool) {
 		}
 		mods = append(mods, m)
 
-		mf := &configuration.ServiceManifest{
+		mf := &configuration.Manifest{
 			Name:      "testing",
 			Arguments: t.args,
 			Modules:   []*configuration.TemplateRepository{{Name: m.Name}},

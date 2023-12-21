@@ -60,7 +60,7 @@ type git struct {
 }
 
 // config contains a small amount of configuration that
-// originates from the service manifest and is propagated
+// originates from the project manifest and is propagated
 // here.
 type config struct {
 	// Name is the name of this repository
@@ -106,7 +106,7 @@ type Values struct {
 	// Runtime is information about the current runtime environment
 	Runtime runtime
 
-	// Config is strongly type values from the service manifest
+	// Config is strongly typed values from the project manifest
 	Config config
 
 	// Module is information about the current module being rendered
@@ -141,7 +141,7 @@ func (v *Values) WithTemplate(name string) *Values {
 
 // NewValues returns a fully initialized Values
 // based on the current runtime environment.
-func NewValues(ctx context.Context, sm *configuration.ServiceManifest, mods []*modules.Module) *Values {
+func NewValues(ctx context.Context, sm *configuration.Manifest, mods []*modules.Module) *Values {
 	vals := &Values{
 		Git: git{},
 		Runtime: runtime{

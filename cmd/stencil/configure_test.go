@@ -14,14 +14,14 @@ func TestConfigureModule(t *testing.T) {
 	tt := []struct {
 		Name                      string
 		RemoveNativeExtensionFlag bool
-		Given                     configuration.ServiceManifest
-		Expected                  configuration.ServiceManifest
+		Given                     configuration.Manifest
+		Expected                  configuration.Manifest
 		ShouldError               bool
 	}{
 		{
-			Name:                      "EnsureServiceNoChangeWithoutFlag",
+			Name:                      "EnsureProjectNoChangeWithoutFlag",
 			RemoveNativeExtensionFlag: true,
-			Given: configuration.ServiceManifest{
+			Given: configuration.Manifest{
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
@@ -36,7 +36,7 @@ func TestConfigureModule(t *testing.T) {
 					"reportingTeam": "test_name",
 				},
 			},
-			Expected: configuration.ServiceManifest{
+			Expected: configuration.Manifest{
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
@@ -55,7 +55,7 @@ func TestConfigureModule(t *testing.T) {
 		}, {
 			Name:                      "EnsureNativeExtensionAddition",
 			RemoveNativeExtensionFlag: false,
-			Given: configuration.ServiceManifest{
+			Given: configuration.Manifest{
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
@@ -70,7 +70,7 @@ func TestConfigureModule(t *testing.T) {
 					"reportingTeam": "test_name",
 				},
 			},
-			Expected: configuration.ServiceManifest{
+			Expected: configuration.Manifest{
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
@@ -91,7 +91,7 @@ func TestConfigureModule(t *testing.T) {
 		}, {
 			Name:                      "EnsureNativeExtensionReversion",
 			RemoveNativeExtensionFlag: true,
-			Given: configuration.ServiceManifest{
+			Given: configuration.Manifest{
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
@@ -108,7 +108,7 @@ func TestConfigureModule(t *testing.T) {
 					"reportingTeam": "test_name",
 				},
 			},
-			Expected: configuration.ServiceManifest{
+			Expected: configuration.Manifest{
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
@@ -131,11 +131,11 @@ func TestConfigureModule(t *testing.T) {
 		test := test
 
 		t.Run(test.Name, func(t *testing.T) {
-			var tm = &configuration.ServiceManifest{}
-			var comp = &configuration.ServiceManifest{}
+			var tm = &configuration.Manifest{}
+			var comp = &configuration.Manifest{}
 
-			// Create temporary service.yaml with valid values
-			tempFile := filepath.Join(t.TempDir(), "service.yaml")
+			// Create temporary stencil.yaml with valid values
+			tempFile := filepath.Join(t.TempDir(), "stencil.yaml")
 			b, err := yaml.Marshal(test.Given)
 			assert.NilError(t, err, "failed to marshal given yaml")
 			assert.NilError(t, os.WriteFile(tempFile, b, 0o777), "failed to write file")
@@ -146,19 +146,19 @@ func TestConfigureModule(t *testing.T) {
 			err = yaml.Unmarshal(b, tm)
 			assert.NilError(t, err, "failed to unmarshal expected yaml")
 
-			// configure the service.yaml and compare to expected
-			err = readAndMergeServiceYaml(tempFile, test.RemoveNativeExtensionFlag, "")
+			// configure the stencil.yaml and compare to expected
+			err = readAndMergeStencilYaml(tempFile, test.RemoveNativeExtensionFlag, "")
 			if test.ShouldError == true {
 				assert.Error(t, err, "no action")
 			} else {
-				assert.NilError(t, err, "failed to read and configure service.yaml")
+				assert.NilError(t, err, "failed to read and configure stencil.yaml")
 			}
 
 			b, err = os.ReadFile(tempFile)
-			assert.NilError(t, err, "failed to read service.yaml")
+			assert.NilError(t, err, "failed to read stencil.yaml")
 
 			err = yaml.Unmarshal(b, comp)
-			assert.NilError(t, err, "failed to unmarshal service.yaml")
+			assert.NilError(t, err, "failed to unmarshal stencil.yaml")
 
 			assert.DeepEqual(t, tm, comp)
 		})

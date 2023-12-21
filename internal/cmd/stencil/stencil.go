@@ -35,9 +35,9 @@ type Command struct {
 	// lock is the current stencil lockfile at command creation time
 	lock *stencil.Lockfile
 
-	// manifest is the service manifest that is being used
+	// manifest is the project manifest that is being used
 	// for this template render
-	manifest *configuration.ServiceManifest
+	manifest *configuration.Manifest
 
 	// log is the logger used for logging output
 	log logrus.FieldLogger
@@ -58,7 +58,7 @@ type Command struct {
 }
 
 // NewCommand creates a new stencil command
-func NewCommand(log logrus.FieldLogger, s *configuration.ServiceManifest,
+func NewCommand(log logrus.FieldLogger, s *configuration.Manifest,
 	dryRun, frozen, allowMajorVersionUpgrades bool) *Command {
 	l, err := stencil.LoadLockfile("")
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
@@ -92,10 +92,10 @@ func (c *Command) Run(ctx context.Context) error {
 	}
 
 	c.log.Info("Fetching dependencies")
-	mods, err := modules.GetModulesForService(ctx, &modules.ModuleResolveOptions{
-		ServiceManifest: c.manifest,
-		Token:           c.token,
-		Log:             c.log,
+	mods, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
+		Manifest: c.manifest,
+		Token:    c.token,
+		Log:      c.log,
 	})
 	if err != nil {
 		return errors.Wrap(err, "failed to process modules list")
@@ -138,7 +138,7 @@ func (c *Command) Run(ctx context.Context) error {
 
 // useModulesFromLock uses the modules from the lockfile instead
 // of the latest versions, or manually supplied versions in the
-// service manifest.
+// project manifest.
 func (c *Command) useModulesFromLock() error {
 	if c.lock == nil {
 		return fmt.Errorf("frozen lockfile requires a lockfile to exist")
@@ -164,13 +164,13 @@ func (c *Command) useModulesFromLock() error {
 		if _, ok := lockfileModulesHM[m.Name]; !ok {
 			outOfSync = true
 			outOfSyncReasons = append(outOfSyncReasons,
-				fmt.Sprintf("module %s requested by service.yaml but is not in the lockfile", m.Name))
+				fmt.Sprintf("module %s requested by stencil.yaml but is not in the lockfile", m.Name))
 		}
 	}
 
 	if outOfSync {
 		c.log.WithField("reasons", outOfSyncReasons).Debug("lockfile out of sync reasons")
-		c.log.Error("Unable to use frozen lockfile, the lockfile is out of sync with the service.yaml")
+		c.log.Error("Unable to use frozen lockfile, the lockfile is out of sync with the stencil.yaml")
 		return fmt.Errorf("lockfile out of sync")
 	}
 

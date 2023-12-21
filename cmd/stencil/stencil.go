@@ -40,7 +40,7 @@ func main() {
 	app := cli.App{
 		Version:     version.Version,
 		Name:        "stencil",
-		Description: "a smart templating engine for service development",
+		Description: "a smart templating engine for project development",
 		Action: func(c *cli.Context) error {
 			log.Infof("stencil %s", c.App.Version)
 
@@ -49,12 +49,12 @@ func main() {
 				log.Debug("Debug logging enabled")
 			}
 
-			serviceManifest, err := configuration.NewDefaultServiceManifest()
+			manifest, err := configuration.NewDefaultManifest()
 			if err != nil {
-				return errors.Wrap(err, "failed to parse service.yaml")
+				return errors.Wrap(err, "failed to parse stencil.yaml")
 			}
 
-			cmd := stencil.NewCommand(log, serviceManifest, c.Bool("dry-run"),
+			cmd := stencil.NewCommand(log, manifest, c.Bool("dry-run"),
 				c.Bool("frozen-lockfile"), c.Bool("allow-major-version-upgrades"))
 			return errors.Wrap(cmd.Run(ctx), "run codegen")
 		},
