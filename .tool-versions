@@ -1,4 +1,4 @@
-golang 1.21.5
+golang 1.21.6
 shfmt 3.7.0
 golangci-lint 1.55.2
 task 3.32.0
