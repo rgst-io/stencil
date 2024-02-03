@@ -18,12 +18,12 @@ jobs:
         with:
           fetch-depth: 0
       - run: git fetch --force --tags
-      - uses: jdx/rtx-action@v1
+      - uses: jdx/mise-action@v1
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Retrieve goreleaser version
         run: |
-          echo "version=$(rtx current goreleaser)" >> "$GITHUB_OUTPUT"
+          echo "version=$(mise current goreleaser)" >> "$GITHUB_OUTPUT"
         id: goreleaser
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
