@@ -21,9 +21,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
       - name: Run go test
         run: |
-          go run gotest.tools/gotestsum@latest -- -coverprofile=cover.out ./...
+          gotestsum -- -coverprofile=cover.out ./...
       - name: Upload test coverage
-        uses: codecov/codecov-action@v4.0.0-beta.3
+        uses: codecov/codecov-action@v4.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./cover.out
