@@ -18,7 +18,7 @@ jobs:
         with:
           fetch-depth: 0
       - run: git fetch --force --tags
-      - uses: jdx/mise-action@v1
+      - uses: jdx/mise-action@v2
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Retrieve goreleaser version
