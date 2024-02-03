@@ -1,0 +1,11 @@
+[tasks.build]
+description = "Build a binary for the current platform/architecture"
+run = "go build -trimpath -o ./bin/ -v ./cmd/stencil"
+
+[tasks.test]
+description = "Run tests"
+run = "gotestsum"
+
+[tasks.lint]
+description = "Run linters"
+run = "golangci-lint run"

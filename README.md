@@ -11,27 +11,27 @@ under construction.
 
 ### Prerequisites
 
-**Note**: If you opt to not use `rtx`, please install all dependencies
+**Note**: If you opt to not use `mise`, please install all dependencies
 from `.tool-versions` manually.
 
-- [rtx](https://github.com/jdx/rtx?tab=readme-ov-file#quickstart) - Ensure that you add the appropriate activations to your shell rc/profiles (details in the rtx README)
+- [mise](https://github.com/jdx/mise?tab=readme-ov-file#quickstart) - Ensure that you add the appropriate activations to your shell rc/profiles (details in the mise README)
 
 Install the dependencies:
 
 ```bash
-rtx install
+mise install
 ```
 
 ### Building
 
 ```bash
-task build
+mise run build
 ```
 
 ### Testing
 
 ```bash
-task test
+mise run test
 ```
 
 ### Releasing
