@@ -17,8 +17,8 @@ import (
 	"github.com/getoutreach/gobox/pkg/cfg"
 	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
 	"github.com/pkg/errors"
-	"go.rgst.io/stencil/pkg/configuration"
 	"github.com/sirupsen/logrus"
+	"go.rgst.io/stencil/pkg/configuration"
 )
 
 // resolvedModule is used to keep track of a module during the resolution

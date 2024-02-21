@@ -22,9 +22,9 @@ import (
 	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
-	"go.rgst.io/stencil/pkg/extensions/apiv1"
 	"github.com/sirupsen/logrus"
 	giturls "github.com/whilp/git-urls"
+	"go.rgst.io/stencil/pkg/extensions/apiv1"
 )
 
 // generatedTemplateFunc is the underlying type of a function

@@ -22,10 +22,10 @@ import (
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/pkg/errors"
-	"go.rgst.io/stencil/pkg/configuration"
-	"go.rgst.io/stencil/pkg/extensions"
 	"github.com/sirupsen/logrus"
 	giturls "github.com/whilp/git-urls"
+	"go.rgst.io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/pkg/extensions"
 	"gopkg.in/yaml.v3"
 )
 
