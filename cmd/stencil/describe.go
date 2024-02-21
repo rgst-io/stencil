@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/rgst-io/stencil/pkg/stencil"
+	"go.rgst.io/stencil/pkg/stencil"
 	"github.com/urfave/cli/v2"
 )
 

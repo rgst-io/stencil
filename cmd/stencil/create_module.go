@@ -12,7 +12,7 @@ import (
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/pkg/errors"
-	"github.com/rgst-io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/pkg/configuration"
 	"github.com/urfave/cli/v2"
 	"gopkg.in/yaml.v3"
 )
@@ -81,11 +81,11 @@ func NewCreateModule() *cli.Command {
 			tm := &configuration.Manifest{
 				Name: path.Base(c.Args().Get(0)),
 				Modules: []*configuration.TemplateRepository{{
-					Name: "github.com/rgst-io/stencil-template-base",
+					Name: "go.rgst.io/stencil-template-base",
 				}, {
 					Name: "github.com/getoutreach/stencil-base",
 				}, {
-					Name: "github.com/rgst-io/stencil-circleci",
+					Name: "go.rgst.io/stencil-circleci",
 				}},
 				Arguments: map[string]interface{}{
 					"reportingTeam": reportingTeam,

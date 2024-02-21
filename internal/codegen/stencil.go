@@ -16,11 +16,11 @@ import (
 	"github.com/go-git/go-billy/v5/util"
 	"github.com/mitchellh/hashstructure/v2"
 	"github.com/pkg/errors"
-	"github.com/rgst-io/stencil/internal/modules"
-	"github.com/rgst-io/stencil/pkg/configuration"
-	"github.com/rgst-io/stencil/pkg/extensions"
-	"github.com/rgst-io/stencil/pkg/extensions/apiv1"
-	"github.com/rgst-io/stencil/pkg/stencil"
+	"go.rgst.io/stencil/internal/modules"
+	"go.rgst.io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/pkg/extensions"
+	"go.rgst.io/stencil/pkg/extensions/apiv1"
+	"go.rgst.io/stencil/pkg/stencil"
 	"github.com/sirupsen/logrus"
 )
 

@@ -25,9 +25,9 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/pkg/errors"
-	"github.com/rgst-io/stencil/internal/cmd/stencil"
-	"github.com/rgst-io/stencil/internal/version"
-	"github.com/rgst-io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/internal/cmd/stencil"
+	"go.rgst.io/stencil/internal/version"
+	"go.rgst.io/stencil/pkg/configuration"
 )
 
 // main is the entrypoint for the stencil CLI.

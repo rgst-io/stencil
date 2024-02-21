@@ -12,9 +12,9 @@ import (
 	"github.com/getoutreach/gobox/pkg/app"
 	"github.com/getoutreach/gobox/pkg/box"
 	gogit "github.com/go-git/go-git/v5"
-	stencilgit "github.com/rgst-io/stencil/internal/git"
-	"github.com/rgst-io/stencil/internal/modules"
-	"github.com/rgst-io/stencil/pkg/configuration"
+	stencilgit "go.rgst.io/stencil/internal/git"
+	"go.rgst.io/stencil/internal/modules"
+	"go.rgst.io/stencil/pkg/configuration"
 )
 
 // runtime contains information about the current state

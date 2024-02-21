@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/rgst-io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/pkg/configuration"
 	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
 )
@@ -25,7 +25,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name: "github.com/rgst-io/stencil-template-base",
+						Name: "go.rgst.io/stencil-template-base",
 					},
 				},
 				Arguments: map[string]interface{}{
@@ -40,7 +40,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name: "github.com/rgst-io/stencil-template-base",
+						Name: "go.rgst.io/stencil-template-base",
 					},
 				},
 				Arguments: map[string]interface{}{
@@ -59,7 +59,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name: "github.com/rgst-io/stencil-template-base",
+						Name: "go.rgst.io/stencil-template-base",
 					},
 				},
 				Arguments: map[string]interface{}{
@@ -74,7 +74,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name: "github.com/rgst-io/stencil-template-base",
+						Name: "go.rgst.io/stencil-template-base",
 					},
 				},
 				Arguments: map[string]interface{}{
@@ -95,7 +95,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name: "github.com/rgst-io/stencil-template-base",
+						Name: "go.rgst.io/stencil-template-base",
 					},
 				},
 				Arguments: map[string]interface{}{
@@ -112,7 +112,7 @@ func TestConfigureModule(t *testing.T) {
 				Name: "test",
 				Modules: []*configuration.TemplateRepository{
 					{
-						Name: "github.com/rgst-io/stencil-template-base",
+						Name: "go.rgst.io/stencil-template-base",
 					},
 				},
 				Arguments: map[string]interface{}{

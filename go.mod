@@ -1,4 +1,4 @@
-module github.com/rgst-io/stencil
+module go.rgst.io/stencil
 
 go 1.21
 

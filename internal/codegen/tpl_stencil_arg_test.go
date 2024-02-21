@@ -11,9 +11,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/rgst-io/stencil/internal/modules"
-	"github.com/rgst-io/stencil/internal/modules/modulestest"
-	"github.com/rgst-io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/internal/modules"
+	"go.rgst.io/stencil/internal/modules/modulestest"
+	"go.rgst.io/stencil/pkg/configuration"
 	"github.com/sirupsen/logrus"
 	"gotest.tools/v3/assert"
 )

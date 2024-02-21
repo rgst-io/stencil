@@ -6,7 +6,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
-	"github.com/rgst-io/stencil/pkg/extensions"
+	"go.rgst.io/stencil/pkg/extensions"
 	"github.com/sirupsen/logrus"
 	"gotest.tools/v3/assert"
 )

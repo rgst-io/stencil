@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/go-git/go-billy/v5"
-	"github.com/rgst-io/stencil/internal/modules/modulestest"
-	"github.com/rgst-io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/internal/modules/modulestest"
+	"go.rgst.io/stencil/pkg/configuration"
 	"github.com/sirupsen/logrus"
 )
 

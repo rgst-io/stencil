@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rgst-io/stencil/internal/modules"
+	"go.rgst.io/stencil/internal/modules"
 	"github.com/sirupsen/logrus"
 )
 

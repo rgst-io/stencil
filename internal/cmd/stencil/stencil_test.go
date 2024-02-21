@@ -11,8 +11,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/rgst-io/stencil/pkg/configuration"
-	"github.com/rgst-io/stencil/pkg/stencil"
+	"go.rgst.io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/pkg/stencil"
 	"github.com/sirupsen/logrus"
 )
 

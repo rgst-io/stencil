@@ -22,7 +22,7 @@ import (
 	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
-	"github.com/rgst-io/stencil/pkg/extensions/apiv1"
+	"go.rgst.io/stencil/pkg/extensions/apiv1"
 	"github.com/sirupsen/logrus"
 	giturls "github.com/whilp/git-urls"
 )
@@ -187,11 +187,11 @@ func getVersionWithCommit(ctx context.Context, token cfg.SecretData, repoURL str
 
 // downloadFromRemote downloads a release from github and extracts it to disk
 //
-// using the example extension module: github.com/rgst-io/stencil-plugin
+// using the example extension module: go.rgst.io/stencil-plugin
 //
 //	org: getoutreach
 //	repo: stencil-plugin
-//	name: github.com/rgst-io/stencil-plugin
+//	name: go.rgst.io/stencil-plugin
 func (h *Host) downloadFromRemote(ctx context.Context, name string,
 	version *resolver.Version) (string, error) {
 	token, err := github.GetToken()
