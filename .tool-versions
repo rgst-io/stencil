@@ -1,6 +1,6 @@
 golang 1.21.7
 shfmt 3.7.0
-golangci-lint 1.55.2
+golangci-lint 1.56.2
 goreleaser latest
 
 # Requires 'mise' to function.
