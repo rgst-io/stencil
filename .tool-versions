@@ -1,5 +1,5 @@
 golang 1.22.0
-shfmt 3.7.0
+shfmt 3.8.0
 golangci-lint 1.56.2
 goreleaser latest
 
