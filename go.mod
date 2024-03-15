@@ -10,7 +10,7 @@ require (
 	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
 	github.com/charmbracelet/glamour v0.6.0
 	github.com/davecgh/go-spew v1.1.1
-	github.com/getoutreach/gobox v1.88.1
+	github.com/getoutreach/gobox v1.89.1
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git/v5 v5.11.0
 	github.com/google/go-cmp v0.6.0
@@ -23,7 +23,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3
 	github.com/urfave/cli/v2 v2.27.1
 	github.com/whilp/git-urls v1.0.0
-	golang.org/x/term v0.17.0
+	golang.org/x/term v0.18.0
 	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools/v3 v3.5.1
 	sigs.k8s.io/yaml v1.4.0
@@ -78,7 +78,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/rivo/uniseg v0.4.4 // indirect
+	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
@@ -90,13 +90,13 @@ require (
 	github.com/yuin/goldmark v1.5.2 // indirect
 	github.com/yuin/goldmark-emoji v1.0.1 // indirect
 	github.com/zalando/go-keyring v0.2.3 // indirect
-	golang.org/x/crypto v0.19.0 // indirect
-	golang.org/x/mod v0.14.0 // indirect
-	golang.org/x/net v0.21.0 // indirect
+	golang.org/x/crypto v0.21.0 // indirect
+	golang.org/x/mod v0.16.0 // indirect
+	golang.org/x/net v0.22.0 // indirect
 	golang.org/x/oauth2 v0.17.0 // indirect
-	golang.org/x/sys v0.17.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
-	golang.org/x/tools v0.17.0 // indirect
+	golang.org/x/tools v0.19.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240102182953-50ed04b92917 // indirect
 	google.golang.org/grpc v1.61.0 // indirect
