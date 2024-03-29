@@ -11,9 +11,9 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"go.rgst.io/stencil/pkg/configuration"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
+	"go.rgst.io/stencil/pkg/configuration"
 	"gopkg.in/yaml.v3"
 )
 

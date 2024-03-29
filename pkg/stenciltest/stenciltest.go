@@ -17,12 +17,12 @@ import (
 
 	"github.com/bradleyjkemp/cupaloy"
 	"github.com/getoutreach/gobox/pkg/cli/github"
+	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/codegen"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/extensions/apiv1"
-	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
 )

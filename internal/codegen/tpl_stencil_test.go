@@ -11,9 +11,9 @@ import (
 	"time"
 
 	"github.com/go-git/go-billy/v5"
+	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/modules/modulestest"
 	"go.rgst.io/stencil/pkg/configuration"
-	"github.com/sirupsen/logrus"
 )
 
 func TestTplStencil_ReadBlocks(t *testing.T) {

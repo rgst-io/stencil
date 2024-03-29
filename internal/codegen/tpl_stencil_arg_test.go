@@ -11,10 +11,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
 	"go.rgst.io/stencil/pkg/configuration"
-	"github.com/sirupsen/logrus"
 	"gotest.tools/v3/assert"
 )
 

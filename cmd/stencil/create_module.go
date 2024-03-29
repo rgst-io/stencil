@@ -12,8 +12,8 @@ import (
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/pkg/errors"
-	"go.rgst.io/stencil/pkg/configuration"
 	"github.com/urfave/cli/v2"
+	"go.rgst.io/stencil/pkg/configuration"
 	"gopkg.in/yaml.v3"
 )
 

@@ -14,9 +14,9 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/santhosh-tekuri/jsonschema/v5"
 	"go.rgst.io/stencil/internal/dotnotation"
 	"go.rgst.io/stencil/pkg/configuration"
-	"github.com/santhosh-tekuri/jsonschema/v5"
 )
 
 // Arg returns the value of an argument in the project's manifest
