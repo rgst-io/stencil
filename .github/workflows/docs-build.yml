@@ -21,4 +21,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
       - run: bun install
+        working-directory: docs
       - run: bun run docs:build
+        working-directory: docs
