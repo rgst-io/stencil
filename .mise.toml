@@ -1,3 +1,16 @@
+[tools]
+golang = "1.22"
+shfmt = "3"
+golangci-lint = "1.56"
+goreleaser = "latest"
+bun = "latest"                                   # Docs site.
+"go:gotest.tools/gotestsum" = "v1.11.0"
+"go:golang.org/x/tools/cmd/goimports" = "latest"
+
+[settings]
+# Conflicts with bun and we don't use node, so disable it.
+disable_tools = ["node"]
+
 [tasks.build]
 description = "Build a binary for the current platform/architecture"
 run = "go build -trimpath -o ./bin/ -v ./cmd/stencil"
@@ -9,3 +22,8 @@ run = "gotestsum"
 [tasks.lint]
 description = "Run linters"
 run = "golangci-lint run"
+
+[tasks.fmt]
+alias = "format"
+description = "Format code"
+run = ["gofmt -s -w .", "goimports -w .", "shfmt -w -i 2 -ci -sr ."]

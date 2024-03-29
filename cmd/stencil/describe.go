@@ -11,8 +11,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"go.rgst.io/stencil/pkg/stencil"
 	"github.com/urfave/cli/v2"
+	"go.rgst.io/stencil/pkg/stencil"
 )
 
 // NewDescribeCmd returns a new urfave/cli.Command for the

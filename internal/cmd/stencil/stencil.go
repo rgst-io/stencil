@@ -20,11 +20,11 @@ import (
 	"github.com/getoutreach/gobox/pkg/cfg"
 	"github.com/getoutreach/gobox/pkg/cli/github"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/codegen"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/stencil"
-	"github.com/sirupsen/logrus"
 	"golang.org/x/term"
 	"gopkg.in/yaml.v3"
 )

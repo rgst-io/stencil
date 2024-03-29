@@ -8,11 +8,11 @@ import (
 
 	"github.com/getoutreach/gobox/pkg/app"
 	"github.com/go-git/go-billy/v5/memfs"
+	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/stencil"
-	"github.com/sirupsen/logrus"
 	"gotest.tools/v3/assert"
 )
 

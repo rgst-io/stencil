@@ -8,8 +8,8 @@ package codegen
 import (
 	"text/template"
 
-	"go.rgst.io/stencil/pkg/extensions"
 	"github.com/sirupsen/logrus"
+	"go.rgst.io/stencil/pkg/extensions"
 )
 
 // NewFuncMap returns the standard func map for a template

@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"go.rgst.io/stencil/pkg/configuration"
 	"github.com/sirupsen/logrus"
+	"go.rgst.io/stencil/pkg/configuration"
 	"gotest.tools/v3/assert"
 )
 

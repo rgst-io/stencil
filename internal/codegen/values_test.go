@@ -15,10 +15,10 @@ import (
 	gogit "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
 	"go.rgst.io/stencil/pkg/configuration"
-	"github.com/sirupsen/logrus"
 	"gotest.tools/v3/assert"
 )
 

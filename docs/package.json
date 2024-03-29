@@ -1,0 +1,13 @@
+{
+  "name": "@stencil/docs",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "vitepress": "1.0.1"
+  },
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
+  }
+}

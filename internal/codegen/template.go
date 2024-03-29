@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"go.rgst.io/stencil/internal/modules"
 	"github.com/sirupsen/logrus"
+	"go.rgst.io/stencil/internal/modules"
 )
 
 // Template is a file that has been processed by stencil
