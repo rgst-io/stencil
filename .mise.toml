@@ -1,3 +1,7 @@
+[settings]
+# Conflicts with bun and we don't use node, so disable it.
+disable_tools = ["node"]
+
 [tasks.build]
 description = "Build a binary for the current platform/architecture"
 run = "go build -trimpath -o ./bin/ -v ./cmd/stencil"
