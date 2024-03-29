@@ -1,4 +1,4 @@
-name: mise-docs
+name: docs
 
 on:
   push:
