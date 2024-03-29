@@ -1,3 +1,11 @@
+[tools]
+golang = "1.22"
+shfmt = "3"
+golangci-lint = "1.56"
+goreleaser = "latest"
+bun = "latest"                          # Docs site.
+"go:gotest.tools/gotestsum" = "v1.11.0"
+
 [settings]
 # Conflicts with bun and we don't use node, so disable it.
 disable_tools = ["node"]
