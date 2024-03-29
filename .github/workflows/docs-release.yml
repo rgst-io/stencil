@@ -26,4 +26,7 @@ jobs:
       - run: bun run docs:build
         working-directory: docs
       - run: .mise/tasks/release
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         working-directory: docs
