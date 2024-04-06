@@ -12,7 +12,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/getoutreach/gobox v1.90.0
 	github.com/go-git/go-billy/v5 v5.5.0
-	github.com/go-git/go-git/v5 v5.11.0
+	github.com/go-git/go-git/v5 v5.12.0
 	github.com/google/go-cmp v0.6.0
 	github.com/hashicorp/go-hclog v1.6.3
 	github.com/hashicorp/go-multierror v1.1.1
@@ -33,14 +33,14 @@ require (
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Microsoft/go-winio v0.6.1 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371 // indirect
+	github.com/ProtonMail/go-crypto v1.0.0 // indirect
 	github.com/alecthomas/chroma v0.10.0 // indirect
 	github.com/alecthomas/chroma/v2 v2.8.0 // indirect
 	github.com/alessio/shellescape v1.4.1 // indirect
 	github.com/aymanbagabas/go-osc52 v1.0.3 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
-	github.com/cloudflare/circl v1.3.3 // indirect
+	github.com/cloudflare/circl v1.3.7 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/danieljoos/wincred v1.2.0 // indirect
@@ -81,9 +81,9 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/sergi/go-diff v1.2.0 // indirect
+	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
-	github.com/skeema/knownhosts v1.2.1 // indirect
+	github.com/skeema/knownhosts v1.2.2 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/ulikunitz/xz v0.5.11 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
