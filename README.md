@@ -1,11 +1,8 @@
 # stencil
 
-[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/go.rgst.io/stencil)
+A modern living-template engine for evolving repositories.
 
-A modern repository templating engine
-
-**Note**: This has been forked from [getoutreach/stencil](https://github.com/getoutreach/stencil) and is currently
-under construction.
+Check out our [Documentation](https://stencil.rgst.io/) for more information!
 
 ## Development
 
@@ -52,7 +49,7 @@ Wait for CI to build and publish the release (Github Actions).
 
 ### Building docs
 
-If you have `mise` installed, you should have all the tooling you need for the docs engine. Just run `mise run docsdev` from the root stencil directory to enter the watch-rebuild cycle to test your docs changes.
+If you have `mise` installed, you should have all the tooling you need for the docs engine. Run `mise run docsdev` from the root stencil directory to enter the watch-rebuild cycle to test your docs changes.
 
 ## License
 
