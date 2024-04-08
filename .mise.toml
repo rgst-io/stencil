@@ -30,4 +30,4 @@ run = ["gofmt -s -w .", "goimports -w .", "shfmt -w -i 2 -ci -sr ."]
 
 [tasks.docsdev]
 description = "Run local dev loop for the docs folder"
-run = "cd docs && bun run docs:dev"
+run = "cd docs && bun install && bun run docs:dev"

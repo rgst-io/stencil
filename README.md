@@ -49,7 +49,7 @@ Wait for CI to build and publish the release (Github Actions).
 
 ### Building docs
 
-If you have `mise` installed, you should have all the tooling you need for the docs engine. Run `bun install` from inside the `docs` directory to get the dependencies installed, then run `mise run docsdev` from the root stencil directory to enter the watch-rebuild cycle to test your docs changes.
+If you have `mise` installed, you should have all the tooling you need for the docs engine. Run `mise run docsdev` from the root stencil directory to enter the watch-rebuild cycle to test your docs changes.
 
 ## License
 
