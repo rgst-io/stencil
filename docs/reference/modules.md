@@ -19,7 +19,7 @@ There are two types of module usable by stencil, a module and a native extension
 
 ### Module
 
-A module consists of templates in a `templates/` directory in the root of the repository. Modules are written in the [go template syntax](https://pkg.go.dev/text/template) with added functions and variables accessible to them at runtime. For more information about the module type see [the basic module documentation](/stencil/reference/template-module).
+A module consists of templates in a `templates/` directory in the root of the repository. Modules are written in the [go template syntax](https://pkg.go.dev/text/template) with added functions and variables accessible to them at runtime. For more information about the module type see [the basic module documentation](/reference/template-module).
 
 ### Native Extensions
 
@@ -27,7 +27,7 @@ Native extensions are modules that run binary code, and generally are written in
 
 ## Creating a Module
 
-For information on how to create a module see the [getting started](/stencil/getting-started/) documentation.
+For information on how to create a module see the [getting started](/guide/basic-module) documentation.
 
 ## More Information
 

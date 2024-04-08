@@ -5,11 +5,11 @@ order: 3
 # Basic Stencil Module
 
 > [!NOTE]
-> This quick start assumes you're familiar with stencil usage already. If you aren't be sure to go through the [reference documentation](/stencil/reference/) or the [quick start](/stencil/getting-started/quick-start).
+> This quick start assumes you're familiar with stencil usage already. If you aren't be sure to go through the [reference documentation](/reference/) or the [quick start](/guide/).
 
 ## Step 1: Create a module
 
-Using the [`stencil create`]() command we're able to quickly create a module, let's start with a simple hello world module.
+Using the `stencil create` command we're able to quickly create a module, let's start with a simple hello world module.
 
 ```bash
 mkdir helloworld; cd helloworld
@@ -148,7 +148,7 @@ If we add contents to the block and re-run stencil they'll be persisted across t
 
 ## Step 5: (Optional/Advanced) Creating Multiple Files
 
-One of the powerful parts of stencil is the ability to create an arbitrary number of files with a single template. This is done with the [`file.Create`](/stencil/functions/file.create) function. Let's create a `greeter.go.tpl` template in the `templates/` directory that'll create `<greeting>.go` based on the `greetings` argument.
+One of the powerful parts of stencil is the ability to create an arbitrary number of files with a single template. This is done with the [`file.Create`](/functions/file.Create) function. Let's create a `greeter.go.tpl` template in the `templates/` directory that'll create `<greeting>.go` based on the `greetings` argument.
 
 ```
 # This is important! We don't want to create a greeter.go file
@@ -228,4 +228,4 @@ func main() {
 
 ## Reflection
 
-We've created a module, used it in a test application via the `replacements` map in the `stencil.yaml` and used a block. Optionally we've also created multiple files with a template. This is just the beginning of what you can do with modules. Modules have a rich amount of [functions](/reference/functions/) available to them. Check out the [reference](/reference/) for more information about modules and how to use them.
+We've created a module, used it in a test application via the `replacements` map in the `stencil.yaml` and used a block. Optionally we've also created multiple files with a template. This is just the beginning of what you can do with modules. Modules have a rich amount of [functions](/functions/) available to them. Check out the [reference](/reference/) for more information about modules and how to use them.

@@ -193,4 +193,4 @@ The contents of `README.md` have changed, but the contents within the block have
 
 In all, we've created a `stencil.yaml`, added a module to it, ran stencil, and then modified the contents within a block. That's it! We've imported a base module and created some files, all without doing much of anything on our side. Hopefully that shows you the power of stencil.
 
-For more resources be sure to dive into [how to create a module](new-module.md) to get insight on how to create a module.
+For more resources be sure to dive into [how to create a module](basic-module.md) to get insight on how to create a module.
