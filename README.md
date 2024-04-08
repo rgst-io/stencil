@@ -50,6 +50,10 @@ git push origin refs/tags/vX.Y.Z
 
 Wait for CI to build and publish the release (Github Actions).
 
+### Building docs
+
+If you have `mise` installed, you should have all the tooling you need for the docs engine. Just run `mise run docsdev` from the root stencil directory to enter the watch-rebuild cycle to test your docs changes.
+
 ## License
 
 The original code, as of the fork, is licensed under the Apache 2.0

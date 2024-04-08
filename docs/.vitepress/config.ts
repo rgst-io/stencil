@@ -1,4 +1,13 @@
 import { defineConfig } from 'vitepress'
+import VitePressSidebar from 'vitepress-sidebar';
+
+const vitepressSidebarOptions = {
+  documentRootPath: '/',
+  useTitleFromFileHeading: true,
+  sortMenusByFrontmatterOrder: true,
+  useFolderTitleFromIndexFile: true,
+  collapsed: true,
+};
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -14,7 +23,7 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     outline: 'deep',
     nav: [],
-    sidebar: [],
+    sidebar: VitePressSidebar.generateSidebar(vitepressSidebarOptions),
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/rgst-io/stencil' }
