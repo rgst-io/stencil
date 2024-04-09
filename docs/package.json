@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "devDependencies": {
-    "vitepress": "1.0.2",
+    "vitepress": "1.1.0",
     "vitepress-sidebar": "^1.22.0"
   },
   "scripts": {
