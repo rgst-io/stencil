@@ -36,9 +36,9 @@ export default defineConfig({
     search: {
       provider: 'algolia',
       options: {
-        indexName: 'stencil',
-        appId: '',
-        apiKey: '',
+        indexName: 'stencil-rgst',
+        appId: 'AMQEFIC433',
+        apiKey: '8f907831b792edbc9d1fe9e951324346',
         insights: true,
       }
     },
