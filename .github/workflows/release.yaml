@@ -1,10 +1,8 @@
 name: goreleaser
 
 on:
-  push:
-    # Run only on tags
-    tags:
-      - "*"
+  # Only run when triggered through the Github UI or API.
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -21,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - run: git fetch --force --tags
+          fetch-tags: true
       - uses: jdx/mise-action@v2
         with:
           experimental: true

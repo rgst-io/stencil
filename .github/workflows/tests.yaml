@@ -23,11 +23,13 @@ jobs:
           experimental: true
         env:
           GH_TOKEN: ${{ github.token }}
+      - name: Download dependencies
+        run: go mod download
       - name: Run go test
         run: |
           gotestsum -- -coverprofile=cover.out ./...
       - name: Upload test coverage
-        uses: codecov/codecov-action@v4.2.0
+        uses: codecov/codecov-action@v4.3.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./cover.out
