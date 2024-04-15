@@ -11,7 +11,6 @@ builds:
     ldflags:
       - -s
       - -w
-      - -X go.rgst.io/stencil/internal/version.Version={{ .Version }}
     env:
       - CGO_ENABLED=0
     goarch:
@@ -19,15 +18,9 @@ builds:
       - arm64
     goos:
       - linux
-      - windows
       - darwin
-
 archives:
   - format: tar.xz
-    # use zip for windows archives
-    format_overrides:
-      - goos: windows
-        format: zip
 checksum:
   name_template: "checksums.txt"
 snapshot:
