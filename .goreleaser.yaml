@@ -11,6 +11,7 @@ builds:
     ldflags:
       - -s
       - -w
+      - -X "go.rgst.io/stencil/internal/version.Version={{.Version}}"
     env:
       - CGO_ENABLED=0
     goarch:
