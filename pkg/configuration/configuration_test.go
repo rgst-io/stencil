@@ -6,8 +6,11 @@ package configuration_test
 
 import (
 	"fmt"
+	"os"
+	"testing"
 
 	"go.rgst.io/stencil/pkg/configuration"
+	"gotest.tools/v3/assert"
 )
 
 func ExampleValidateName() {
@@ -38,4 +41,30 @@ func ExampleNewManifest() {
 	// Output:
 	// testing
 	// map[hello:world]
+}
+
+func TestShouldSupportServiceYaml(t *testing.T) {
+	// Change into test directory
+	curDir, err := os.Getwd()
+	assert.NilError(t, err)
+	defer os.Chdir(curDir)
+	assert.NilError(t, os.Chdir("testdata/interop/service-if-not-found"))
+
+	sm, err := configuration.NewDefaultManifest()
+	assert.NilError(t, err)
+
+	assert.Equal(t, sm.Name, "service")
+}
+
+func TestShouldUseStencilOverServiceYaml(t *testing.T) {
+	// Change into test directory
+	curDir, err := os.Getwd()
+	assert.NilError(t, err)
+	defer os.Chdir(curDir)
+	assert.NilError(t, os.Chdir("testdata/interop/stencil-over-service"))
+
+	sm, err := configuration.NewDefaultManifest()
+	assert.NilError(t, err)
+
+	assert.Equal(t, sm.Name, "stencil")
 }

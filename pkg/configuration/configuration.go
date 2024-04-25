@@ -41,7 +41,14 @@ func NewManifest(path string) (*Manifest, error) {
 // NewDefaultManifest returns a parsed project manifest
 // from a set default path on disk.
 func NewDefaultManifest() (*Manifest, error) {
-	return NewManifest("stencil.yaml")
+	manifestFiles := []string{"stencil.yaml", "service.yaml"}
+	for _, file := range manifestFiles {
+		if _, err := os.Stat(file); err == nil {
+			return NewManifest(file)
+		}
+	}
+
+	return nil, fmt.Errorf("no manifest found (searched %v)", manifestFiles)
 }
 
 // Manifest is a manifest used to describe a project and impact
