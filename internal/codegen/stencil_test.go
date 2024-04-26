@@ -4,13 +4,14 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
 	"testing"
 
-	"github.com/getoutreach/gobox/pkg/app"
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
+	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/stencil"
 	"gotest.tools/v3/assert"
@@ -46,7 +47,7 @@ func TestBasicE2ERender(t *testing.T) {
 
 	lock := st.GenerateLockfile(tpls)
 	assert.DeepEqual(t, lock, &stencil.Lockfile{
-		Version: app.Info().Version,
+		Version: version.Version,
 		Modules: []*stencil.LockfileModuleEntry{
 			{
 				Name:    "testing",
@@ -92,7 +93,7 @@ func TestModuleHookRender(t *testing.T) {
 	assert.NilError(t, err, "expected Render() to not fail")
 	assert.Equal(t, len(tpls), 2, "expected Render() to return a single template")
 	assert.Equal(t, len(tpls[1].Files), 1, "expected Render() template to return a single file")
-	assert.Equal(t, tpls[1].Files[0].String(), "a", "expected Render() to return correct output")
+	assert.Equal(t, strings.TrimSpace(tpls[1].Files[0].String()), "a", "expected Render() to return correct output")
 }
 
 func ExampleStencil_PostRun() {

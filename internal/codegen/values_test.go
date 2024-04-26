@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/getoutreach/gobox/pkg/app"
 	"github.com/getoutreach/gobox/pkg/box"
 	gogit "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -18,6 +17,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
+	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 	"gotest.tools/v3/assert"
 )
@@ -81,8 +81,8 @@ func TestValues(t *testing.T) {
 			DefaultBranch: "main",
 		},
 		Runtime: runtime{
-			Generator:        app.Info().Name,
-			GeneratorVersion: app.Info().Version,
+			Generator:        "stencil",
+			GeneratorVersion: version.Version,
 			Box:              boxConf,
 			Modules: modulesSlice{
 				{

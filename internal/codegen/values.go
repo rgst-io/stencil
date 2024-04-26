@@ -9,11 +9,11 @@ package codegen
 import (
 	"context"
 
-	"github.com/getoutreach/gobox/pkg/app"
 	"github.com/getoutreach/gobox/pkg/box"
 	gogit "github.com/go-git/go-git/v5"
 	stencilgit "go.rgst.io/stencil/internal/git"
 	"go.rgst.io/stencil/internal/modules"
+	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 )
 
@@ -145,8 +145,8 @@ func NewValues(ctx context.Context, sm *configuration.Manifest, mods []*modules.
 	vals := &Values{
 		Git: git{},
 		Runtime: runtime{
-			Generator:        app.Info().Name,
-			GeneratorVersion: app.Info().Version,
+			Generator:        "stencil",
+			GeneratorVersion: version.Version,
 			Modules:          modulesSlice{},
 		},
 		Config: config{

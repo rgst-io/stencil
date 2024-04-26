@@ -14,12 +14,12 @@ import (
 	"sort"
 	"time"
 
-	"github.com/getoutreach/gobox/pkg/app"
 	"github.com/go-git/go-billy/v5/util"
 	"github.com/mitchellh/hashstructure/v2"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/modules"
+	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/extensions"
 	"go.rgst.io/stencil/pkg/extensions/apiv1"
@@ -139,7 +139,7 @@ func (s *Stencil) RegisterInprocExtensions(name string, ext apiv1.Implementation
 // on a list of templates.
 func (s *Stencil) GenerateLockfile(tpls []*Template) *stencil.Lockfile {
 	l := &stencil.Lockfile{
-		Version: app.Info().Version,
+		Version: version.Version,
 	}
 
 	for _, tpl := range tpls {
