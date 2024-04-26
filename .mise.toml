@@ -30,6 +30,10 @@ run = [
   "shfmt -w -i 2 -ci -sr .",
 ]
 
+[tasks.next-version]
+description = "Get the version number that would be released if a release was ran right now"
+run = ["go run github.com/thenativeweb/get-next-version@latest"]
+
 ## <<Stencil::Block(custom)>>
 [settings]
 # Conflicts with bun, and we don't use it anyways.
