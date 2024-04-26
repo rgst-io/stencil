@@ -53,6 +53,20 @@ changelog:
       order: 400
     - title: Other work
       order: 9999
+brews:
+  - commit_author:
+      name: GitHub Actions
+      email: 41898282+github-actions[bot]@users.noreply.github.com
+    homepage: https://stencil.rgst.io
+    license: AGPL-3.0
+    dependencies:
+      - name: git
+        os: mac
+    conflicts:
+      - stencil
+    repository:
+      owner: rgst-io
+      name: homebrew-tap
 
 release:
   footer: |-
