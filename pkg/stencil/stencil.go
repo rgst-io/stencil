@@ -6,7 +6,6 @@
 package stencil
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 
@@ -17,9 +16,6 @@ import (
 const (
 	// LockfileName is the name of the lockfile used by stencil
 	LockfileName = "stencil.lock"
-
-	// oldLockfileName is the old lockfile that stencil interops with
-	oldLockfileName = "bootstrap.lock"
 )
 
 // LockfileModuleEntry is an entry in the lockfile for a module
@@ -75,12 +71,7 @@ type Lockfile struct {
 // repository path
 func LoadLockfile(path string) (*Lockfile, error) {
 	f, err := os.Open(filepath.Join(path, LockfileName))
-	if errors.Is(err, os.ErrNotExist) {
-		f, err = os.Open(oldLockfileName)
-		if err != nil {
-			return nil, err
-		}
-	} else if err != nil {
+	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
