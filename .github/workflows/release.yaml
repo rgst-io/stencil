@@ -17,6 +17,14 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/create-github-app-token@v1
+        id: homebrew-tap-github-app
+        with:
+          # https://github.com/organizations/rgst-io/settings/apps/rgst-io-stencil-homebrew
+          app-id: 885121
+          private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: homebrew-tap
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -61,3 +69,4 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ steps.homebrew-tap-github-app.outputs.token }}

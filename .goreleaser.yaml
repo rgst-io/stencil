@@ -67,6 +67,7 @@ brews:
     repository:
       owner: rgst-io
       name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN}}"
 
 release:
   footer: |-
