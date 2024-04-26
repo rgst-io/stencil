@@ -6,11 +6,13 @@ package codegen
 import (
 	"context"
 	"io"
+	"math/rand"
 	"os"
 	"os/exec"
 	"path"
 	"path/filepath"
 	"sort"
+	"time"
 
 	"github.com/getoutreach/gobox/pkg/app"
 	"github.com/go-git/go-billy/v5/util"
@@ -329,6 +331,13 @@ func (s *Stencil) getTemplates(ctx context.Context, log logrus.FieldLogger) ([]*
 	}
 
 	log.Debug("Finished discovering templates")
+
+	// Shuffle the templates to prevent accidental file order guarantees
+	// from being relied upon.
+	//nolint:gosec // Why: We don't need that much entropy.
+	rand.New(rand.NewSource(time.Now().UnixNano())).Shuffle(len(tpls), func(i, j int) {
+		tpls[i], tpls[j] = tpls[j], tpls[i]
+	})
 
 	return tpls, nil
 }

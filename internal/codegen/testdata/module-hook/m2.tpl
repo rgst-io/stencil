@@ -1,1 +1,1 @@
-{{ index (stencil.GetModuleHook "coolthing") 0 }}
+{{ index (stencil.GetModuleHook "coolthing" | default (list "")) 0 }}

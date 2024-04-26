@@ -44,6 +44,13 @@ type TplStencil struct {
 //	  {{ . }}
 //	{{- end }}
 func (s *TplStencil) GetModuleHook(name string) []any {
+	// On the first pass, never return any data. If we did, the data would
+	// be unreliably set because we don't sort the templates in any way or
+	// guarantee that they will be rendered in specific any order.
+	if s.s.isFirstPass {
+		return []any{}
+	}
+
 	k := s.s.sharedData.key(s.t.Module.Name, name)
 	v := s.s.sharedData.moduleHooks[k]
 	if v == nil {
