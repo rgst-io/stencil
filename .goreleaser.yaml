@@ -71,5 +71,7 @@ brews:
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN}}"
 
 release:
+  extra_files:
+    - glob: .dist/stencil-*-deps.tar.xz
   footer: |-
     **Full Changelog**: https://github.com/rgst-io/stencil/compare/{{ .PreviousTag }}...{{ .Tag }}
