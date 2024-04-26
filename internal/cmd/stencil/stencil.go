@@ -291,7 +291,7 @@ func (c *Command) promptMajorVersion(ctx context.Context, m *modules.Module, las
 		if err != nil {
 			c.log.WithError(err).Warn("Failed to render release notes, using raw release notes")
 		}
-	} else if err != nil {
+	} else {
 		c.log.WithError(err).Warn("Failed to create markdown render, using raw release notes")
 	}
 

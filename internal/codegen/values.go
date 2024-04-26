@@ -124,10 +124,10 @@ func (v *Values) Copy() *Values {
 
 // WithModule returns a copy of the current values with the
 // provided module information being set.
-func (v *Values) WithModule(name, version string) *Values {
+func (v *Values) WithModule(name, ver string) *Values {
 	nv := v.Copy()
 	nv.Module.Name = name
-	nv.Module.Version = version
+	nv.Module.Version = ver
 	return nv
 }
 
