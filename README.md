@@ -109,10 +109,4 @@ directory to enter the watch-rebuild cycle to test your docs changes.
 
 ## License
 
-The original code, as of the fork, is licensed under the Apache 2.0
-license which can be found (as it was) at
-[LICENSE.original](LICENSE.original). This applies to all code created
-before the commit [ea98384ec4b1031ba032cedad90df4bb0451cdce](https://go.rgst.io/stencil/commit/ea98384ec4b1031ba032cedad90df4bb0451cdce).
-
-All code after that commit is licensed under AGPL 3.0. The license for
-this can be found at [LICENSE](LICENSE).
+Apache-2.0

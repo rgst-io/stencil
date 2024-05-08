@@ -58,7 +58,7 @@ brews:
       name: GitHub Actions
       email: 41898282+github-actions[bot]@users.noreply.github.com
     homepage: https://stencil.rgst.io
-    license: AGPL-3.0
+    license: Apache-2.0
     description: "A modern living-template engine for evolving repositories"
     dependencies:
       - name: git
