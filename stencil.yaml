@@ -1,6 +1,6 @@
 name: stencil
 arguments:
   org: rgst-io
-  license: AGPL-3.0
+  license: Apache-2.0
 modules:
 - name: github.com/rgst-io/stencil-golang
