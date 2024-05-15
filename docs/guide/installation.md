@@ -16,14 +16,14 @@ Stencil may also be compiled from source wherever the Go toolchain can run; e.g.
 
 ## Quick Install
 
-<!-- ### Homebrew (macOS)
+### Homebrew (macOS)
 
 We have a brew formula for Stencil. It is recommended to install Stencil via Homebrew on macOS.
 
 ```bash
-brew install stencil
+brew install rgst-io/tap/stencil
 ```
- -->
+
 ### Binary (Cross-platform)
 
 Download the appropriate version for your platform from [Stencil Releases](https://github.com/rgst-io/stencil/releases). Once downloaded, the binary can be run from anywhere. You don't need to install it into a global location. This works well for shared hosts and other systems where you don't have a privileged account.
@@ -44,7 +44,7 @@ Stencil is quite easy to build from source as well.
 ```
 git clone https://github.com/rgst-io/stencil/stencil.git
 cd stencil
-make
+mise run build
 cp ./bin/stencil "$(go env GOPATH)/bin/stencil"
 ```
 
