@@ -97,7 +97,7 @@ func (t *Template) Parse(_ *Stencil) error {
 
 // Render renders the provided template, the produced files
 // are rendered onto the Files field of the template struct.
-func (t *Template) Render(st *Stencil, vals *Values) error {
+func (t *Template) Render(st *Stencil, vals *Values, dms map[string]*DirManifest) error {
 	if len(t.Files) == 0 && !t.Library {
 		f, err := NewFile(strings.TrimSuffix(t.Path, ".tpl"), t.mode, t.modTime)
 		if err != nil {
@@ -143,6 +143,11 @@ func (t *Template) Render(st *Stencil, vals *Values) error {
 		// we constructed the template. It's only used when we have
 		// no calls to file.Create
 		t.Files = t.Files[1:len(t.Files)]
+	}
+
+	// Now that everything's been decided, see if we need to replace any file paths from directory manifests
+	for _, tf := range t.Files {
+		tf.ApplyDirManifests(dms)
 	}
 
 	return nil
