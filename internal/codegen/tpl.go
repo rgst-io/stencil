@@ -23,7 +23,7 @@ func NewFuncMap(st *Stencil, t *Template, log logrus.FieldLogger) template.FuncM
 	if st != nil {
 		tplst = &TplStencil{st, t, log}
 	}
-	if t != nil {
+	if t != nil && len(t.Files) > 0 {
 		tplf = &TplFile{t.Files[0], t, log}
 	}
 

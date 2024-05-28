@@ -81,11 +81,9 @@ func NewCreateModule() *cli.Command {
 			tm := &configuration.Manifest{
 				Name: path.Base(c.Args().Get(0)),
 				Modules: []*configuration.TemplateRepository{{
-					Name: "go.rgst.io/stencil-template-base",
+					Name: "github.com/getoutreach/stencil-template-base",
 				}, {
 					Name: "github.com/getoutreach/stencil-base",
-				}, {
-					Name: "go.rgst.io/stencil-circleci",
 				}},
 				Arguments: map[string]interface{}{
 					"reportingTeam": reportingTeam,
