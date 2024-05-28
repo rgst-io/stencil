@@ -62,7 +62,7 @@ func fakeTemplate(t *testing.T, args map[string]interface{},
 	// which we've created earlier after loading the module in the
 	// NewModuleFromTemplates call. This won't be used, but it's
 	// enough to set up the correct environment for running template test functions.
-	tpls, err := test.s.getTemplates(context.Background(), log)
+	tpls, _, err := test.s.getTemplates(context.Background(), log)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -130,7 +130,7 @@ func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]interface
 	// which we've created earlier after loading the module in the
 	// NewModuleFromTemplates call. This won't be used, but it's
 	// enough to set up the correct environment for running template test functions.
-	tpls, err := test.s.getTemplates(context.Background(), log)
+	tpls, _, err := test.s.getTemplates(context.Background(), log)
 	if err != nil {
 		t.Fatal(err)
 	}
