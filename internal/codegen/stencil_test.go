@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"slices"
 	"strings"
 	"testing"
 
@@ -91,9 +92,19 @@ func TestModuleHookRender(t *testing.T) {
 
 	tpls, err := st.Render(ctx, logrus.New())
 	assert.NilError(t, err, "expected Render() to not fail")
-	assert.Equal(t, len(tpls), 2, "expected Render() to return a single template")
-	assert.Equal(t, len(tpls[1].Files), 1, "expected Render() template to return a single file")
-	assert.Equal(t, strings.TrimSpace(tpls[1].Files[0].String()), "a", "expected Render() to return correct output")
+	assert.Equal(t, len(tpls), 2, "expected Render() to return two templates")
+	// template return order is randomized to prevent order dependencies
+	slices.SortFunc(tpls, func(a, b *Template) int {
+		if a.Module.Name < b.Module.Name {
+			return -1
+		}
+		if a.Module.Name > b.Module.Name {
+			return 1
+		}
+		return 0
+	})
+	assert.Equal(t, len(tpls[1].Files), 1, "expected Render() m2 template to return a single file")
+	assert.Equal(t, strings.TrimSpace(tpls[1].Files[0].String()), "a", "expected Render() m2 to return correct output")
 }
 
 func ExampleStencil_PostRun() {

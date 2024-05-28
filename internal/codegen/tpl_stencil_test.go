@@ -135,9 +135,8 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 
 			s.s.isFirstPass = true
 			for _, insert := range tt.inserts {
-				err1, err2 := s.AddToModuleHook(s.t.Module.Name, tt.args.name, insert)
-				if err1 != nil || err2 != nil {
-					t.Errorf("TplStencil.GetModuleHook() error = %v, %v", err1, err2)
+				if _, err := s.AddToModuleHook(s.t.Module.Name, tt.args.name, insert); err != nil {
+					t.Errorf("TplStencil.GetModuleHook() error = %v", err)
 					return
 				}
 			}

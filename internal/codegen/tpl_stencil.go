@@ -77,10 +77,10 @@ func (s *TplStencil) GetModuleHook(name string) []any {
 //
 //	{{- /* This writes a global into the current context of the template module repository */}}
 //	{{ stencil.SetGlobal "IsGeorgeCool" true }}
-func (s *TplStencil) SetGlobal(name string, data interface{}) error {
+func (s *TplStencil) SetGlobal(name string, data interface{}) (output string, err error) {
 	// Only modify on first pass
 	if !s.s.isFirstPass {
-		return nil
+		return "", nil
 	}
 
 	k := s.s.sharedData.key(s.t.Module.Name, name)
@@ -92,7 +92,7 @@ func (s *TplStencil) SetGlobal(name string, data interface{}) error {
 		value:    data,
 	}
 
-	return nil
+	return "", nil
 }
 
 // GetGlobal retrieves a global variable set by SetGlobal. The data returned from this function
@@ -131,10 +131,10 @@ func (s *TplStencil) GetGlobal(name string) interface{} {
 //
 //	{{- /* This writes to a module hook */}}
 //	{{ stencil.AddToModuleHook "github.com/myorg/repo" "myModuleHook" (list "myData") }}
-func (s *TplStencil) AddToModuleHook(module, name string, data interface{}) (out, err error) {
+func (s *TplStencil) AddToModuleHook(module, name string, data interface{}) (out string, err error) {
 	// Only modify on first pass
 	if !s.s.isFirstPass {
-		return nil, nil
+		return "", nil
 	}
 
 	k := s.s.sharedData.key(module, name)
@@ -144,14 +144,14 @@ func (s *TplStencil) AddToModuleHook(module, name string, data interface{}) (out
 	v := reflect.ValueOf(data)
 	if !v.IsValid() {
 		err := fmt.Errorf("third parameter, data, must be set")
-		return err, err
+		return "", err
 	}
 
 	// we only allow slices or maps to allow multiple templates to
 	// write to the same block
 	if v.Kind() != reflect.Slice {
 		err := fmt.Errorf("unsupported module block data type %q, supported type is slice", v.Kind())
-		return err, err
+		return "", err
 	}
 
 	// convert the slice into a []any
@@ -167,7 +167,7 @@ func (s *TplStencil) AddToModuleHook(module, name string, data interface{}) (out
 		s.s.sharedData.moduleHooks[k] = &moduleHook{values: interfaceSlice}
 	}
 
-	return nil, nil
+	return "", nil
 }
 
 // ReadFile reads a file from the current directory and returns it's contents
