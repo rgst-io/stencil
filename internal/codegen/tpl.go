@@ -6,6 +6,7 @@
 package codegen
 
 import (
+	"fmt"
 	"text/template"
 
 	"github.com/sirupsen/logrus"
@@ -30,7 +31,13 @@ func NewFuncMap(st *Stencil, t *Template, log logrus.FieldLogger) template.FuncM
 	// build the function map
 	funcs := Default
 	funcs["stencil"] = func() *TplStencil { return tplst }
-	funcs["file"] = func() *TplFile { return tplf }
+	funcs["file"] = func() *TplFile {
+		if tplf == nil {
+			panic(fmt.Errorf("attempted to use file in a template that doesn't support file rendering"))
+		}
+
+		return tplf
+	}
 	funcs["extensions"] = func() *extensions.ExtensionCaller { return st.extCaller }
 	return funcs
 }

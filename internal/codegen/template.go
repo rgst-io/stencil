@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -45,12 +46,22 @@ type Template struct {
 
 	// Contents is the content of this template
 	Contents []byte
+
+	// Library denotes if a template is a library template or not. Library
+	// templates cannot generate files.
+	Library bool
 }
 
 // NewTemplate creates a new Template with the current file being the same name
-// with the extension .tpl being removed.
+// with the extension .tpl being removed. If the provided template has
+// the extension .library.tpl, then the Library field is set to true.
 func NewTemplate(m *modules.Module, fpath string, mode os.FileMode,
 	modTime time.Time, contents []byte, log logrus.FieldLogger) (*Template, error) {
+	var library bool
+	if filepath.Ext(strings.TrimSuffix(fpath, ".tpl")) == ".library" {
+		library = true
+	}
+
 	return &Template{
 		log:      log,
 		mode:     mode,
@@ -58,6 +69,7 @@ func NewTemplate(m *modules.Module, fpath string, mode os.FileMode,
 		Module:   m,
 		Path:     fpath,
 		Contents: contents,
+		Library:  library,
 	}, nil
 }
 
@@ -86,7 +98,7 @@ func (t *Template) Parse(_ *Stencil) error {
 // Render renders the provided template, the produced files
 // are rendered onto the Files field of the template struct.
 func (t *Template) Render(st *Stencil, vals *Values) error {
-	if len(t.Files) == 0 {
+	if len(t.Files) == 0 && !t.Library {
 		f, err := NewFile(strings.TrimSuffix(t.Path, ".tpl"), t.mode, t.modTime)
 		if err != nil {
 			return err
@@ -110,6 +122,12 @@ func (t *Template) Render(st *Stencil, vals *Values) error {
 	if err := t.Module.GetTemplate().Funcs(NewFuncMap(st, t, t.log)).
 		ExecuteTemplate(&buf, t.ImportPath(), t.args); err != nil {
 		return err
+	}
+
+	// If we're a library template, we don't want to generate any files so
+	// we can return early here.
+	if t.Library {
+		t.Files = nil
 	}
 
 	// If we're writing only a single file, and the contents is empty

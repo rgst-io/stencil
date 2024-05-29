@@ -154,3 +154,37 @@ func TestGeneratedBlock(t *testing.T) {
 
 	assert.Equal(t, tpl.Files[0].String(), fakeGeneratedBlockFile, "expected fake to equal rendered output")
 }
+
+// TestLibraryTemplate ensures that library templates don't generate
+// files as well as that the library flag is set correctly.
+func TestLibraryTemplate(t *testing.T) {
+	m := modules.NewWithFS(context.Background(), "testing", memfs.New())
+
+	tpl, err := NewTemplate(m, "hello.library.tpl", 0o644, time.Now(), []byte("hello world!"), logrus.New())
+	assert.NilError(t, err, "failed to create basic template")
+	assert.Equal(t, tpl.Library, true, "expected library template to be marked as such")
+
+	assert.NilError(t, tpl.Render(
+		NewStencil(&configuration.Manifest{Name: "testing"}, []*modules.Module{m},
+			logrus.New()), NewValues(context.Background(), &configuration.Manifest{Name: "testing"}, nil)),
+		"expected library template to not fail on render")
+
+	assert.Equal(t, len(tpl.Files), 0, "expected library template to not generate files")
+}
+
+// TestLibraryCantAccessFileFunctions ensures that library templates
+// can't access file functions in the template.
+func TestLibraryCantAccessFileFunctions(t *testing.T) {
+	m := modules.NewWithFS(context.Background(), "testing", memfs.New())
+
+	tpl, err := NewTemplate(m, "hello.library.tpl", 0o644, time.Now(), []byte("{{ file.Create }}"), logrus.New())
+	assert.NilError(t, err, "failed to create basic template")
+	assert.Equal(t, tpl.Library, true, "expected library template to be marked as such")
+
+	err = tpl.Render(NewStencil(&configuration.Manifest{Name: "testing"}, []*modules.Module{m}, logrus.New()),
+		NewValues(context.Background(), &configuration.Manifest{Name: "testing"}, nil))
+	assert.ErrorContains(t, err,
+		"attempted to use file in a template that doesn't support file rendering",
+		"expected library template to fail on render",
+	)
+}
