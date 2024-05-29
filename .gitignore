@@ -28,6 +28,7 @@ TAGS
 # Releases and other binaries
 bin/
 dist/
+.dist/
 
 # Don't. Commit. Vendor. Or other package manager dep directories
 node_modules
