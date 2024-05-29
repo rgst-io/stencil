@@ -76,7 +76,7 @@ func (s *TplStencil) GetModuleHook(name string) []any {
 // occur if you're using the data it returns in the wrong way.
 //
 //	{{- /* This writes a global into the current context of the template module repository */}}
-//	{{ stencil.SetGlobal "IsGeorgeCool" true }}
+//	{{- stencil.SetGlobal "IsGeorgeCool" true -}}
 func (s *TplStencil) SetGlobal(name string, data interface{}) (output string, err error) {
 	// Only modify on first pass
 	if !s.s.isFirstPass {
@@ -130,7 +130,7 @@ func (s *TplStencil) GetGlobal(name string) interface{} {
 // times.
 //
 //	{{- /* This writes to a module hook */}}
-//	{{ stencil.AddToModuleHook "github.com/myorg/repo" "myModuleHook" (list "myData") }}
+//	{{- stencil.AddToModuleHook "github.com/myorg/repo" "myModuleHook" (list "myData") }}
 func (s *TplStencil) AddToModuleHook(module, name string, data interface{}) (out string, err error) {
 	// Only modify on first pass
 	if !s.s.isFirstPass {

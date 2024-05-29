@@ -51,7 +51,7 @@ func (f *TplFile) Block(name string) string {
 
 // SetPath changes the path of the current file being rendered
 //
-//	{{ file.SetPath "new/path/to/file.txt" }}
+//	{{- file.SetPath "new/path/to/file.txt" }}
 func (f *TplFile) SetPath(path string) (out string, err error) {
 	err = f.f.SetPath(path)
 	return "", err
@@ -69,7 +69,7 @@ func (f *TplFile) SetContents(contents string) error {
 
 // Skip skips the current file being rendered
 //
-//	{{ file.Skip "A reason to skip this file" }}
+//	{{- file.Skip "A reason to skip this file" }}
 func (f *TplFile) Skip(reason string) (output string, err error) {
 	f.f.Skipped = true
 	f.f.SkippedReason = reason
