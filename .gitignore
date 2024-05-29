@@ -38,3 +38,6 @@ vendor
 
 # Task local state
 .task
+
+# VSCode debugger launch configs
+launch.json

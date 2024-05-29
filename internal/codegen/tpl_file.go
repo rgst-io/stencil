@@ -51,13 +51,10 @@ func (f *TplFile) Block(name string) string {
 
 // SetPath changes the path of the current file being rendered
 //
-//	{{ $_ := file.SetPath "new/path/to/file.txt" }}
-//
-// Note: The $_ is required to ensure <nil> isn't outputted into
-// the template.
-func (f *TplFile) SetPath(path string) (out, err error) {
+//	{{- file.SetPath "new/path/to/file.txt" }}
+func (f *TplFile) SetPath(path string) (out string, err error) {
 	err = f.f.SetPath(path)
-	return err, err
+	return "", err
 }
 
 // SetContents sets the contents of file being rendered to the value
@@ -72,11 +69,11 @@ func (f *TplFile) SetContents(contents string) error {
 
 // Skip skips the current file being rendered
 //
-//	{{ $_ := file.Skip "A reason to skip this reason" }}
-func (f *TplFile) Skip(reason string) error {
+//	{{- file.Skip "A reason to skip this file" }}
+func (f *TplFile) Skip(reason string) (output string, err error) {
 	f.f.Skipped = true
 	f.f.SkippedReason = reason
-	return nil
+	return "", nil
 }
 
 // Delete deletes the current file being rendered
@@ -95,17 +92,16 @@ func (f *TplFile) Delete() error {
 // recommended that you do not do this as it limits your ability to change
 // the file in the future.
 //
-//	{{ $_ := file.Static }}
-func (f *TplFile) Static() (out, err error) {
+//	{{ file.Static }}
+func (f *TplFile) Static() (out string, err error) {
 	// if the file already exists, skip it
 	if _, err := os.Stat(f.f.path); err == nil {
 		f.log.WithField("template", f.t.Path).WithField("path", f.f.path).
 			Debug("Skipping static file because it already exists")
-		err := f.Skip("Static file, output already exists")
-		return err, err
+		return f.Skip("Static file, output already exists")
 	}
 
-	return nil, nil
+	return "", nil
 }
 
 // Path returns the current path of the file we're writing to
