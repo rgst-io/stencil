@@ -128,6 +128,7 @@ func (t *Template) Render(st *Stencil, vals *Values) error {
 	// we can return early here.
 	if t.Library {
 		t.Files = nil
+		return nil
 	}
 
 	// If we're writing only a single file, and the contents is empty
