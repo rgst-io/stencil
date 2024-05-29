@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/sirupsen/logrus"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/configuration"
 	"gotest.tools/v3/assert"
 )
@@ -16,7 +16,7 @@ func TestMain(t *testing.T) {
 		m:                   &configuration.TemplateRepositoryManifest{Name: "testing"},
 		t:                   t,
 		persist:             false,
-		log:                 logrus.New(),
+		log:                 slogext.NewTestLogger(t),
 	}
 	st.Run(false)
 }
@@ -28,7 +28,7 @@ func TestErrorHandling(t *testing.T) {
 		m:                   &configuration.TemplateRepositoryManifest{Name: "testing"},
 		t:                   t,
 		persist:             false,
-		log:                 logrus.New(),
+		log:                 slogext.NewTestLogger(t),
 	}
 	st.ErrorContains("sad")
 	st.Run(false)
@@ -39,7 +39,7 @@ func TestErrorHandling(t *testing.T) {
 		m:                   &configuration.TemplateRepositoryManifest{Name: "testing"},
 		t:                   t,
 		persist:             false,
-		log:                 logrus.New(),
+		log:                 slogext.NewTestLogger(t),
 	}
 	st.ErrorContains("sad pikachu")
 	st.Run(false)
@@ -54,7 +54,7 @@ func TestArgs(t *testing.T) {
 		}},
 		t:       t,
 		persist: false,
-		log:     logrus.New(),
+		log:     slogext.NewTestLogger(t),
 	}
 	st.Args(map[string]interface{}{"hello": "world"})
 	st.Run(false)

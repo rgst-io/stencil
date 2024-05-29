@@ -17,7 +17,7 @@ import (
 	"github.com/getoutreach/gobox/pkg/cfg"
 	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/configuration"
 )
 
@@ -72,7 +72,7 @@ type ModuleResolveOptions struct {
 	Token cfg.SecretData
 
 	// Log is the logger to use
-	Log logrus.FieldLogger
+	Log slogext.Logger
 
 	// Manifest is the manifest to resolve modules for.
 	// This can only be supplied if Module is not set.
@@ -170,9 +170,7 @@ func GetModulesForProject(ctx context.Context, opts *ModuleResolveOptions) ([]*M
 		// "dontResolve", then re-use it.
 		if rm.dontResolve {
 			// this module has already been resolved and should always be used
-			log.WithFields(logrus.Fields{
-				"module": importPath,
-			}).Debug("Using in-memory module")
+			log.With("module", importPath).Debug("Using in-memory module")
 			modulesToResolve = modulesToResolve[1:]
 			continue
 		}
@@ -183,10 +181,7 @@ func GetModulesForProject(ctx context.Context, opts *ModuleResolveOptions) ([]*M
 			channel:      resolv.conf.Channel,
 			parentModule: resolv.parent,
 		})
-		log.WithFields(logrus.Fields{
-			"module": importPath,
-			"parent": resolv.parent,
-		}).Debug("resolving module")
+		log.With("module", importPath, "parent", resolv.parent).Debug("resolving module")
 
 		uri := "https://" + importPath
 		var version *resolver.Version
@@ -253,10 +248,7 @@ func GetModulesForProject(ctx context.Context, opts *ModuleResolveOptions) ([]*M
 		rm.Module = m
 		rm.version = version
 
-		log.WithFields(logrus.Fields{
-			"module":  importPath,
-			"version": version.GitRef(),
-		}).Debug("resolved module")
+		log.With("module", importPath, "version", version.GitRef()).Debug("resolved module")
 
 		// resolve the next module
 		modulesToResolve = modulesToResolve[1:]

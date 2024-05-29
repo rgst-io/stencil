@@ -8,7 +8,7 @@ package apiv1
 import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
-	"github.com/sirupsen/logrus"
+	"go.rgst.io/stencil/internal/slogext"
 )
 
 // NewHandshake returns a plugin.HandshakeConfig for
@@ -23,10 +23,10 @@ func NewHandshake() plugin.HandshakeConfig {
 
 // NewExtensionImplementation implements a new extension
 // and starts serving it.
-func NewExtensionImplementation(impl Implementation, log logrus.FieldLogger) error {
+func NewExtensionImplementation(impl Implementation, log slogext.Logger) error {
 	logger := hclog.New(&hclog.LoggerOptions{
 		Level:       hclog.Trace,
-		Output:      &logger{fn: log.Debug},
+		Output:      &logger{fn: func(args ...interface{}) { log.Debugf("%s", args...) }},
 		DisableTime: true,
 	})
 

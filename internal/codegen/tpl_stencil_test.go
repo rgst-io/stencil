@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/go-git/go-billy/v5"
-	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/modules/modulestest"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/configuration"
 )
 
@@ -112,6 +112,7 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		log := slogext.NewTestLogger(t)
 		t.Run(tt.name, func(t *testing.T) {
 			s := &TplStencil{
 				t: must(
@@ -123,14 +124,14 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 						0o755,
 						time.Now(),
 						[]byte(""),
-						logrus.New(),
+						log,
 					),
 				),
 				s: &Stencil{sharedData: &sharedData{
 					moduleHooks: make(map[string]*moduleHook),
 					globals:     make(map[string]global),
 				}},
-				log: logrus.New(),
+				log: log,
 			}
 
 			s.s.isFirstPass = true

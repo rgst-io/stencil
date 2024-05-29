@@ -17,8 +17,8 @@ import (
 	"github.com/go-git/go-billy/v5/util"
 	"github.com/mitchellh/hashstructure/v2"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/modules"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/extensions"
@@ -27,7 +27,7 @@ import (
 )
 
 // NewStencil creates a new, fully initialized Stencil renderer function
-func NewStencil(m *configuration.Manifest, mods []*modules.Module, log logrus.FieldLogger) *Stencil {
+func NewStencil(m *configuration.Manifest, mods []*modules.Module, log slogext.Logger) *Stencil {
 	return &Stencil{
 		log:         log,
 		m:           m,
@@ -41,7 +41,7 @@ func NewStencil(m *configuration.Manifest, mods []*modules.Module, log logrus.Fi
 // Stencil provides the basic functions for
 // stencil templates
 type Stencil struct {
-	log logrus.FieldLogger
+	log slogext.Logger
 	m   *configuration.Manifest
 
 	ext       *extensions.Host
@@ -120,7 +120,7 @@ func (*sharedData) key(module, key string) string {
 // modules.
 func (s *Stencil) RegisterExtensions(ctx context.Context) error {
 	for _, m := range s.modules {
-		if err := m.RegisterExtensions(ctx, s.log, s.ext); err != nil {
+		if err := m.RegisterExtensions(ctx, s.ext); err != nil {
 			return errors.Wrapf(err, "failed to load extensions from module %q", m.Name)
 		}
 	}
@@ -187,7 +187,7 @@ func (s *Stencil) sortModuleHooks() {
 // Render renders all templates using the Manifest that was
 // provided to stencil at creation time, returned is the templates
 // that were produced and their associated files.
-func (s *Stencil) Render(ctx context.Context, log logrus.FieldLogger) ([]*Template, error) {
+func (s *Stencil) Render(ctx context.Context, log slogext.Logger) ([]*Template, error) {
 	tplfiles, err := s.getTemplates(ctx, log)
 	if err != nil {
 		return nil, err
@@ -241,7 +241,7 @@ func (s *Stencil) Render(ctx context.Context, log logrus.FieldLogger) ([]*Templa
 
 // PostRun runs all post run commands specified in the modules that
 // this project depends on
-func (s *Stencil) PostRun(ctx context.Context, log logrus.FieldLogger) error {
+func (s *Stencil) PostRun(ctx context.Context, log slogext.Logger) error {
 	log.Info("Running post-run command(s)")
 	for _, m := range s.modules {
 		for _, cmdStr := range m.Manifest.PostRunCommand {
@@ -262,7 +262,7 @@ func (s *Stencil) PostRun(ctx context.Context, log logrus.FieldLogger) error {
 
 // getTemplates takes all modules attached to this stencil
 // struct and returns all templates exposed by it.
-func (s *Stencil) getTemplates(ctx context.Context, log logrus.FieldLogger) ([]*Template, error) {
+func (s *Stencil) getTemplates(ctx context.Context, log slogext.Logger) ([]*Template, error) {
 	tpls := make([]*Template, 0)
 	for _, m := range s.modules {
 		log.Debugf("Fetching module %q", m.Name)

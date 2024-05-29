@@ -17,10 +17,10 @@ import (
 
 	"github.com/bradleyjkemp/cupaloy"
 	"github.com/getoutreach/gobox/pkg/cli/github"
-	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/codegen"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/extensions/apiv1"
 	"gopkg.in/yaml.v3"
@@ -53,7 +53,7 @@ type Template struct {
 	errStr string
 
 	// log is the logger to use when running stencil
-	log logrus.FieldLogger
+	log slogext.Logger
 
 	// persist denotes if we should save a snapshot or not
 	// This is meant for tests.
@@ -79,8 +79,8 @@ func New(t *testing.T, templatePath string, additionalTemplates ...string) *Temp
 		t.Fatal(err)
 	}
 
-	log := logrus.New()
-	log.SetLevel(logrus.DebugLevel)
+	log := slogext.NewTestLogger(t)
+	log.SetLevel(slogext.DebugLevel)
 
 	return &Template{
 		t:                   t,
@@ -166,15 +166,12 @@ func (t *Template) Run(save bool) {
 		tpls, err := st.Render(context.Background(), t.log)
 		if err != nil {
 			if t.errStr != "" {
-				// if t.errStr was set then we expected an error, since that
-				// was set via t.ErrorContains()
-				if err == nil {
-					got.Fatal("expected error, got nil")
-				}
 				assert.ErrorContains(t.t, err, t.errStr, "expected render to fail with error containing %q", t.errStr)
 			} else {
 				got.Fatalf("failed to render: %v", err)
 			}
+		} else if t.errStr != "" {
+			got.Fatalf("expected render to fail with error containing %q, but it succeeded", t.errStr)
 		}
 
 		for _, tpl := range tpls {

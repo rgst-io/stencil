@@ -20,9 +20,9 @@ import (
 	"github.com/getoutreach/gobox/pkg/cfg"
 	"github.com/getoutreach/gobox/pkg/cli/github"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/codegen"
 	"go.rgst.io/stencil/internal/modules"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/stencil"
 	"golang.org/x/term"
@@ -40,7 +40,7 @@ type Command struct {
 	manifest *configuration.Manifest
 
 	// log is the logger used for logging output
-	log logrus.FieldLogger
+	log slogext.Logger
 
 	// dryRun denotes if we should write files to disk or not
 	dryRun bool
@@ -58,7 +58,7 @@ type Command struct {
 }
 
 // NewCommand creates a new stencil command
-func NewCommand(log logrus.FieldLogger, s *configuration.Manifest,
+func NewCommand(log slogext.Logger, s *configuration.Manifest,
 	dryRun, frozen, allowMajorVersionUpgrades bool) *Command {
 	l, err := stencil.LoadLockfile("")
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
@@ -169,7 +169,7 @@ func (c *Command) useModulesFromLock() error {
 	}
 
 	if outOfSync {
-		c.log.WithField("reasons", outOfSyncReasons).Debug("lockfile out of sync reasons")
+		c.log.With("reasons", outOfSyncReasons).Debug("lockfile out of sync reasons")
 		c.log.Error("Unable to use frozen lockfile, the lockfile is out of sync with the stencil.yaml")
 		return fmt.Errorf("lockfile out of sync")
 	}
@@ -269,7 +269,7 @@ func (c *Command) promptMajorVersion(ctx context.Context, m *modules.Module, las
 		return fmt.Errorf("unable to prompt for major version upgrade, stdin is not a terminal, pass --allow-major-version-upgrades to continue")
 	}
 
-	gh, err := github.NewClient(github.WithAllowUnauthenticated(), github.WithLogger(c.log))
+	gh, err := github.NewClient(github.WithAllowUnauthenticated())
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch release notes (create github client)")
 	}

@@ -9,18 +9,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/configuration"
 	"gotest.tools/v3/assert"
 )
 
 // newLogger creates a new logger for testing
-func newLogger() logrus.FieldLogger {
-	log := logrus.New()
-	log.SetLevel(logrus.DebugLevel)
-	return log
+func newLogger(t *testing.T) slogext.Logger {
+	return slogext.NewTestLogger(t)
 }
 
 func TestCanFetchModule(t *testing.T) {
@@ -49,7 +47,7 @@ func TestReplacementLocalModule(t *testing.T) {
 		},
 	}
 
-	mods, err := modules.GetModulesForProject(context.Background(), &modules.ModuleResolveOptions{Manifest: sm, Log: newLogger()})
+	mods, err := modules.GetModulesForProject(context.Background(), &modules.ModuleResolveOptions{Manifest: sm, Log: newLogger(t)})
 	assert.NilError(t, err, "expected GetModulesForProject() to not error")
 	assert.Equal(t, len(mods), 1, "expected exactly one module to be returned")
 	assert.Equal(t, mods[0].URI, sm.Replacements["github.com/getoutreach/stencil-base"],
@@ -67,7 +65,7 @@ func TestCanGetLatestVersion(t *testing.T) {
 				},
 			},
 		},
-		Log: newLogger(),
+		Log: newLogger(t),
 	})
 	assert.NilError(t, err, "failed to call GetModulesForProject()")
 	assert.Assert(t, len(mods) >= 1, "expected at least one module to be returned")
@@ -91,7 +89,7 @@ func TestHandleMultipleConstraints(t *testing.T) {
 				"nested_constraint": "file://testdata/nested_constraint",
 			},
 		},
-		Log: newLogger(),
+		Log: newLogger(t),
 	})
 	assert.NilError(t, err, "failed to call GetModulesForProject()")
 	assert.Equal(t, len(mods), 2, "expected exactly two modules to be returned")
@@ -125,7 +123,7 @@ func TestHandleNestedModules(t *testing.T) {
 				"b": "file://testdata/nested_modules/b",
 			},
 		},
-		Log: newLogger(),
+		Log: newLogger(t),
 	})
 	assert.NilError(t, err, "failed to call GetModulesForProject()")
 
@@ -162,7 +160,7 @@ func TestFailOnIncompatibleConstraints(t *testing.T) {
 				"nested_constraint": "file://testdata/nested_constraint",
 			},
 		},
-		Log: newLogger(),
+		Log: newLogger(t),
 	})
 	assert.Error(t, err,
 		//nolint:lll // Why: That's the error :(
@@ -183,7 +181,7 @@ func TestSupportChannelAndConstraint(t *testing.T) {
 				},
 			},
 		},
-		Log: newLogger(),
+		Log: newLogger(t),
 	})
 	assert.NilError(t, err, "failed to call GetModulesForProject()")
 	assert.Equal(t, len(mods), 1, "expected exactly one module to be returned")
@@ -202,7 +200,7 @@ func TestCanUseBranch(t *testing.T) {
 				},
 			},
 		},
-		Log: newLogger(),
+		Log: newLogger(t),
 	})
 	assert.NilError(t, err, "failed to call GetModulesForProject()")
 
@@ -252,7 +250,7 @@ func TestBranchAlwaysUsedOverDependency(t *testing.T) {
 				},
 			},
 		},
-		Log: newLogger(),
+		Log: newLogger(t),
 	})
 	assert.NilError(t, err, "failed to call GetModulesForProject()")
 
@@ -286,7 +284,7 @@ func TestCanRespectChannels(t *testing.T) {
 				},
 			},
 		},
-		Log: newLogger(),
+		Log: newLogger(t),
 	})
 	assert.NilError(t, err, "failed to call GetModulesForProject()")
 	assert.Equal(t, len(mods), 1, "expected exactly one module to be returned")
@@ -324,7 +322,7 @@ func TestShouldResolveInMemoryModule(t *testing.T) {
 	mods, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
 		Module:       m,
 		Replacements: map[string]*modules.Module{"test-dep": mDep},
-		Log:          newLogger(),
+		Log:          newLogger(t),
 	})
 	assert.NilError(t, err, "failed to call GetModulesForProject()")
 	assert.Equal(t, len(mods), 2, "expected exactly two modules to be returned")
@@ -355,7 +353,7 @@ func TestShouldErrorOnTwoDifferentChannels(t *testing.T) {
 				},
 			},
 		},
-		Log: newLogger(),
+		Log: newLogger(t),
 	})
 	assert.ErrorContains(t, err, "previously resolved with channel", "expected GetModulesForProject() to error")
 }

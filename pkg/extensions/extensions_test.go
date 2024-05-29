@@ -6,7 +6,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
-	"github.com/sirupsen/logrus"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/extensions"
 	"gotest.tools/v3/assert"
 )
@@ -15,7 +15,7 @@ func TestCanImportNativeExtension(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	ext := extensions.NewHost(logrus.New())
+	ext := extensions.NewHost(slogext.NewTestLogger(t))
 	defer ext.Close()
 
 	version := &resolver.Version{

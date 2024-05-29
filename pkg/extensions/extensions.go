@@ -22,8 +22,8 @@ import (
 	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	giturls "github.com/whilp/git-urls"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/extensions/apiv1"
 )
 
@@ -35,7 +35,7 @@ type generatedTemplateFunc func(...interface{}) (interface{}, error)
 // Host implements an extension host that handles
 // registering extensions and executing them.
 type Host struct {
-	log        logrus.FieldLogger
+	log        slogext.Logger
 	extensions map[string]extension
 }
 
@@ -46,7 +46,7 @@ type extension struct {
 }
 
 // NewHost creates a new extension host
-func NewHost(log logrus.FieldLogger) *Host {
+func NewHost(log slogext.Logger) *Host {
 	return &Host{
 		log:        log,
 		extensions: make(map[string]extension),
@@ -92,7 +92,7 @@ func (h *Host) GetExtensionCaller(_ context.Context) (*ExtensionCaller, error) {
 		}
 
 		for _, f := range funcs {
-			h.log.WithField("extension", extName).WithField("function", f.Name).Debug("Registering extension function")
+			h.log.With("extension", extName).With("function", f.Name).Debug("Registering extension function")
 			tfunc := h.createFunctionFromTemplateFunction(extName, ext.impl, f)
 
 			if _, ok := funcMap[extName]; !ok {
@@ -112,7 +112,7 @@ func (h *Host) GetExtensionCaller(_ context.Context) (*ExtensionCaller, error) {
 // and compiles/downloads it. A client is then created
 // that is able to communicate with the ext.
 func (h *Host) RegisterExtension(ctx context.Context, source, name string, version *resolver.Version) error { //nolint:lll // Why: OK length.
-	h.log.WithField("extension", name).WithField("source", source).Debug("Registered extension")
+	h.log.With("extension", name).With("source", source).Debug("Registered extension")
 
 	u, err := giturls.Parse(source)
 	if err != nil {
@@ -145,7 +145,7 @@ func (h *Host) RegisterExtension(ctx context.Context, source, name string, versi
 // RegisterInprocExtension registers an extension that is implemented within the same process
 // directly with the host. Please limit the use of this API for unit testing only!
 func (h *Host) RegisterInprocExtension(name string, ext apiv1.Implementation) {
-	h.log.WithField("extension", name).Debug("Registered inproc extension")
+	h.log.With("extension", name).Debug("Registered inproc extension")
 	h.extensions[name] = extension{ext, func() error { return nil }}
 }
 
@@ -226,7 +226,7 @@ func (h *Host) downloadFromRemote(ctx context.Context, name string,
 		return dlPath, nil
 	}
 
-	h.log.WithField("version", version).WithField("repo", repoURL).Debug("Downloading native extension")
+	h.log.With("version", version).With("repo", repoURL).Debug("Downloading native extension")
 	a, archiveName, _, err := release.Fetch(ctx, token, &release.FetchOptions{
 		AssetName: filepath.Base(name) + "_*_" + runtime.GOOS + "_" + runtime.GOARCH + ".tar.gz",
 		RepoURL:   repoURL,

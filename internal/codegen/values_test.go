@@ -14,9 +14,9 @@ import (
 	gogit "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 	"gotest.tools/v3/assert"
@@ -98,7 +98,7 @@ func TestValues(t *testing.T) {
 }
 
 func TestGeneratedValues(t *testing.T) {
-	log := logrus.New()
+	log := slogext.NewTestLogger(t)
 
 	man := &configuration.TemplateRepositoryManifest{
 		Name: "testing",

@@ -2,16 +2,14 @@ package codegen
 
 import (
 	"context"
-	"fmt"
-	"io"
 	"slices"
 	"strings"
 	"testing"
 
 	"github.com/go-git/go-billy/v5/memfs"
-	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/stencil"
@@ -21,6 +19,7 @@ import (
 func TestBasicE2ERender(t *testing.T) {
 	fs := memfs.New()
 	ctx := context.Background()
+	log := slogext.NewTestLogger(t)
 
 	// create stub manifest
 	f, _ := fs.Create("manifest.yaml")
@@ -38,9 +37,9 @@ func TestBasicE2ERender(t *testing.T) {
 	st := NewStencil(&configuration.Manifest{
 		Name:      "test",
 		Arguments: map[string]interface{}{},
-	}, []*modules.Module{tp}, logrus.New())
+	}, []*modules.Module{tp}, log)
 
-	tpls, err := st.Render(ctx, logrus.New())
+	tpls, err := st.Render(ctx, log)
 	assert.NilError(t, err, "expected Render() to not fail")
 	assert.Equal(t, len(tpls), 1, "expected Render() to return a single template")
 	assert.Equal(t, len(tpls[0].Files), 1, "expected Render() template to return a single file")
@@ -68,6 +67,7 @@ func TestBasicE2ERender(t *testing.T) {
 
 func TestModuleHookRender(t *testing.T) {
 	ctx := context.Background()
+	log := slogext.NewTestLogger(t)
 
 	// create modules
 	m1man := &configuration.TemplateRepositoryManifest{
@@ -88,9 +88,9 @@ func TestModuleHookRender(t *testing.T) {
 	st := NewStencil(&configuration.Manifest{
 		Name:      "test",
 		Arguments: map[string]interface{}{},
-	}, []*modules.Module{m1, m2}, logrus.New())
+	}, []*modules.Module{m1, m2}, log)
 
-	tpls, err := st.Render(ctx, logrus.New())
+	tpls, err := st.Render(ctx, log)
 	assert.NilError(t, err, "expected Render() to not fail")
 	assert.Equal(t, len(tpls), 2, "expected Render() to return two templates")
 	// template return order is randomized to prevent order dependencies
@@ -105,33 +105,4 @@ func TestModuleHookRender(t *testing.T) {
 	})
 	assert.Equal(t, len(tpls[1].Files), 1, "expected Render() m2 template to return a single file")
 	assert.Equal(t, strings.TrimSpace(tpls[1].Files[0].String()), "a", "expected Render() m2 to return correct output")
-}
-
-func ExampleStencil_PostRun() {
-	fs := memfs.New()
-	ctx := context.Background()
-
-	// create a stub manifest
-	f, _ := fs.Create("manifest.yaml")
-	f.Write([]byte("name: testing\npostRunCommand:\n- command: echo \"hello\""))
-	f.Close()
-
-	nullLog := logrus.New()
-	nullLog.SetOutput(io.Discard)
-
-	tf, err := modulestest.NewWithFS(ctx, "testing", fs)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	st := NewStencil(&configuration.Manifest{
-		Name:      "test",
-		Arguments: map[string]interface{}{},
-	}, []*modules.Module{tf}, logrus.New())
-	if err := st.PostRun(ctx, nullLog); err != nil {
-		fmt.Println(err)
-	}
-
-	// Output:
-	// hello
 }

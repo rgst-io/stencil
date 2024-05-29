@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/sirupsen/logrus"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/stencil"
 )
@@ -143,7 +143,7 @@ func TestCommand_useModulesFromLock(t *testing.T) {
 			c := &Command{
 				lock:                      tt.fields.lock,
 				manifest:                  tt.fields.manifest,
-				log:                       logrus.New(),
+				log:                       slogext.NewTestLogger(t),
 				dryRun:                    tt.fields.dryRun,
 				frozenLockfile:            true,
 				allowMajorVersionUpgrades: tt.fields.allowMajorVersionUpgrades,

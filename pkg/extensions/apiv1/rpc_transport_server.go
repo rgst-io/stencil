@@ -5,13 +5,13 @@
 package apiv1
 
 import (
-	"github.com/sirupsen/logrus"
+	"go.rgst.io/stencil/internal/slogext"
 )
 
 // rpcTransportServer implements a rpc backed implementation
 // of implementationTransport.
 type rpcTransportServer struct {
-	log  logrus.FieldLogger
+	log  slogext.Logger
 	impl implementationTransport
 }
 
@@ -34,7 +34,7 @@ func (s *rpcTransportServer) GetTemplateFunctions(_ interface{}, resp *[]*Templa
 //nolint:gocritic // Why: go-plugin wants this
 func (s *rpcTransportServer) ExecuteTemplateFunction(t *TemplateFunctionExec, resp *[]byte) error {
 	v, err := s.impl.ExecuteTemplateFunction(t)
-	s.log.WithField("name", t.Name).WithError(err).Debugf("Extension function called: %s", string(v))
+	s.log.With("name", t.Name).WithError(err).Debugf("Extension function called: %s", string(v))
 	*resp = v
 	return err
 }

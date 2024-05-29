@@ -13,18 +13,18 @@ import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"go.rgst.io/stencil/internal/slogext"
 )
 
 // IDEA(jaredallard): Cleanup this to return a Implementation backed by a transport as well.
 
 // NewExtensionClient creates a new Implementation from a plugin
-func NewExtensionClient(ctx context.Context, extPath string, log logrus.FieldLogger) (Implementation, func() error, error) {
+func NewExtensionClient(ctx context.Context, extPath string, log slogext.Logger) (Implementation, func() error, error) {
 	// create a connection to the extension
 	client := plugin.NewClient(&plugin.ClientConfig{
 		Logger: hclog.New(&hclog.LoggerOptions{
 			Level:       hclog.Trace,
-			Output:      &logger{fn: log.Debug},
+			Output:      &logger{fn: func(args ...interface{}) { log.Debugf("%s", args...) }},
 			DisableTime: true,
 		}),
 		HandshakeConfig: plugin.HandshakeConfig{

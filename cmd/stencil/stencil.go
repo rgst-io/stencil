@@ -19,13 +19,14 @@ package main
 
 import (
 	"context"
+
 	"os"
 
-	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 
 	"github.com/pkg/errors"
 	"go.rgst.io/stencil/internal/cmd/stencil"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 )
@@ -35,7 +36,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	log := logrus.New()
+	log := slogext.New()
 
 	app := cli.App{
 		Version:     version.Version,
@@ -45,7 +46,7 @@ func main() {
 			log.Infof("stencil %s", c.App.Version)
 
 			if c.Bool("debug") {
-				log.SetLevel(logrus.DebugLevel)
+				log.SetLevel(slogext.DebugLevel)
 				log.Debug("Debug logging enabled")
 			}
 
@@ -88,6 +89,6 @@ func main() {
 
 	if err := app.RunContext(ctx, os.Args); err != nil {
 		//nolint:gocritic // Why: We're OK not canceling context in this case.
-		log.WithError(err).Error("failed to run")
+		log.With(err).Error("failed to run")
 	}
 }

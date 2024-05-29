@@ -116,7 +116,7 @@ func (m *Module) GetTemplate() *template.Template {
 // by the given module. If the module is a local file
 // URI then extensions will be sourced from the `./bin`
 // directory of the base of the path.
-func (m *Module) RegisterExtensions(ctx context.Context, _ logrus.FieldLogger, ext *extensions.Host) error {
+func (m *Module) RegisterExtensions(ctx context.Context, ext *extensions.Host) error {
 	// Only register extensions if this repository declares extensions explicitly in its type.
 	if !m.Manifest.Type.Contains(configuration.TemplateRepositoryTypeExt) {
 		return nil

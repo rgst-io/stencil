@@ -8,13 +8,13 @@ import (
 	"net/rpc"
 
 	"github.com/hashicorp/go-plugin"
-	"github.com/sirupsen/logrus"
+	"go.rgst.io/stencil/internal/slogext"
 )
 
 // ExtensionPlugin is the high level plugin used by go-plugin
 // it stores both the server and client implementation
 type ExtensionPlugin struct {
-	log  logrus.FieldLogger
+	log  slogext.Logger
 	impl implementationTransport
 }
 
