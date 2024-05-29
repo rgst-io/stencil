@@ -13,9 +13,11 @@ import (
 
 	_ "embed"
 
+	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/modules"
+	"go.rgst.io/stencil/internal/modules/modulestest"
 	"go.rgst.io/stencil/pkg/configuration"
 	"gotest.tools/v3/assert"
 )
@@ -35,8 +37,18 @@ var generatedBlockTemplate string
 //go:embed testdata/generated-block/fake.txt
 var fakeGeneratedBlockFile string
 
+func memfsWithManifest(manifest string) billy.Filesystem {
+	fs := memfs.New()
+	f, _ := fs.Create("manifest.yaml")
+	f.Write([]byte(manifest))
+	f.Close()
+	return fs
+}
+
 func TestSingleFileRender(t *testing.T) {
-	m := modules.NewWithFS(context.Background(), "testing", memfs.New())
+	fs := memfsWithManifest("name: testing\n")
+	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
+	assert.NilError(t, err, "failed to NewWithFS")
 
 	tpl, err := NewTemplate(m, "virtual-file.tpl", 0o644, time.Now(), []byte("hello world!"), logrus.New())
 	assert.NilError(t, err, "failed to create basic template")
@@ -50,12 +62,9 @@ func TestSingleFileRender(t *testing.T) {
 }
 
 func TestMultiFileRender(t *testing.T) {
-	fs := memfs.New()
-	f, _ := fs.Create("manifest.yaml")
-	f.Write([]byte("name: testing\narguments:\n  commands:\n    type: list"))
-	f.Close()
-
-	m := modules.NewWithFS(context.Background(), "testing", fs)
+	fs := memfsWithManifest("name: testing\narguments:\n  commands:\n    type: list")
+	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
+	assert.NilError(t, err, "failed to NewWithFS")
 
 	tpl, err := NewTemplate(m, "multi-file.tpl", 0o644,
 		time.Now(), []byte(multiFileTemplate), logrus.New())
@@ -76,12 +85,9 @@ func TestMultiFileRender(t *testing.T) {
 }
 
 func TestMultiFileWithInputRender(t *testing.T) {
-	fs := memfs.New()
-	f, _ := fs.Create("manifest.yaml")
-	f.Write([]byte("name: testing\narguments:\n  commands:\n    type: list"))
-	f.Close()
-
-	m := modules.NewWithFS(context.Background(), "testing", fs)
+	fs := memfsWithManifest("name: testing\narguments:\n  commands:\n    type: list")
+	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
+	assert.NilError(t, err, "failed to NewWithFS")
 
 	tpl, err := NewTemplate(m, "multi-file-input.tpl", 0o644,
 		time.Now(), []byte(multiFileInputTemplate), logrus.New())
@@ -102,12 +108,9 @@ func TestMultiFileWithInputRender(t *testing.T) {
 }
 
 func TestApplyTemplateArgumentPassthrough(t *testing.T) {
-	fs := memfs.New()
-	f, _ := fs.Create("manifest.yaml")
-	f.Write([]byte("name: testing\narguments:\n  commands:\n    type: list"))
-	f.Close()
-
-	m := modules.NewWithFS(context.Background(), "testing", fs)
+	fs := memfsWithManifest("name: testing\narguments:\n  commands:\n    type: list")
+	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
+	assert.NilError(t, err, "failed to NewWithFS")
 
 	tpl, err := NewTemplate(m, "apply-template-passthrough.tpl", 0o644,
 		time.Now(), []byte(applyTemplatePassthroughTemplate), logrus.New())
@@ -129,13 +132,10 @@ func TestGeneratedBlock(t *testing.T) {
 	tempDir := t.TempDir()
 	fakeFilePath := filepath.Join(tempDir, "generated-block.txt")
 
-	fs := memfs.New()
-	f, _ := fs.Create("manifest.yaml")
-	f.Write([]byte("name: testing\n"))
-	f.Close()
-
+	fs := memfsWithManifest("name: testing\n")
 	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{}}
-	m := modules.NewWithFS(context.Background(), "testing", fs)
+	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
+	assert.NilError(t, err, "failed to NewWithFS")
 
 	st := NewStencil(sm, []*modules.Module{m}, logrus.New())
 	assert.NilError(t, os.WriteFile(fakeFilePath, []byte(fakeGeneratedBlockFile), 0o644),

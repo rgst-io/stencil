@@ -68,7 +68,7 @@ func uriIsLocal(uri string) bool {
 //
 // uri is the URI for the module. If it is an empty string https://+name is used
 // instead.
-func New(ctx context.Context, uri string, tr *configuration.TemplateRepository) (*Module, error) {
+func New(ctx context.Context, uri string, tr *configuration.TemplateRepository, fs billy.Filesystem) (*Module, error) {
 	if uri == "" {
 		uri = "https://" + tr.Name
 	}
@@ -95,6 +95,7 @@ func New(ctx context.Context, uri string, tr *configuration.TemplateRepository) 
 		Name:    tr.Name,
 		URI:     uri,
 		Version: tr.Version,
+		fs:      fs,
 	}
 
 	mani, err := m.getManifest(ctx)
@@ -104,18 +105,6 @@ func New(ctx context.Context, uri string, tr *configuration.TemplateRepository) 
 	m.Manifest = mani
 
 	return &m, nil
-}
-
-// NewWithFS creates a module with the specified file system. This is
-// generally only meant to be used in tests.
-func NewWithFS(ctx context.Context, name string, fs billy.Filesystem) *Module {
-	//nolint:errcheck // Why: No errors
-	m, _ := New(ctx, "vfs://"+name, &configuration.TemplateRepository{
-		Name:    name,
-		Version: "vfs",
-	})
-	m.fs = fs
-	return m
 }
 
 // GetTemplate returns the go template for this module

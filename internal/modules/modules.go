@@ -235,7 +235,7 @@ func GetModulesForProject(ctx context.Context, opts *ModuleResolveOptions) ([]*M
 				Name:    importPath,
 				Channel: resolv.conf.Channel,
 				Version: version.GitRef(),
-			})
+			}, nil)
 			if err != nil {
 				return nil, err
 			}

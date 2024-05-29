@@ -25,7 +25,7 @@ func newLogger() logrus.FieldLogger {
 
 func TestCanFetchModule(t *testing.T) {
 	ctx := context.Background()
-	m, err := modules.New(ctx, "", &configuration.TemplateRepository{Name: "github.com/getoutreach/stencil-base", Version: "main"})
+	m, err := modules.New(ctx, "", &configuration.TemplateRepository{Name: "github.com/getoutreach/stencil-base", Version: "main"}, nil)
 	assert.NilError(t, err, "failed to call New()")
 	assert.Assert(t, m.Manifest.Type.Contains(configuration.TemplateRepositoryTypeTemplates), "failed to validate returned manifest")
 
