@@ -148,28 +148,36 @@ func (t *Template) Render(st *Stencil, vals *Values) error {
 	if !st.isFirstPass {
 		// Now that everything's been decided, see if we need to replace any file paths from directory manifests
 		for _, tf := range t.Files {
-			// Hop through the path dir by dir, starting at the end (because the raw paths won't match if you replace the earlier
-			// path segments first), and see if there's any replacements.
-			pp := strings.Split(tf.path, string(os.PathSeparator))
-			for i := len(pp) - 1; i >= 0; i-- {
-				pathPart := strings.Join(pp[0:i+1], string(os.PathSeparator))
-				if dr, has := t.Module.Manifest.DirReplacements[pathPart]; has {
-					// Render replacement
-					rt, err := NewTemplate(t.Module, "dirReplace", 0o000, time.Time{}, []byte(dr), t.log)
-					if err != nil {
-						return err
-					}
-
-					if err := rt.Render(st, vals); err != nil {
-						return err
-					}
-
-					pp[i] = rt.Files[0].String()
-				}
+			if err := t.applyDirReplacements(tf, st, vals); err != nil {
+				return err
 			}
-			tf.path = strings.Join(pp, string(os.PathSeparator))
 		}
 	}
+
+	return nil
+}
+
+func (t *Template) applyDirReplacements(tf *File, st *Stencil, vals *Values) error {
+	// Hop through the path dir by dir, starting at the end (because the raw paths won't match if you replace the earlier
+	// path segments first), and see if there's any replacements.
+	pp := strings.Split(tf.path, string(os.PathSeparator))
+	for i := len(pp) - 1; i >= 0; i-- {
+		pathPart := strings.Join(pp[0:i+1], string(os.PathSeparator))
+		if dr, has := t.Module.Manifest.DirReplacements[pathPart]; has {
+			// Render replacement
+			rt, err := NewTemplate(t.Module, "dirReplace", 0o000, time.Time{}, []byte(dr), t.log)
+			if err != nil {
+				return err
+			}
+
+			if err := rt.Render(st, vals); err != nil {
+				return err
+			}
+
+			pp[i] = rt.Files[0].String()
+		}
+	}
+	tf.path = strings.Join(pp, string(os.PathSeparator))
 
 	return nil
 }
