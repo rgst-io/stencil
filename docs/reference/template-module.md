@@ -54,7 +54,12 @@ The important keys that a module has are listed below, but an exhaustive list ca
 - `dirReplacements` - a key:value mapping of template-able replacements for directory names, often used for languages like Java/Kotlin with directories named after the projects
   - key: The directory name to replace
   - value: The template-able replacement name
-  - example: `"src/main/kotlin/com.projname": "{{ stencil.Arg \"project-name\" }}"` will take the `com.projname` directory and replace it with the result of rendering the template (replacing it with the contents of the module's argument named "project-name")
+  - example: This k:v pair will take the `com.projname` directory and replace it with the result of rendering the template (replacing it with the contents of the module's argument named "project-name"):
+
+```
+  "src/main/kotlin/com.projname": '{{ stencil.Arg "project-name" }}'
+```
+
 - `arguments` - a map of arguments that this module accepts. A module cannot access an argument via `stencil.Arg` without first declaring it here.
   - `name` - the name of the argument
   - `description` - a description of the argument
