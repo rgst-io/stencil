@@ -27,10 +27,7 @@ func TestCanFetchModule(t *testing.T) {
 	ctx := context.Background()
 	m, err := modules.New(ctx, "", &configuration.TemplateRepository{Name: "github.com/getoutreach/stencil-base", Version: "main"})
 	assert.NilError(t, err, "failed to call New()")
-
-	manifest, err := m.Manifest(ctx)
-	assert.NilError(t, err, "failed to call Manifest() on module")
-	assert.Assert(t, manifest.Type.Contains(configuration.TemplateRepositoryTypeTemplates), "failed to validate returned manifest")
+	assert.Assert(t, m.Manifest.Type.Contains(configuration.TemplateRepositoryTypeTemplates), "failed to validate returned manifest")
 
 	fs, err := m.GetFS(ctx)
 	assert.NilError(t, err, "failed to call GetFS() on module")

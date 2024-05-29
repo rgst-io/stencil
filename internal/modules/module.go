@@ -40,6 +40,9 @@ type Module struct {
 	// the data passing system should be used for cases like this.
 	t *template.Template
 
+	// Manifest is the module's manifest information/configuration
+	Manifest *configuration.TemplateRepositoryManifest
+
 	// Name is the name of a module. This should be a valid go
 	// import path. For example: github.com/getoutreach/stencil-base
 	Name string
@@ -65,7 +68,7 @@ func uriIsLocal(uri string) bool {
 //
 // uri is the URI for the module. If it is an empty string https://+name is used
 // instead.
-func New(_ context.Context, uri string, tr *configuration.TemplateRepository) (*Module, error) {
+func New(ctx context.Context, uri string, tr *configuration.TemplateRepository) (*Module, error) {
 	if uri == "" {
 		uri = "https://" + tr.Name
 	}
@@ -87,7 +90,20 @@ func New(_ context.Context, uri string, tr *configuration.TemplateRepository) (*
 		return nil, fmt.Errorf("version must be specified for module %q", tr.Name)
 	}
 
-	return &Module{template.New(tr.Name).Funcs(sprig.TxtFuncMap()), tr.Name, uri, tr.Version, nil}, nil
+	m := Module{
+		t:       template.New(tr.Name).Funcs(sprig.TxtFuncMap()),
+		Name:    tr.Name,
+		URI:     uri,
+		Version: tr.Version,
+	}
+
+	mani, err := m.getManifest(ctx)
+	if err != nil {
+		return nil, err
+	}
+	m.Manifest = mani
+
+	return &m, nil
 }
 
 // NewWithFS creates a module with the specified file system. This is
@@ -112,13 +128,8 @@ func (m *Module) GetTemplate() *template.Template {
 // URI then extensions will be sourced from the `./bin`
 // directory of the base of the path.
 func (m *Module) RegisterExtensions(ctx context.Context, _ logrus.FieldLogger, ext *extensions.Host) error {
-	mf, err := m.Manifest(ctx)
-	if err != nil {
-		return err
-	}
-
 	// Only register extensions if this repository declares extensions explicitly in its type.
-	if !mf.Type.Contains(configuration.TemplateRepositoryTypeExt) {
+	if !m.Manifest.Type.Contains(configuration.TemplateRepositoryTypeExt) {
 		return nil
 	}
 
@@ -128,34 +139,34 @@ func (m *Module) RegisterExtensions(ctx context.Context, _ logrus.FieldLogger, e
 	return ext.RegisterExtension(ctx, m.URI, m.Name, version)
 }
 
-// Manifest downloads the module if not already downloaded and returns a parsed
+// getManifest downloads the module if not already downloaded and returns a parsed
 // configuration.TemplateRepositoryManifest of this module.
-func (m *Module) Manifest(ctx context.Context) (configuration.TemplateRepositoryManifest, error) {
+func (m *Module) getManifest(ctx context.Context) (*configuration.TemplateRepositoryManifest, error) {
 	fs, err := m.GetFS(ctx)
 	if err != nil {
-		return configuration.TemplateRepositoryManifest{}, errors.Wrap(err, "failed to download fs")
+		return nil, errors.Wrap(err, "failed to download fs")
 	}
 
 	mf, err := fs.Open("manifest.yaml")
 	if err != nil {
-		return configuration.TemplateRepositoryManifest{}, err
+		return nil, err
 	}
 	defer mf.Close()
 
 	var manifest configuration.TemplateRepositoryManifest
 	if err := yaml.NewDecoder(mf).Decode(&manifest); err != nil {
-		return configuration.TemplateRepositoryManifest{}, err
+		return nil, err
 	}
 
 	// ensure that the manifest name is equal to the import path
 	if manifest.Name != m.Name {
-		return configuration.TemplateRepositoryManifest{}, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"module declares its import path as %q but was imported as %q",
 			manifest.Name, m.Name,
 		)
 	}
 
-	return manifest, nil
+	return &manifest, nil
 }
 
 // GetFS returns a billy.Filesystem that contains the contents

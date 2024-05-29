@@ -111,6 +111,9 @@ type TemplateRepositoryManifest struct {
 
 	// Arguments are a declaration of arguments to the template generator
 	Arguments map[string]Argument `yaml:"arguments,omitempty"`
+
+	// DirReplacements is a list of directory name replacement templates to render
+	DirReplacements map[string]string `yaml:"dirReplacements,omitempty"`
 }
 
 // PostRunCommandSpec is the spec of a command to be ran and its

@@ -7,7 +7,6 @@ package codegen
 
 import (
 	"os"
-	"strings"
 	"time"
 )
 
@@ -92,20 +91,6 @@ func (f *File) SetPath(path string) error {
 	f.path = path
 
 	return nil
-}
-
-func (f *File) ApplyDirManifests(dms map[string]*DirManifest) {
-	// Hop through the path dir by dir, starting at the end (because the raw paths won't match if you replace the earlier
-	// path segments first), and see if there's any replacements.
-	pp := strings.Split(f.path, string(os.PathSeparator))
-	for i := len(pp) - 1; i >= 0; i-- {
-		pathPart := strings.Join(pp[0:i+1], string(os.PathSeparator))
-		if dm, has := dms[pathPart]; has {
-			pp[i] = dm.ReplaceName
-		}
-	}
-
-	f.path = strings.Join(pp, string(os.PathSeparator))
 }
 
 // SetMode updates the mode of the file

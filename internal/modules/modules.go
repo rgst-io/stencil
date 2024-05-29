@@ -241,15 +241,10 @@ func GetModulesForProject(ctx context.Context, opts *ModuleResolveOptions) ([]*M
 			}
 		}
 
-		mf, err := m.Manifest(ctx)
-		if err != nil {
-			return nil, err
-		}
-
 		// add the dependencies of this module to the stack to be resolved
-		for i := range mf.Modules {
+		for _, mfm := range m.Manifest.Modules {
 			modulesToResolve = append(modulesToResolve, resolveModule{
-				conf:   mf.Modules[i],
+				conf:   mfm,
 				parent: importPath + "@" + version.String(),
 			})
 		}

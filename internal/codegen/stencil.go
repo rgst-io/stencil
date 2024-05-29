@@ -188,7 +188,7 @@ func (s *Stencil) sortModuleHooks() {
 // provided to stencil at creation time, returned is the templates
 // that were produced and their associated files.
 func (s *Stencil) Render(ctx context.Context, log logrus.FieldLogger) ([]*Template, error) {
-	tplfiles, dirManifests, err := s.getTemplates(ctx, log)
+	tplfiles, err := s.getTemplates(ctx, log)
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +213,7 @@ func (s *Stencil) Render(ctx context.Context, log logrus.FieldLogger) ([]*Templa
 	// Render the first pass, this is used to populate shared data
 	for _, t := range tplfiles {
 		log.Debugf("First pass render of template %s", t.ImportPath())
-		if err := t.Render(s, vals, nil); err != nil {
+		if err := t.Render(s, vals); err != nil {
 			return nil, errors.Wrapf(err, "failed to render template %q", t.ImportPath())
 		}
 
@@ -225,19 +225,10 @@ func (s *Stencil) Render(ctx context.Context, log logrus.FieldLogger) ([]*Templa
 	// Sort module hook data before the next pass
 	s.sortModuleHooks()
 
-	// Render the dirmanifests now that we have globals rendered from the first pass
-	dmLookup := map[string]*DirManifest{}
-	for _, dm := range dirManifests {
-		if err := dm.Render(s, vals); err != nil {
-			return nil, errors.Wrapf(err, "failed to render dir manifest %q", dm.OriginalPathBase)
-		}
-		dmLookup[dm.OriginalPathBase] = dm
-	}
-
 	tpls := make([]*Template, 0)
 	for _, t := range tplfiles {
 		log.Debugf("Second pass render of template %s", t.ImportPath())
-		if err := t.Render(s, vals, dmLookup); err != nil {
+		if err := t.Render(s, vals); err != nil {
 			return nil, errors.Wrapf(err, "failed to render template %q", t.ImportPath())
 		}
 
@@ -253,12 +244,7 @@ func (s *Stencil) Render(ctx context.Context, log logrus.FieldLogger) ([]*Templa
 func (s *Stencil) PostRun(ctx context.Context, log logrus.FieldLogger) error {
 	log.Info("Running post-run command(s)")
 	for _, m := range s.modules {
-		mf, err := m.Manifest(ctx)
-		if err != nil {
-			return err
-		}
-
-		for _, cmdStr := range mf.PostRunCommand {
+		for _, cmdStr := range m.Manifest.PostRunCommand {
 			log.Infof(" - %s", cmdStr.Name)
 			//nolint:gosec // Why: This is by design
 			cmd := exec.CommandContext(ctx, "/usr/bin/env", "bash", "-c", cmdStr.Command)
@@ -276,24 +262,19 @@ func (s *Stencil) PostRun(ctx context.Context, log logrus.FieldLogger) error {
 
 // getTemplates takes all modules attached to this stencil
 // struct and returns all templates exposed by it.
-func (s *Stencil) getTemplates(ctx context.Context, log logrus.FieldLogger) ([]*Template, []*DirManifest, error) {
+func (s *Stencil) getTemplates(ctx context.Context, log logrus.FieldLogger) ([]*Template, error) {
 	tpls := make([]*Template, 0)
-	dms := make([]*DirManifest, 0)
 	for _, m := range s.modules {
 		log.Debugf("Fetching module %q", m.Name)
 		fs, err := m.GetFS(ctx)
 		if err != nil {
-			return nil, nil, errors.Wrapf(err, "failed to read module filesystem %q", m.Name)
+			return nil, errors.Wrapf(err, "failed to read module filesystem %q", m.Name)
 		}
 
 		// Note: This error should never really fire since we already fetched the FS above
 		// that being said, we handle it here. Skip native extensions as they cannot have templates.
-		mf, err := m.Manifest(ctx)
-		if err != nil {
-			return nil, nil, err
-		}
-		if !mf.Type.Contains(configuration.TemplateRepositoryTypeTemplates) {
-			log.Debugf("Skipping template discovery for module %q, not a template module (type %s)", m.Name, mf.Type)
+		if !m.Manifest.Type.Contains(configuration.TemplateRepositoryTypeTemplates) {
+			log.Debugf("Skipping template discovery for module %q, not a template module (type %s)", m.Name, m.Manifest.Type)
 			continue
 		}
 
@@ -302,7 +283,7 @@ func (s *Stencil) getTemplates(ctx context.Context, log logrus.FieldLogger) ([]*
 		// Only find templates in the templates/ directory
 		fs, err = fs.Chroot("templates")
 		if err != nil {
-			return nil, nil, errors.Wrap(err, "failed to chroot module filesystem to templates/ (does it exist?)")
+			return nil, errors.Wrap(err, "failed to chroot module filesystem to templates/ (does it exist?)")
 		}
 
 		err = util.Walk(fs, "", func(path string, inf os.FileInfo, err error) error {
@@ -311,12 +292,6 @@ func (s *Stencil) getTemplates(ctx context.Context, log logrus.FieldLogger) ([]*
 			}
 
 			switch {
-			case filepath.Base(path) == "dir.yaml":
-				dm, err := LoadDirManifest(fs, path, m, log)
-				if err != nil {
-					return errors.Wrapf(err, "failed to load directory manifest %q from module %q", path, m.Name)
-				}
-				dms = append(dms, dm)
 			case filepath.Ext(path) == ".tpl":
 				f, err := fs.Open(path)
 				if err != nil {
@@ -340,7 +315,7 @@ func (s *Stencil) getTemplates(ctx context.Context, log logrus.FieldLogger) ([]*
 			return nil
 		})
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 	}
 
@@ -353,7 +328,7 @@ func (s *Stencil) getTemplates(ctx context.Context, log logrus.FieldLogger) ([]*
 		tpls[i], tpls[j] = tpls[j], tpls[i]
 	})
 
-	return tpls, dms, nil
+	return tpls, nil
 }
 
 // Close closes all resources that should be closed when done
