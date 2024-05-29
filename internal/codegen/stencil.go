@@ -291,26 +291,28 @@ func (s *Stencil) getTemplates(ctx context.Context, log logrus.FieldLogger) ([]*
 				return err
 			}
 
-			switch {
-			case filepath.Ext(path) == ".tpl":
-				f, err := fs.Open(path)
-				if err != nil {
-					return errors.Wrapf(err, "failed to open template %q from module %q", path, m.Name)
-				}
-				defer f.Close()
-
-				tplContents, err := io.ReadAll(f)
-				if err != nil {
-					return errors.Wrapf(err, "failed to read template %q from module %q", path, m.Name)
-				}
-
-				log.Debugf("Discovered template %q", path)
-				tpl, err := NewTemplate(m, path, inf.Mode(), inf.ModTime(), tplContents, log)
-				if err != nil {
-					return errors.Wrapf(err, "failed to create template %q from module %q", path, m.Name)
-				}
-				tpls = append(tpls, tpl)
+			// Skip files without a .tpl extension
+			if filepath.Ext(path) != ".tpl" {
+				return nil
 			}
+
+			f, err := fs.Open(path)
+			if err != nil {
+				return errors.Wrapf(err, "failed to open template %q from module %q", path, m.Name)
+			}
+			defer f.Close()
+
+			tplContents, err := io.ReadAll(f)
+			if err != nil {
+				return errors.Wrapf(err, "failed to read template %q from module %q", path, m.Name)
+			}
+
+			log.Debugf("Discovered template %q", path)
+			tpl, err := NewTemplate(m, path, inf.Mode(), inf.ModTime(), tplContents, log)
+			if err != nil {
+				return errors.Wrapf(err, "failed to create template %q from module %q", path, m.Name)
+			}
+			tpls = append(tpls, tpl)
 
 			return nil
 		})
