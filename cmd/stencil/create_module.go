@@ -10,7 +10,6 @@ import (
 	"os/exec"
 	"path"
 
-	"github.com/AlecAivazis/survey/v2"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
 	"go.rgst.io/stencil/pkg/configuration"
@@ -24,13 +23,6 @@ func NewCreateModule() *cli.Command {
 		Name:        "module",
 		Description: "Creates a module with the provided name in the current directory",
 		ArgsUsage:   "create module <name>",
-		Aliases:     []string{"templaterepository"},
-		Flags: []cli.Flag{
-			&cli.BoolFlag{
-				Name:  "native-extension",
-				Usage: "Generates a native extension",
-			},
-		},
 		Action: func(c *cli.Context) error {
 			var manifestFileName = "stencil.yaml"
 
@@ -39,7 +31,9 @@ func NewCreateModule() *cli.Command {
 				return errors.New("must provide a name for the module")
 			}
 
-			allowedFiles := []string{".", "..", ".git"}
+			allowedFiles := map[string]struct{}{
+				".git": {},
+			}
 			files, err := os.ReadDir(".")
 			if err != nil {
 				return err
@@ -48,57 +42,13 @@ func NewCreateModule() *cli.Command {
 			// ensure we don't have any files in the current directory, except for
 			// the allowed files
 			for _, file := range files {
-				found := false
-				for _, af := range allowedFiles {
-					if file.Name() == af {
-						found = true
-						continue
-					}
+				if _, ok := allowedFiles[file.Name()]; !ok {
+					return fmt.Errorf("directory is not empty, found %s", file.Name())
 				}
-				if !found {
-					return errors.New("must be in a directory with no files")
-				}
-			}
-
-			var reportingTeam string
-			if err := survey.AskOne(&survey.Input{
-				Message: "What is the reporting team for this module in the form of a GitHub slug (used in CODEOWNERS)?",
-			}, &reportingTeam); err != nil {
-				return errors.Wrap(err, "ask for reporting team")
-			}
-
-			var description string
-			if err := survey.AskOne(&survey.Input{
-				Message: "Enter a description for the module.",
-			}, &description); err != nil {
-				return errors.Wrap(err, "ask for description")
-			}
-
-			releaseOpts := map[string]interface{}{
-				"enablePrereleases": true,
 			}
 
 			tm := &configuration.Manifest{
 				Name: path.Base(c.Args().Get(0)),
-				Modules: []*configuration.TemplateRepository{{
-					Name: "github.com/getoutreach/stencil-template-base",
-				}, {
-					Name: "github.com/getoutreach/stencil-base",
-				}},
-				Arguments: map[string]interface{}{
-					"reportingTeam": reportingTeam,
-					"description":   description,
-				},
-			}
-
-			if c.Bool("native-extension") {
-				tm.Arguments["plugin"] = true
-				releaseOpts["force"] = true
-			}
-			tm.Arguments["releaseOptions"] = releaseOpts
-
-			if _, err := os.Stat(manifestFileName); err == nil {
-				return fmt.Errorf("%s already exists", manifestFileName)
 			}
 
 			f, err := os.Create(manifestFileName)
