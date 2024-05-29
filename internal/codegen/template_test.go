@@ -158,7 +158,9 @@ func TestGeneratedBlock(t *testing.T) {
 // TestLibraryTemplate ensures that library templates don't generate
 // files as well as that the library flag is set correctly.
 func TestLibraryTemplate(t *testing.T) {
-	m := modules.NewWithFS(context.Background(), "testing", memfs.New())
+	fs := memfsWithManifest("name: testing\n")
+	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
+	assert.NilError(t, err, "failed to NewWithFS")
 
 	tpl, err := NewTemplate(m, "hello.library.tpl", 0o644, time.Now(), []byte("hello world!"), logrus.New())
 	assert.NilError(t, err, "failed to create basic template")
@@ -175,7 +177,9 @@ func TestLibraryTemplate(t *testing.T) {
 // TestLibraryCantAccessFileFunctions ensures that library templates
 // can't access file functions in the template.
 func TestLibraryCantAccessFileFunctions(t *testing.T) {
-	m := modules.NewWithFS(context.Background(), "testing", memfs.New())
+	fs := memfsWithManifest("name: testing\n")
+	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
+	assert.NilError(t, err, "failed to NewWithFS")
 
 	tpl, err := NewTemplate(m, "hello.library.tpl", 0o644, time.Now(), []byte("{{ file.Create }}"), logrus.New())
 	assert.NilError(t, err, "failed to create basic template")
@@ -187,4 +191,45 @@ func TestLibraryCantAccessFileFunctions(t *testing.T) {
 		"attempted to use file in a template that doesn't support file rendering",
 		"expected library template to fail on render",
 	)
+}
+
+func TestSimpleDirReplacement(t *testing.T) {
+	fs := memfsWithManifest("name: testing\ndirReplacements:\n  a: 'b'\n")
+	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{}}
+	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
+	assert.NilError(t, err, "failed to NewWithFS")
+
+	st := NewStencil(sm, []*modules.Module{m}, logrus.New())
+	tpl, err := NewTemplate(m, "a/base.tpl", 0o644, time.Now(), []byte("out"), logrus.New())
+	assert.NilError(t, err, "failed to create template")
+
+	tplf, err := NewFile("a/base", 0o644, time.Now())
+	assert.NilError(t, err, "failed to create file")
+
+	assert.Equal(t, tplf.path, "a/base")
+	vals := NewValues(context.Background(), sm, nil)
+	err = tpl.applyDirReplacements(tplf, st, vals)
+	assert.NilError(t, err, "failed to apply dir replacements")
+	assert.Equal(t, tplf.path, "b/base")
+}
+
+func TestNestedAndTemplatedDirReplacements(t *testing.T) {
+	fs := memfsWithManifest(
+		"name: testing\ndirReplacements:\n  a: 'b'\n  a/c: '{{ stencil.Arg \"x\" }}'\narguments:\n  x:\n    type: string\n")
+	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]any{"x": "d"}}
+	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
+	assert.NilError(t, err, "failed to NewWithFS")
+
+	st := NewStencil(sm, []*modules.Module{m}, logrus.New())
+	tpl, err := NewTemplate(m, "a/c/base.tpl", 0o644, time.Now(), []byte("out"), logrus.New())
+	assert.NilError(t, err, "failed to create template")
+
+	tplf, err := NewFile("a/c/base", 0o644, time.Now())
+	assert.NilError(t, err, "failed to create file")
+
+	assert.Equal(t, tplf.path, "a/c/base")
+	vals := NewValues(context.Background(), sm, nil)
+	err = tpl.applyDirReplacements(tplf, st, vals)
+	assert.NilError(t, err, "failed to apply dir replacements")
+	assert.Equal(t, tplf.path, "b/d/base")
 }
