@@ -31,6 +31,15 @@ This can be changed with the [`file.SetPath`](/functions/file.SetPath) function 
 
 Templates can also call `file.Create` to create a new file within a loop. For more information see the [`file.Create` documentation](/functions/file.Create)
 
+#### Library Templates
+
+Library templates special templates that are meant to only contain
+functions callable by the current module. They cannot call `file`
+methods as they do not ever generate files.
+
+To create a library template, create a file with the `.library.tpl`
+extension.
+
 ### `manifest.yaml`
 
 The manifest.yaml file is arguably the most important file in a stencil module. This dictates the type of module, the arguments that the module accepts, and the dependencies that the module has.
