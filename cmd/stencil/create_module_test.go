@@ -13,7 +13,7 @@ import (
 
 // testRunCommand runs a command with the provided arguments. It does
 // not support global flags.
-func testRunCommand(t *testing.T, cmd *cli.Command, args ...string) error {
+func testRunCommand(t *testing.T, cmd *cli.Command, dir string, args ...string) error {
 	// Change into the repo root.
 	// GOMOD: <module path>/go.mod
 	b, err := exec.Command("go", "env", "GOMOD").Output()
@@ -32,8 +32,11 @@ func testRunCommand(t *testing.T, cmd *cli.Command, args ...string) error {
 	defer func() { os.Args = origArgs }()
 	os.Args = []string{filepath.Join(repoRoot, "bin", "stencil")}
 
-	// Use a temporary directory for the test.
-	chdir(t, t.TempDir())
+	// Use a temporary directory for the test if one is not provided.
+	if dir == "" {
+		dir = t.TempDir()
+	}
+	chdir(t, dir)
 
 	app := cli.NewApp()
 	app.Commands = []*cli.Command{cmd}
@@ -59,9 +62,24 @@ func chdir(t *testing.T, dir string) {
 func TestCanCreateModule(t *testing.T) {
 	cmd := NewCreateModule()
 	assert.Assert(t, cmd != nil)
-	assert.NilError(t, testRunCommand(t, cmd, "test-module"))
+	assert.NilError(t, testRunCommand(t, cmd, "", "test-module"))
 
 	// Ensure it created the expected files.
 	_, err := os.Stat("stencil.yaml")
 	assert.NilError(t, err)
+}
+
+func TestCreateModuleFailsWhenFilesExist(t *testing.T) {
+	cmd := NewCreateModule()
+	assert.Assert(t, cmd != nil)
+
+	tmpDir := t.TempDir()
+
+	// Create a file to trigger the error.
+	f, err := os.Create(filepath.Join(tmpDir, "test-file"))
+	assert.NilError(t, err)
+	assert.NilError(t, f.Close())
+
+	err = testRunCommand(t, cmd, tmpDir, "test-module")
+	assert.ErrorContains(t, err, "directory is not empty, found test-file")
 }
