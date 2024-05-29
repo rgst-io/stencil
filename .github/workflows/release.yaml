@@ -66,6 +66,7 @@ jobs:
           NEXT_VERSION: ${{ steps.next_version.outputs.version }}
         run: |-
           export GOMODCACHE="$(pwd)/.dist/go-mod"
+          mkdir -p "${GOMODCACHE}"
           cd "${GOMODCACHE}/.."
 
           go mod download -modcacherw
