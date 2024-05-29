@@ -35,7 +35,7 @@ Templates can also call `file.Create` to create a new file within a loop. For mo
 
 Library templates special templates that are meant to only contain
 functions callable by the current module. They cannot call `file`
-methods as they do not ever generate file.
+methods as they do not ever generate files.
 
 To create a library template, create a file with the `.library.tpl`
 extension.
