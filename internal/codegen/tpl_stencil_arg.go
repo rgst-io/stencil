@@ -31,14 +31,7 @@ func (s *TplStencil) Arg(pth string) (interface{}, error) {
 	// can even get a context passed to them
 	ctx := context.TODO()
 
-	mf, err := s.t.Module.Manifest(ctx)
-	if err != nil {
-		// In theory this should never happen because we've
-		// already parsed the manifest. But, just in case
-		// we handle this here.
-		return nil, err
-	}
-
+	mf := s.t.Module.Manifest
 	if _, ok := mf.Arguments[pth]; !ok {
 		return "", fmt.Errorf("module %q doesn't list argument %q as an argument in its manifest", s.t.Module.Name, pth)
 	}
@@ -120,15 +113,10 @@ func (s *TplStencil) resolveDefault(pth string, arg *configuration.Argument) (in
 }
 
 // resolveFrom resoles the "from" field of an argument
-func (s *TplStencil) resolveFrom(ctx context.Context, pth string, arg *configuration.Argument) (*configuration.Argument, error) {
+func (s *TplStencil) resolveFrom(_ context.Context, pth string, arg *configuration.Argument) (*configuration.Argument, error) {
 	foundModuleInDeps := false
-	ourMf, err := s.t.Module.Manifest(ctx)
-	if err != nil {
-		return nil, err
-	}
-
 	// Ensure that the module imports the referenced module
-	for _, m := range ourMf.Modules {
+	for _, m := range s.t.Module.Manifest.Modules {
 		if m.Name == arg.From {
 			foundModuleInDeps = true
 		}
@@ -144,11 +132,7 @@ func (s *TplStencil) resolveFrom(ctx context.Context, pth string, arg *configura
 	var fromMf *configuration.TemplateRepositoryManifest
 	for _, m := range s.s.modules {
 		if m.Name == arg.From {
-			mf, err := m.Manifest(ctx)
-			if err != nil {
-				return nil, err
-			}
-			fromMf = &mf
+			fromMf = m.Manifest
 
 			// Found the module, break
 			break

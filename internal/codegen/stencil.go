@@ -244,12 +244,7 @@ func (s *Stencil) Render(ctx context.Context, log logrus.FieldLogger) ([]*Templa
 func (s *Stencil) PostRun(ctx context.Context, log logrus.FieldLogger) error {
 	log.Info("Running post-run command(s)")
 	for _, m := range s.modules {
-		mf, err := m.Manifest(ctx)
-		if err != nil {
-			return err
-		}
-
-		for _, cmdStr := range mf.PostRunCommand {
+		for _, cmdStr := range m.Manifest.PostRunCommand {
 			log.Infof(" - %s", cmdStr.Name)
 			//nolint:gosec // Why: This is by design
 			cmd := exec.CommandContext(ctx, "/usr/bin/env", "bash", "-c", cmdStr.Command)
@@ -278,12 +273,8 @@ func (s *Stencil) getTemplates(ctx context.Context, log logrus.FieldLogger) ([]*
 
 		// Note: This error should never really fire since we already fetched the FS above
 		// that being said, we handle it here. Skip native extensions as they cannot have templates.
-		mf, err := m.Manifest(ctx)
-		if err != nil {
-			return nil, err
-		}
-		if !mf.Type.Contains(configuration.TemplateRepositoryTypeTemplates) {
-			log.Debugf("Skipping template discovery for module %q, not a template module (type %s)", m.Name, mf.Type)
+		if !m.Manifest.Type.Contains(configuration.TemplateRepositoryTypeTemplates) {
+			log.Debugf("Skipping template discovery for module %q, not a template module (type %s)", m.Name, m.Manifest.Type)
 			continue
 		}
 

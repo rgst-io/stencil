@@ -33,12 +33,12 @@ func TestBasicE2ERender(t *testing.T) {
 	f.Write([]byte("{{ .Config.Name }}"))
 	f.Close()
 
+	tp, err := modulestest.NewWithFS(ctx, "testing", fs)
+	assert.NilError(t, err, "failed to NewWithFS")
 	st := NewStencil(&configuration.Manifest{
 		Name:      "test",
 		Arguments: map[string]interface{}{},
-	}, []*modules.Module{
-		modules.NewWithFS(ctx, "testing", fs),
-	}, logrus.New())
+	}, []*modules.Module{tp}, logrus.New())
 
 	tpls, err := st.Render(ctx, logrus.New())
 	assert.NilError(t, err, "expected Render() to not fail")
@@ -119,14 +119,16 @@ func ExampleStencil_PostRun() {
 	nullLog := logrus.New()
 	nullLog.SetOutput(io.Discard)
 
+	tf, err := modulestest.NewWithFS(ctx, "testing", fs)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	st := NewStencil(&configuration.Manifest{
 		Name:      "test",
 		Arguments: map[string]interface{}{},
-	}, []*modules.Module{
-		modules.NewWithFS(ctx, "testing", fs),
-	}, logrus.New())
-	err := st.PostRun(ctx, nullLog)
-	if err != nil {
+	}, []*modules.Module{tf}, logrus.New())
+	if err := st.PostRun(ctx, nullLog); err != nil {
 		fmt.Println(err)
 	}
 

@@ -6,6 +6,7 @@ package codegen
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -144,6 +145,44 @@ func (t *Template) Render(st *Stencil, vals *Values) error {
 		// no calls to file.Create
 		t.Files = t.Files[1:len(t.Files)]
 	}
+
+	if !st.isFirstPass {
+		// Now that everything's been decided, see if we need to replace any file paths from directory manifests
+		for _, tf := range t.Files {
+			if err := t.applyDirReplacements(tf, st, vals); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (t *Template) applyDirReplacements(tf *File, st *Stencil, vals *Values) error {
+	// Hop through the path dir by dir, starting at the end (because the raw paths won't match if you replace the earlier
+	// path segments first), and see if there's any replacements.
+	pp := strings.Split(tf.path, string(os.PathSeparator))
+	for i := len(pp) - 1; i >= 0; i-- {
+		pathPart := strings.Join(pp[0:i+1], string(os.PathSeparator))
+		if dr, has := t.Module.Manifest.DirReplacements[pathPart]; has {
+			// Render replacement
+			rt, err := NewTemplate(t.Module, "dirReplace", 0o000, time.Time{}, []byte(dr), t.log)
+			if err != nil {
+				return err
+			}
+
+			if err := rt.Render(st, vals); err != nil {
+				return err
+			}
+
+			nn := rt.Files[0].String()
+			if strings.Contains(nn, string(os.PathSeparator)) {
+				return fmt.Errorf("directory replacement of %s to %s contains path separator in output", pp[i], nn)
+			}
+			pp[i] = nn
+		}
+	}
+	tf.path = strings.Join(pp, string(os.PathSeparator))
 
 	return nil
 }

@@ -67,5 +67,13 @@ func NewModuleFromTemplates(manifest *configuration.TemplateRepositoryManifest,
 	}
 
 	// create the module
-	return modules.NewWithFS(context.Background(), manifest.Name, fs), nil
+	return NewWithFS(context.Background(), manifest.Name, fs)
+}
+
+// NewWithFS creates a module with the specified file system.
+func NewWithFS(ctx context.Context, name string, fs billy.Filesystem) (*modules.Module, error) {
+	return modules.New(ctx, "vfs://"+name, &configuration.TemplateRepository{
+		Name:    name,
+		Version: "vfs",
+	}, fs)
 }
