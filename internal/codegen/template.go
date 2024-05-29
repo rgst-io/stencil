@@ -6,6 +6,7 @@ package codegen
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -174,7 +175,11 @@ func (t *Template) applyDirReplacements(tf *File, st *Stencil, vals *Values) err
 				return err
 			}
 
-			pp[i] = rt.Files[0].String()
+			nn := rt.Files[0].String()
+			if strings.Contains(nn, string(os.PathSeparator)) {
+				return fmt.Errorf("directory replacement of %s to %s contains path separator in output", pp[i], nn)
+			}
+			pp[i] = nn
 		}
 	}
 	tf.path = strings.Join(pp, string(os.PathSeparator))

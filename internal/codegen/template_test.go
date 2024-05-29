@@ -233,3 +233,24 @@ func TestNestedAndTemplatedDirReplacements(t *testing.T) {
 	assert.NilError(t, err, "failed to apply dir replacements")
 	assert.Equal(t, tplf.path, "b/d/base")
 }
+
+func TestBadDirReplacement(t *testing.T) {
+	fs := memfsWithManifest(
+		"name: testing\ndirReplacements:\n  a: 'b/c'\n")
+	sm := &configuration.Manifest{Name: "testing"}
+	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
+	assert.NilError(t, err, "failed to NewWithFS")
+
+	st := NewStencil(sm, []*modules.Module{m}, logrus.New())
+	tpl, err := NewTemplate(m, "a/base.tpl", 0o644, time.Now(), []byte("out"), logrus.New())
+	assert.NilError(t, err, "failed to create template")
+
+	tplf, err := NewFile("a/base", 0o644, time.Now())
+	assert.NilError(t, err, "failed to create file")
+
+	assert.Equal(t, tplf.path, "a/base")
+	vals := NewValues(context.Background(), sm, nil)
+	err = tpl.applyDirReplacements(tplf, st, vals)
+	assert.ErrorContains(t, err, "contains path separator in output")
+	assert.Equal(t, tplf.path, "a/base")
+}

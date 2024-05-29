@@ -51,7 +51,7 @@ The important keys that a module has are listed below, but an exhaustive list ca
 - `modules` - a list of modules that this module depends on
   - `name` - import path of the module depended on
   - `version` - optional: A version to pin this module to.
-- `dirReplacements` - a key:value mapping of template-able replacements for directory names, often used for languages like Java/Kotlin with directories named after the projects
+- `dirReplacements` - a key:value mapping of template-able replacements for directory names, often used for languages like Java/Kotlin with directories named after the projects. These replacements can not rewrite directory structures, it only renames the leaf node directory name itself.
   - key: The directory name to replace
   - value: The template-able replacement name
   - example: This k:v pair will take the `com.projname` directory and replace it with the result of rendering the template (replacing it with the contents of the module's argument named "project-name"):
