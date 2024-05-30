@@ -266,7 +266,10 @@ func (c *Command) promptMajorVersion(ctx context.Context, m *modules.Module, las
 	// If we're not a terminal, we can't ask for consent
 	// so we error out informing the user how to fix this.
 	if !term.IsTerminal(int(os.Stdin.Fd())) {
-		return fmt.Errorf("unable to prompt for major version upgrade, stdin is not a terminal, pass --allow-major-version-upgrades to continue")
+		return fmt.Errorf(
+			"unable to prompt for major version upgrade, stdin is not a terminal, " +
+				"pass --allow-major-version-upgrades to continue",
+		)
 	}
 
 	gh, err := github.NewClient(github.WithAllowUnauthenticated())

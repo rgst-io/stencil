@@ -82,8 +82,6 @@ func main() {
 		Commands: []*cli.Command{
 			NewDescribeCmd(),
 			NewCreateCommand(),
-			NewDocsCommand(),
-			NewConfigureCommand(),
 		},
 	}
 
