@@ -11,9 +11,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/sirupsen/logrus"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/configuration"
 	"gotest.tools/v3/assert"
 )
@@ -21,7 +21,7 @@ import (
 type testTpl struct {
 	s   *Stencil
 	t   *Template
-	log logrus.FieldLogger
+	log slogext.Logger
 }
 
 // fakeTemplate returns a faked struct suitable for testing
@@ -29,7 +29,7 @@ type testTpl struct {
 func fakeTemplate(t *testing.T, args map[string]interface{},
 	requestArgs map[string]configuration.Argument) *testTpl {
 	test := &testTpl{}
-	log := logrus.New()
+	log := slogext.NewTestLogger(t)
 
 	man := &configuration.TemplateRepositoryManifest{
 		Name:      "test",
@@ -79,7 +79,7 @@ func fakeTemplate(t *testing.T, args map[string]interface{},
 func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]interface{},
 	args ...map[string]configuration.Argument) *testTpl {
 	test := &testTpl{}
-	log := logrus.New()
+	log := slogext.NewTestLogger(t)
 
 	mods := make([]*modules.Module, len(args))
 	importList := []string{}

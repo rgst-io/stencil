@@ -16,7 +16,7 @@ import (
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"go.rgst.io/stencil/internal/slogext"
 )
 
 // TplStencil contains the global functions available to a template for
@@ -28,7 +28,7 @@ type TplStencil struct {
 	// t is the current template in the context of our render
 	t *Template
 
-	log logrus.FieldLogger
+	log slogext.Logger
 }
 
 // GetModuleHook returns a module block in the scope of this module
@@ -58,8 +58,8 @@ func (s *TplStencil) GetModuleHook(name string) []any {
 		return []any{}
 	}
 
-	s.log.WithField("template", s.t.ImportPath()).WithField("path", k).
-		WithField("data", spew.Sdump(v)).Debug("getting module hook")
+	s.log.With("template", s.t.ImportPath(), "path", k, "data", spew.Sdump(v)).
+		Debug("getting module hook")
 
 	return v.values
 }
@@ -84,8 +84,8 @@ func (s *TplStencil) SetGlobal(name string, data interface{}) (output string, er
 	}
 
 	k := s.s.sharedData.key(s.t.Module.Name, name)
-	s.log.WithField("template", s.t.ImportPath()).WithField("path", k).
-		WithField("data", spew.Sdump(data)).Debug("adding to global store")
+	s.log.With("template", s.t.ImportPath(), "path", k, "data", spew.Sdump(data)).
+		Debug("adding to global store")
 
 	s.s.sharedData.globals[k] = global{
 		template: s.t.Path,
@@ -105,16 +105,19 @@ func (s *TplStencil) GetGlobal(name string) interface{} {
 	k := s.s.sharedData.key(s.t.Module.Name, name)
 
 	if v, ok := s.s.sharedData.globals[k]; ok {
-		s.log.WithField("template", s.t.ImportPath()).WithField("path", k).
-			WithField("data", spew.Sdump(v)).WithField("definingTemplate", v.template).
-			Debug("retrieved data from global store")
+		s.log.With(
+			"template", s.t.ImportPath(),
+			"path", k,
+			"data", spew.Sdump(v),
+			"definingTemplate", v.template,
+		).Debug("retrieved data from global store")
 
 		return v.value
 	}
 
 	// Don't log on the first pass because we haven't rendered all the templates yet
 	if !s.s.isFirstPass {
-		s.log.WithField("template", s.t.ImportPath()).WithField("path", k).
+		s.log.With("template", s.t.ImportPath(), "path", k).
 			Warn("failed to retrieved data from global store")
 	}
 
@@ -138,8 +141,8 @@ func (s *TplStencil) AddToModuleHook(module, name string, data interface{}) (out
 	}
 
 	k := s.s.sharedData.key(module, name)
-	s.log.WithField("template", s.t.ImportPath()).WithField("path", k).
-		WithField("data", spew.Sdump(data)).Debug("adding to module hook")
+	s.log.With("template", s.t.ImportPath(), "path", k, "data", spew.Sdump(data)).
+		Debug("adding to module hook")
 
 	v := reflect.ValueOf(data)
 	if !v.IsValid() {
@@ -296,7 +299,7 @@ func (s *TplStencil) ReadBlocks(fpath string) (map[string]string, error) {
 //
 //	{{- $_ := stencil.Debug "I'm a log!" }}
 func (s *TplStencil) Debug(args ...interface{}) error {
-	s.log.WithField("path", s.t.Path).Debug(args...)
+	s.log.With("path", s.t.Path).Debugf("%s", args...)
 
 	// We have to return something...
 	return nil

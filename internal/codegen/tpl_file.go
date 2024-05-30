@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"go.rgst.io/stencil/internal/slogext"
 )
 
 // TplFile is the current file we're writing output to in a
@@ -25,7 +25,7 @@ type TplFile struct {
 	t *Template
 
 	// log is the logger to use for debugging
-	log logrus.FieldLogger
+	log slogext.Logger
 }
 
 // Block returns the contents of a given block
@@ -96,7 +96,7 @@ func (f *TplFile) Delete() error {
 func (f *TplFile) Static() (out string, err error) {
 	// if the file already exists, skip it
 	if _, err := os.Stat(f.f.path); err == nil {
-		f.log.WithField("template", f.t.Path).WithField("path", f.f.path).
+		f.log.With("template", f.t.Path, "path", f.f.path).
 			Debug("Skipping static file because it already exists")
 		return f.Skip("Static file, output already exists")
 	}
