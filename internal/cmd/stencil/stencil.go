@@ -17,10 +17,9 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/blang/semver/v4"
 	"github.com/charmbracelet/glamour"
-	"github.com/getoutreach/gobox/pkg/cfg"
-	"github.com/getoutreach/gobox/pkg/cli/github"
 	"github.com/pkg/errors"
 	"go.rgst.io/stencil/internal/codegen"
+	"go.rgst.io/stencil/internal/git/vcs/github"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/configuration"
@@ -54,7 +53,7 @@ type Command struct {
 	allowMajorVersionUpgrades bool
 
 	// token is the github token used for fetching modules
-	token cfg.SecretData
+	token string
 }
 
 // NewCommand creates a new stencil command
@@ -64,7 +63,7 @@ func NewCommand(log slogext.Logger, s *configuration.Manifest,
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		log.WithError(err).Warn("failed to load lockfile")
 	}
-	token, err := github.GetToken()
+	token, err := github.Token()
 	if err != nil {
 		log.Warn("failed to get github token, using anonymous access")
 	}
@@ -272,7 +271,7 @@ func (c *Command) promptMajorVersion(ctx context.Context, m *modules.Module, las
 		)
 	}
 
-	gh, err := github.NewClient(github.WithAllowUnauthenticated())
+	gh, err := github.New()
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch release notes (create github client)")
 	}
