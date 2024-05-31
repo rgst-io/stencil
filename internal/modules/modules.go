@@ -69,7 +69,7 @@ type resolution struct {
 // ModuleResolveOptions contains options for resolving modules
 type ModuleResolveOptions struct {
 	// Token is the token to use to resolve modules
-	Token cfg.SecretData
+	Token string
 
 	// Log is the logger to use
 	Log slogext.Logger
@@ -263,7 +263,7 @@ func GetModulesForProject(ctx context.Context, opts *ModuleResolveOptions) ([]*M
 }
 
 // getLatestModuleForConstraints returns the latest module that satisfies the provided constraints
-func getLatestModuleForConstraints(ctx context.Context, uri string, token cfg.SecretData,
+func getLatestModuleForConstraints(ctx context.Context, uri, token string,
 	m *resolveModule, resolved map[string]*resolvedModule) (*resolver.Version, error) {
 	constraints := make([]string, 0)
 	for _, r := range resolved[m.conf.Name].history {
@@ -299,7 +299,7 @@ func getLatestModuleForConstraints(ctx context.Context, uri string, token cfg.Se
 		}
 	}
 
-	v, err := resolver.Resolve(ctx, token, &resolver.Criteria{
+	v, err := resolver.Resolve(ctx, cfg.SecretData(token), &resolver.Criteria{
 		URL:           uri,
 		Channel:       channel,
 		Constraints:   constraints,
