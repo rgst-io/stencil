@@ -24,7 +24,7 @@ import (
 	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
 	"go.rgst.io/stencil/internal/git/vcs/github"
 	"go.rgst.io/stencil/internal/modules/nativeext/apiv1"
-	"go.rgst.io/stencil/internal/slogext"
+	"go.rgst.io/stencil/pkg/slogext"
 )
 
 // generatedTemplateFunc is the underlying type of a function

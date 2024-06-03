@@ -7,7 +7,7 @@ package apiv1
 import (
 	"net/rpc"
 
-	"go.rgst.io/stencil/internal/slogext"
+	"go.rgst.io/stencil/pkg/slogext"
 )
 
 // _ is a compile time assertion we implement the interface
