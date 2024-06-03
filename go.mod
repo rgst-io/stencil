@@ -7,7 +7,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/blang/semver/v4 v4.0.0
-	github.com/bradleyjkemp/cupaloy v2.3.0+incompatible
+	github.com/chainguard-dev/git-urls v1.0.2
 	github.com/charmbracelet/glamour v0.7.0
 	github.com/charmbracelet/log v0.4.0
 	github.com/davecgh/go-spew v1.1.1
@@ -17,15 +17,11 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/google/go-github/v62 v62.0.0
 	github.com/hashicorp/go-hclog v1.6.3
-	github.com/hashicorp/go-multierror v1.1.1
 	github.com/hashicorp/go-plugin v1.6.1
-	github.com/mitchellh/hashstructure/v2 v2.0.2
 	github.com/pkg/errors v0.9.1
 	github.com/princjef/gomarkdoc v1.1.0
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
-	github.com/sirupsen/logrus v1.9.3
 	github.com/urfave/cli/v2 v2.27.2
-	github.com/whilp/git-urls v1.0.0
 	golang.org/x/oauth2 v0.21.0
 	golang.org/x/term v0.21.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -62,7 +58,6 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
-	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
 	github.com/huandu/xstrings v1.4.0 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
@@ -86,16 +81,15 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/onsi/ginkgo v1.16.4 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/princjef/mageutil v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
+	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/skeema/knownhosts v1.2.2 // indirect
 	github.com/spf13/cast v1.6.0 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
-	github.com/ulikunitz/xz v0.5.12 // indirect
 	github.com/x-cray/logrus-prefixed-formatter v0.5.2 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xrash/smetrics v0.0.0-20240521201337-686a1a2994c1 // indirect

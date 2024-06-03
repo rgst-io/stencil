@@ -18,9 +18,10 @@ import (
 	"github.com/mitchellh/hashstructure/v2"
 	"github.com/pkg/errors"
 	"go.rgst.io/stencil/internal/modules"
+	"go.rgst.io/stencil/internal/modules/nativeext"
+	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
-	"go.rgst.io/stencil/pkg/extensions"
 	"go.rgst.io/stencil/pkg/extensions/apiv1"
 	"go.rgst.io/stencil/pkg/slogext"
 	"go.rgst.io/stencil/pkg/stencil"
@@ -31,7 +32,7 @@ func NewStencil(m *configuration.Manifest, mods []*modules.Module, log slogext.L
 	return &Stencil{
 		log:         log,
 		m:           m,
-		ext:         extensions.NewHost(log),
+		ext:         nativeext.NewHost(log),
 		modules:     mods,
 		isFirstPass: true,
 		sharedData:  newSharedData(),
@@ -44,8 +45,8 @@ type Stencil struct {
 	log slogext.Logger
 	m   *configuration.Manifest
 
-	ext       *extensions.Host
-	extCaller *extensions.ExtensionCaller
+	ext       *nativeext.Host
+	extCaller *nativeext.ExtensionCaller
 
 	// modules is a list of modules used in this stencil render
 	modules []*modules.Module

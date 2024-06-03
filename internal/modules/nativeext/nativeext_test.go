@@ -1,4 +1,4 @@
-package extensions_test
+package nativeext_test
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
-	"go.rgst.io/stencil/pkg/extensions"
-	"go.rgst.io/stencil/pkg/slogext"
+	"go.rgst.io/stencil/internal/modules/nativeext"
+	"go.rgst.io/stencil/internal/slogext"
 	"gotest.tools/v3/assert"
 )
 
@@ -15,7 +15,7 @@ func TestCanImportNativeExtension(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	ext := extensions.NewHost(slogext.NewTestLogger(t))
+	ext := nativeext.NewHost(slogext.NewTestLogger(t))
 	defer ext.Close()
 
 	version := &resolver.Version{
