@@ -12,20 +12,14 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
-	"github.com/getoutreach/gobox/pkg/cli/github"
+	giturls "github.com/chainguard-dev/git-urls"
 	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
 	"github.com/go-git/go-billy/v5"
-	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/go-git/go-billy/v5/osfs"
-	"github.com/go-git/go-git/v5"
-	"github.com/go-git/go-git/v5/plumbing"
-	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
-	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	giturls "github.com/whilp/git-urls"
+	"go.rgst.io/stencil/internal/git"
+	"go.rgst.io/stencil/internal/modules/nativeext"
 	"go.rgst.io/stencil/pkg/configuration"
-	"go.rgst.io/stencil/pkg/extensions"
 	"gopkg.in/yaml.v3"
 )
 
@@ -34,10 +28,11 @@ const localModuleVersion = "local"
 
 // Module is a stencil module that contains template files.
 type Module struct {
-	// t is a shared go-template that is used for this module. This is important
-	// because this allows us to call shared templates across a single module.
-	// Note: We don't currently support sharing templates across modules. Instead
-	// the data passing system should be used for cases like this.
+	// t is a shared go-template that is used for this module. This is
+	// important because this allows us to call shared templates across a
+	// single module.
+	//
+	// Note: We don't currently support sharing templates across modules.
 	t *template.Template
 
 	// Manifest is the module's manifest information/configuration
@@ -47,13 +42,14 @@ type Module struct {
 	// import path. For example: github.com/getoutreach/stencil-base
 	Name string
 
-	// URI is the underlying URI being used to download this module
+	// URI is the location of the module for fetching purposes. By
+	// default, it's equal to the name with the HTTPS scheme.
 	URI string
 
 	// Version is the version of this module
 	Version string
 
-	// fs is a cached filesystem
+	// fs is underlying filesystem for this module
 	fs billy.Filesystem
 }
 
@@ -62,13 +58,14 @@ func uriIsLocal(uri string) bool {
 	return !strings.Contains(uri, "://") || strings.HasPrefix(uri, "file://")
 }
 
-// New creates a new module from a TemplateRepository. Version must be set and can
-// be obtained via the gobox/pkg/cli/updater/resolver package, or by using the
-// GetModulesForProject function.
+// New creates a new module from a TemplateRepository. Version must be
+// set and can be obtained via the gobox/pkg/cli/updater/resolver
+// package, or by using the GetModulesForProject function.
 //
-// uri is the URI for the module. If it is an empty string https://+name is used
-// instead.
-func New(ctx context.Context, uri string, tr *configuration.TemplateRepository, fs billy.Filesystem) (*Module, error) {
+// uri is the URI for the module. If it is an empty string
+// https://+name is used instead.
+func New(ctx context.Context, uri string, tr *configuration.TemplateRepository,
+	fs billy.Filesystem) (*Module, error) {
 	if uri == "" {
 		uri = "https://" + tr.Name
 	}
@@ -112,11 +109,10 @@ func (m *Module) GetTemplate() *template.Template {
 	return m.t
 }
 
-// RegisterExtensions registers all extensions provided
-// by the given module. If the module is a local file
-// URI then extensions will be sourced from the `./bin`
-// directory of the base of the path.
-func (m *Module) RegisterExtensions(ctx context.Context, ext *extensions.Host) error {
+// RegisterExtensions registers all extensions provided by the given
+// module. If the module is a local file URI then extensions will be
+// sourced from the `./bin` directory of the base of the path.
+func (m *Module) RegisterExtensions(ctx context.Context, ext *nativeext.Host) error {
 	// Only register extensions if this repository declares extensions explicitly in its type.
 	if !m.Manifest.Type.Contains(configuration.TemplateRepositoryTypeExt) {
 		return nil
@@ -128,8 +124,8 @@ func (m *Module) RegisterExtensions(ctx context.Context, ext *extensions.Host) e
 	return ext.RegisterExtension(ctx, m.URI, m.Name, version)
 }
 
-// getManifest downloads the module if not already downloaded and returns a parsed
-// configuration.TemplateRepositoryManifest of this module.
+// getManifest downloads the module if not already downloaded and
+// returns a parsed configuration.TemplateRepositoryManifest of this module.
 func (m *Module) getManifest(ctx context.Context) (*configuration.TemplateRepositoryManifest, error) {
 	fs, err := m.GetFS(ctx)
 	if err != nil {
@@ -158,57 +154,32 @@ func (m *Module) getManifest(ctx context.Context) (*configuration.TemplateReposi
 	return &manifest, nil
 }
 
-// GetFS returns a billy.Filesystem that contains the contents
-// of this module.
+// GetFS returns a billy.Filesystem that contains the contents of this
+// module. If we've already fetched the filesystem, it will not be
+// fetched again.
 func (m *Module) GetFS(ctx context.Context) (billy.Filesystem, error) {
+	// If we've already fetched the filesystem, don't do it again.
 	if m.fs != nil {
 		return m.fs, nil
 	}
 
 	u, err := giturls.Parse(m.URI)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse module URI")
+		return nil, fmt.Errorf("failed to parse module URI: %w", err)
 	}
 
+	var storageDir string
 	if u.Scheme == "file" {
-		m.fs = osfs.New(strings.TrimPrefix(m.URI, "file://"))
-		return m.fs, nil
-	}
-
-	m.fs = memfs.New()
-	opts := &git.CloneOptions{
-		URL:               m.URI,
-		RecurseSubmodules: git.DefaultSubmoduleRecursionDepth,
-		Depth:             1,
-	}
-
-	if token, err := github.GetToken(); err == nil {
-		opts.Auth = &githttp.BasicAuth{
-			Username: "x-access-token",
-			Password: string(token),
-		}
+		// File URLs are already on disk, so just use that path.
+		storageDir = strings.TrimPrefix(m.URI, "file://")
 	} else {
-		logrus.WithError(err).Warn("failed to get github token, will use an unauthenticated client")
-	}
-
-	if m.Version != "" {
-		opts.ReferenceName = plumbing.NewTagReferenceName(m.Version)
-		opts.SingleBranch = true
-	}
-
-	// We don't use the git object here because all we care about is
-	// the underlying filesystem object, which was created earlier
-	if _, err := git.CloneContext(ctx, memory.NewStorage(), m.fs, opts); err != nil {
-		// if tag not found try as a branch
-		if !errors.Is(err, git.NoMatchingRefSpecError{}) {
-			return nil, err
-		}
-
-		opts.ReferenceName = plumbing.NewBranchReferenceName(m.Version)
-		if _, err := git.CloneContext(ctx, memory.NewStorage(), m.fs, opts); err != nil {
-			return nil, errors.Wrap(err, "failed to find version as branch/tag")
+		var err error
+		storageDir, err = git.Clone(ctx, m.Version, m.URI)
+		if err != nil {
+			return nil, fmt.Errorf("failed to clone module: %w", err)
 		}
 	}
 
+	m.fs = osfs.New(storageDir)
 	return m.fs, nil
 }

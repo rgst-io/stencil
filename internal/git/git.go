@@ -7,8 +7,11 @@ package git
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"os/exec"
 	"regexp"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -43,4 +46,36 @@ func GetDefaultBranch(ctx context.Context, path string) (string, error) {
 	}
 
 	return matches[1], nil
+}
+
+// Clone clone a git repository to a temporary directory and returns the
+// path to the repository. If ref is empty, the default branch will be
+// used.
+func Clone(ctx context.Context, ref, url string) (string, error) {
+	tempDir, err := os.MkdirTemp("", "stencil-"+strings.ReplaceAll(url, "/", "-"))
+	if err != nil {
+		return "", errors.Wrap(err, "failed to create temporary directory")
+	}
+
+	cmds := [][]string{
+		{"git", "init"},
+		{"git", "remote", "add", "origin", url},
+		{"git", "-c", "protocol.version=2", "fetch", "origin", ref},
+		{"git", "reset", "--hard", "FETCH_HEAD"},
+	}
+	for _, cmd := range cmds {
+		//nolint:gosec // Why: Commands are not user provided.
+		c := exec.CommandContext(ctx, cmd[0], cmd[1:]...)
+		c.Dir = tempDir
+		if err := c.Run(); err != nil {
+			var execErr *exec.ExitError
+			if errors.As(err, &execErr) {
+				return "", fmt.Errorf("failed to run %q (%w): %s", cmd, err, string(execErr.Stderr))
+			}
+
+			return "", fmt.Errorf("failed to run %q: %w", cmd, err)
+		}
+	}
+
+	return tempDir, nil
 }

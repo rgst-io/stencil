@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"text/template"
 
+	"go.rgst.io/stencil/internal/modules/nativeext"
 	"go.rgst.io/stencil/internal/slogext"
-	"go.rgst.io/stencil/pkg/extensions"
 )
 
 // NewFuncMap returns the standard func map for a template
@@ -38,6 +38,6 @@ func NewFuncMap(st *Stencil, t *Template, log slogext.Logger) template.FuncMap {
 
 		return tplf
 	}
-	funcs["extensions"] = func() *extensions.ExtensionCaller { return st.extCaller }
+	funcs["extensions"] = func() *nativeext.ExtensionCaller { return st.extCaller }
 	return funcs
 }
