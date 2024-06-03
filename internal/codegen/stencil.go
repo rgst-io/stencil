@@ -18,11 +18,11 @@ import (
 	"github.com/mitchellh/hashstructure/v2"
 	"github.com/pkg/errors"
 	"go.rgst.io/stencil/internal/modules"
-	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/extensions"
 	"go.rgst.io/stencil/pkg/extensions/apiv1"
+	"go.rgst.io/stencil/pkg/slogext"
 	"go.rgst.io/stencil/pkg/stencil"
 )
 

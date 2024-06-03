@@ -8,7 +8,7 @@ package apiv1
 import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
-	"go.rgst.io/stencil/internal/slogext"
+	"go.rgst.io/stencil/pkg/slogext"
 )
 
 // NewHandshake returns a plugin.HandshakeConfig for

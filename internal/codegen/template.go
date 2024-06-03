@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"go.rgst.io/stencil/internal/modules"
-	"go.rgst.io/stencil/internal/slogext"
+	"go.rgst.io/stencil/pkg/slogext"
 )
 
 // Template is a file that has been processed by stencil

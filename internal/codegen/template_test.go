@@ -17,8 +17,8 @@ import (
 	"github.com/go-git/go-billy/v5/memfs"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
-	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/pkg/slogext"
 	"gotest.tools/v3/assert"
 )
 
