@@ -349,7 +349,7 @@ func (c *Command) writeFile(f *codegen.File) error {
 	}
 	c.log.Info(msg)
 	if f.Skipped {
-		c.log.Debug("Skipped: ", f.SkippedReason)
+		c.log.Debug("Skipped file", "reason", f.SkippedReason)
 	}
 	return nil
 }
