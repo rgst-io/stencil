@@ -27,7 +27,7 @@ require (
 	github.com/urfave/cli/v2 v2.27.2
 	github.com/whilp/git-urls v1.0.0
 	golang.org/x/oauth2 v0.21.0
-	golang.org/x/term v0.20.0
+	golang.org/x/term v0.21.0
 	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools/v3 v3.5.1
 	sigs.k8s.io/yaml v1.4.0
@@ -102,7 +102,7 @@ require (
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/exp v0.0.0-20240529005216-23cca8864a10 // indirect
 	golang.org/x/net v0.25.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240528184218-531527333157 // indirect
 	google.golang.org/grpc v1.64.0 // indirect
