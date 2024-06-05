@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"go.rgst.io/stencil/internal/testing/cmdexec"
 )
 
 // This block contains errors and regexes
@@ -78,4 +79,24 @@ func Clone(ctx context.Context, ref, url string) (string, error) {
 	}
 
 	return tempDir, nil
+}
+
+// ListRemote returns a list of all remotes as shown from running 'git
+// ls-remote'.
+func ListRemote(ctx context.Context, remote string) ([][]string, error) {
+	cmd := cmdexec.CommandContext(ctx, "git", "ls-remote", remote)
+	out, err := cmd.Output()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get remote branches")
+	}
+
+	remotes := make([][]string, 0)
+	for _, line := range strings.Split(string(out), "\n") {
+		if line == "" {
+			continue
+		}
+
+		remotes = append(remotes, strings.Fields(line))
+	}
+	return remotes, nil
 }

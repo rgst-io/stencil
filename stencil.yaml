@@ -1,6 +1,7 @@
+# yaml-language-server: $schema=./.vscode/schema.json
 name: stencil
 arguments:
   org: rgst-io
   license: Apache-2.0
 modules:
-- name: github.com/rgst-io/stencil-golang
+  - name: github.com/rgst-io/stencil-golang
