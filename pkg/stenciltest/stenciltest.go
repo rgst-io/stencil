@@ -20,9 +20,9 @@ import (
 	"go.rgst.io/stencil/internal/codegen"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
-	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/extensions/apiv1"
+	"go.rgst.io/stencil/pkg/slogext"
 	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
 )
