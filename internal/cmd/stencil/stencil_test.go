@@ -11,8 +11,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/pkg/slogext"
 	"go.rgst.io/stencil/pkg/stencil"
 )
 

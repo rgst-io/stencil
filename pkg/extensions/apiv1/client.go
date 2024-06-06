@@ -13,7 +13,7 @@ import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
 	"github.com/pkg/errors"
-	"go.rgst.io/stencil/internal/slogext"
+	"go.rgst.io/stencil/pkg/slogext"
 )
 
 // IDEA(jaredallard): Cleanup this to return a Implementation backed by a transport as well.

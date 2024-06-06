@@ -26,9 +26,9 @@ import (
 
 	"github.com/pkg/errors"
 	"go.rgst.io/stencil/internal/cmd/stencil"
-	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/pkg/slogext"
 )
 
 // main is the entrypoint for the stencil CLI.

@@ -23,8 +23,8 @@ import (
 	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 	giturls "github.com/whilp/git-urls"
-	"go.rgst.io/stencil/internal/slogext"
 	"go.rgst.io/stencil/pkg/extensions/apiv1"
+	"go.rgst.io/stencil/pkg/slogext"
 )
 
 // generatedTemplateFunc is the underlying type of a function
