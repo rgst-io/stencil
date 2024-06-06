@@ -62,6 +62,18 @@ func main() {
 		// VSCode doesn't handle above draft-07 right now, so we force it.
 		schema.Version = "https://json-schema.org/draft-07/schema#"
 
+		// Apply manifest-specific overrides.
+		if s.FileName == "manifest" {
+			subSchema, ok := schema.Definitions["Argument"].Properties.Get("schema")
+			if !ok {
+				fmt.Println("failed to update schema property for manifest to include $ref")
+				os.Exit(1)
+			}
+
+			subSchema.Ref = schema.Version
+			subSchema.Type = "" // Don't set type.
+		}
+
 		b, err := schema.MarshalJSON()
 		if err != nil {
 			fmt.Printf("error generating schema for %s: %v\n", s.FileName, err)

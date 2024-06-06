@@ -17,7 +17,7 @@
           "description": "Default is the default value for this argument if it's not set.\nThis cannot be set when required is true."
         },
         "schema": {
-          "type": "object",
+          "$ref": "https://json-schema.org/draft-07/schema#",
           "description": "Schema is a JSON schema, in YAML, for the argument."
         },
         "from": {

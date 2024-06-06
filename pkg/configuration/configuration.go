@@ -141,7 +141,7 @@ type Argument struct {
 	Default interface{} `yaml:"default,omitempty"`
 
 	// Schema is a JSON schema, in YAML, for the argument.
-	Schema map[string]interface{} `yaml:"schema"`
+	Schema map[string]any `yaml:"schema"`
 
 	// From is a reference to an argument in another module, if this is
 	// set, all other fields are ignored and instead the module referenced
