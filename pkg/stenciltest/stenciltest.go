@@ -131,7 +131,7 @@ func (t *Template) getModuleDependencies(ctx context.Context, m *modules.Module)
 	}
 
 	mods, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
-		Token:  string(token),
+		Token:  token,
 		Module: m,
 		Log:    t.log,
 	})
