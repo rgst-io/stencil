@@ -20,6 +20,6 @@
   // Schema support OOTB.
   "yaml.schemas": {
     "schemas/manifest.jsonschema.json": ["manifest.yaml"],
-    "schemas/stencil.jsonschema.json": [".stencil.yaml"]
+    "schemas/stencil.jsonschema.json": ["stencil.yaml"]
   }
 }
