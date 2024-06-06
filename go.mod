@@ -24,7 +24,6 @@ require (
 	github.com/princjef/gomarkdoc v1.1.0
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/urfave/cli/v2 v2.27.2
-	github.com/whilp/git-urls v1.0.0
 	golang.org/x/oauth2 v0.21.0
 	golang.org/x/term v0.21.0
 	gopkg.in/yaml.v3 v3.0.1

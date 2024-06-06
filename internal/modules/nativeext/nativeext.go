@@ -22,8 +22,6 @@ import (
 	"github.com/getoutreach/gobox/pkg/cli/updater/archive"
 	"github.com/getoutreach/gobox/pkg/cli/updater/release"
 	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
-	"github.com/pkg/errors"
-	giturls "github.com/whilp/git-urls"
 	"go.rgst.io/stencil/internal/git/vcs/github"
 	"go.rgst.io/stencil/internal/modules/nativeext/apiv1"
 	"go.rgst.io/stencil/pkg/slogext"
