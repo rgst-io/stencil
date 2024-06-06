@@ -10,7 +10,7 @@ import (
 	"text/template"
 
 	"go.rgst.io/stencil/internal/modules/nativeext"
-	"go.rgst.io/stencil/internal/slogext"
+	"go.rgst.io/stencil/pkg/slogext"
 )
 
 // NewFuncMap returns the standard func map for a template
