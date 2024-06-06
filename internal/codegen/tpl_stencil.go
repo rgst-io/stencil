@@ -16,7 +16,7 @@ import (
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/pkg/errors"
-	"go.rgst.io/stencil/internal/slogext"
+	"go.rgst.io/stencil/pkg/slogext"
 )
 
 // TplStencil contains the global functions available to a template for

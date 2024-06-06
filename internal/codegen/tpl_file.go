@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"go.rgst.io/stencil/internal/slogext"
+	"go.rgst.io/stencil/pkg/slogext"
 )
 
 // TplFile is the current file we're writing output to in a

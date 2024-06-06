@@ -55,7 +55,7 @@ const (
 
 // New creates a new logger using the slog package.
 func New() Logger {
-	handler := charmlog.New(os.Stderr)
+	handler := charmlog.New(os.Stdout)
 	return &logger{slog.New(handler), handler}
 }
 
