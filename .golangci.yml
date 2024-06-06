@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://json.schemastore.org/golangci-lint
-controller:
+lintroller:
   tier: "platinum"
 
 # Linter settings

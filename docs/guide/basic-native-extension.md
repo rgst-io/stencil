@@ -5,41 +5,52 @@ order: 4
 # Basic Native Extension
 
 > [!NOTE]
-> This quick start assumes you're familiar with stencil and module usage already. If you aren't, be sure to go through the [reference documentation](/reference/) or the other quick starts here before proceeding. You've been warned!
+> This quick start assumes you're familiar with stencil and module
+> usage already. If you aren't, be sure to go through the
+> [reference documentation](/reference/) or the other quick starts
+> here before proceeding. You've been warned!
 
 # What is a Native Extension?
 
-Native extensions are special module types that don't use go-templates to integrate with stencil. Instead they expose template functions written in another language that can be called by stencil templates.
+Native extensions are special module types that don't use go-templates
+to integrate with stencil. Instead they expose template functions
+written in another language that can be called by stencil templates.
 
 # How to create a Native Extension
 
-This quick start will focus on creating a Go native extension. While other languages may work as well, there currently is no official documentation or support for those languages (if you're interested in another language please contribute it back!).
+This quick start will focus on creating a Go native extension. While
+other languages may work as well, there currently is no official
+documentation or support for those languages (if you're interested in
+another language please contribute it back!).
 
 ## Step 1: Create a Native Extension
 
-Much like a module we're going to use the [`stencil create module`] command to create a native extension.
+Much like a module we're going to use the [`stencil create module`]
+command to create a native extension.
 
 ```bash
 mkdir helloworld; cd helloworld
-stencil create module --native-extension github.com/yourorg/helloworld
+stencil create module github.com/yourorg/helloworld
 ```
 
-However, instead of using the `templates/` directory we're going to create a `plugin/` directory.
+However, instead of using the `templates/` directory we're going to
+create a `plugin/` directory.
 
 ```bash
 rm templates; mkdir plugin
 ```
 
-Now that we've created the `plugin/` directory we're going to created a simple `plugin.go` file that'll implement the `Implementation` interface and prints `helloWorld` when the `helloWorld` function is called.
+Now that we've created the `plugin/` directory we're going to created a
+simple `plugin.go` file that'll implement the `Implementation` interface
+and prints `helloWorld` when the `helloWorld` function is called.
 
 ```go
 package main
 
 import (
-"fmt"
+	"fmt"
 
-	"github.com/getoutreach/stencil/pkg/extensions/apiv1"
-	"github.com/sirupsen/logrus"
+	"github.com/rgst-io/stencil/pkg/extensions/apiv1"
 )
 
 // _ is a compile time assertion to ensure we implement
@@ -76,12 +87,12 @@ func helloWorld() (interface{}, error) {
 func main() {
 	err := apiv1.NewExtensionImplementation(&TestPlugin{})
 	if err != nil {
-		logrus.WithError(err).Fatal("failed to start extension")
+		fmt.Printf("Error: %v\n", err)
 	}
 }
 ```
 
-Now lets run `make` to create the binary at `bin/plugin` so we can consume it in a test application.
+Next, we'll need to build the plugin: `go build -o bin/plugin .`
 
 ## Step 2: Using in a Test Module
 
@@ -94,7 +105,7 @@ stencil create module github.com/yourorg/testmodule
 
 Now let's create a `hello.txt.tpl` that consumes the `helloWorld` function.
 
-```
+```go
 {{ extensions.Call "github.com/yourorg/helloworld" "helloWorld" }}
 ```
 
@@ -115,7 +126,7 @@ mkdir testapp; cd testapp
 cat > stencil.yaml <<EOF
 name: testapp
 modules:
-- name: github.com/yourorg/testmodule
+	- name: github.com/yourorg/testmodule
 replacements:
 	# Note: Replace these directories with their actual paths. This assumes they're
 	# right behind our application in the directory tree.
@@ -127,13 +138,13 @@ Now, if we run `stencil` we should get a `hello.txt` file in our test applicatio
 
 ```bash
 testapp ❯ stencil
-INFO[0000] stencil v1.14.2
-INFO[0000] Fetching dependencies
-INFO[0002]  -> github.com/yourorg/helloworld local
-INFO[0002] Loading native extensions
-INFO[0002] Rendering templates
-INFO[0002] Writing template(s) to disk
-INFO[0002]   -> Created hello.txt
+INFO stencil v0.5.0
+INFO Fetching dependencies
+INFO  -> github.com/yourorg/helloworld local
+INFO Loading native extensions
+INFO Rendering templates
+INFO Writing template(s) to disk
+INFO  -> Created hello.txt
 
 testapp ❯ cat hello.txt
 helloWorld
@@ -143,6 +154,5 @@ Success! :tada:
 
 # Reflection
 
-To reflect, we've created a `hello.txt.tpl` file that calls the `helloWorld` function in the native extension we implemented.
-
-Releasing is all handled by the templates in `stencil-base` and `stencil-template-base` that were created when you ran `stencil create`
+To reflect, we've created a `hello.txt.tpl` file that calls the
+`helloWorld` function in the native extension we implemented.

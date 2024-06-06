@@ -32,7 +32,6 @@ export default defineConfig({
     editLink: {
       pattern: 'https://github.com/rgst-io/stencil/edit/main/docs/:path',
     },
-    // TODO: Enable once approved.
     search: {
       provider: 'algolia',
       options: {

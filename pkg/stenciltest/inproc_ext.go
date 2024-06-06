@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	"go.rgst.io/stencil/pkg/extensions/apiv1"
+	"go.rgst.io/stencil/internal/modules/nativeext/apiv1"
 )
 
 // inprocExt wraps test-provided implementation and 'simulates' the transport layer between
