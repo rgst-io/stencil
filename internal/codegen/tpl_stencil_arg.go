@@ -164,7 +164,7 @@ func (s *TplStencil) validateArg(pth string, arg *configuration.Argument, v inte
 	}
 
 	jsc := jsonschema.NewCompiler()
-	jsc.Draft = jsonschema.Draft2020
+	jsc.DefaultDraft(jsonschema.Draft2020)
 
 	schemaURL := "manifest.yaml/arguments/" + pth
 	if err := jsc.AddResource(schemaURL, schemaBuf); err != nil {
