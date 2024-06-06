@@ -321,7 +321,7 @@ func getLatestModuleForConstraints(ctx context.Context, uri, token string,
 
 			errorString += fmt.Sprintln(history[i].parentModule, "wants", wants)
 		}
-		return nil, errors.Wrapf(err, "failed to resolve module '%s' with constraints\n%s", m.conf.Name, errorString)
+		return nil, errors.Wrapf(err, "failed to resolve module %q with constraints\n%s", m.conf.Name, errorString)
 	}
 
 	return v, nil

@@ -16,12 +16,12 @@ import (
 	"testing"
 
 	"github.com/bradleyjkemp/cupaloy"
-	"github.com/getoutreach/gobox/pkg/cli/github"
 	"go.rgst.io/stencil/internal/codegen"
+	"go.rgst.io/stencil/internal/git/vcs/github"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
+	"go.rgst.io/stencil/internal/modules/nativeext/apiv1"
 	"go.rgst.io/stencil/pkg/configuration"
-	"go.rgst.io/stencil/pkg/extensions/apiv1"
 	"go.rgst.io/stencil/pkg/slogext"
 	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
@@ -125,13 +125,13 @@ func (t *Template) ErrorContains(msg string) {
 // the top-level manifest should be used to create the module that is passed in to ensure
 // that the version criteria is met.
 func (t *Template) getModuleDependencies(ctx context.Context, m *modules.Module) ([]*modules.Module, error) {
-	token, err := github.GetToken()
+	token, err := github.Token()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Warning: failed to get github token: %v", err)
 	}
 
 	mods, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
-		Token:  string(token),
+		Token:  token,
 		Module: m,
 		Log:    t.log,
 	})

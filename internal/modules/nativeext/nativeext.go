@@ -2,11 +2,13 @@
 
 // Description: See package description.
 
-// Package extensions consumes extensions in stencil
-package extensions
+// Package nativeext contains the logic for interacting with native
+// extensions in stencil.
+package nativeext
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -15,15 +17,13 @@ import (
 	"strings"
 
 	"github.com/blang/semver/v4"
+	giturls "github.com/chainguard-dev/git-urls"
 	"github.com/getoutreach/gobox/pkg/cfg"
-	"github.com/getoutreach/gobox/pkg/cli/github"
 	"github.com/getoutreach/gobox/pkg/cli/updater/archive"
 	"github.com/getoutreach/gobox/pkg/cli/updater/release"
 	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
-	"github.com/hashicorp/go-multierror"
-	"github.com/pkg/errors"
-	giturls "github.com/whilp/git-urls"
-	"go.rgst.io/stencil/pkg/extensions/apiv1"
+	"go.rgst.io/stencil/internal/git/vcs/github"
+	"go.rgst.io/stencil/internal/modules/nativeext/apiv1"
 	"go.rgst.io/stencil/pkg/slogext"
 )
 
@@ -70,7 +70,7 @@ func (h *Host) createFunctionFromTemplateFunction(extName string, ext apiv1.Impl
 		})
 		if err != nil {
 			// return an error if the extension returns an error
-			return nil, errors.Wrapf(err, "failed to execute template function %q", extPath)
+			return nil, fmt.Errorf("failed to execute template function %q: %w", extPath, err)
 		}
 
 		// return the response, and a nil error
@@ -88,7 +88,7 @@ func (h *Host) GetExtensionCaller(_ context.Context) (*ExtensionCaller, error) {
 	for extName, ext := range h.extensions {
 		funcs, err := ext.impl.GetTemplateFunctions()
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to get template functions from plugin '%s'", extName)
+			return nil, fmt.Errorf("failed to get template functions from plugin %q: %w", extName, err)
 		}
 
 		for _, f := range funcs {
@@ -116,7 +116,7 @@ func (h *Host) RegisterExtension(ctx context.Context, source, name string, versi
 
 	u, err := giturls.Parse(source)
 	if err != nil {
-		return errors.Wrap(err, "failed to parse extension URL")
+		return fmt.Errorf("failed to parse extension URL: %w", err)
 	}
 
 	var extPath string
@@ -126,7 +126,7 @@ func (h *Host) RegisterExtension(ctx context.Context, source, name string, versi
 		extPath, err = h.downloadFromRemote(ctx, name, version)
 	}
 	if err != nil {
-		return errors.Wrap(err, "failed to setup extension")
+		return fmt.Errorf("failed to setup extension: %w", err)
 	}
 
 	ext, closer, err := apiv1.NewExtensionClient(ctx, extPath, h.log)
@@ -134,28 +134,43 @@ func (h *Host) RegisterExtension(ctx context.Context, source, name string, versi
 		return err
 	}
 
+	// Right now we don't have any configuration, so this serves as test
+	// to ensure that the extension is working.
 	if _, err := ext.GetConfig(); err != nil {
-		return errors.Wrap(err, "failed to get config from extension")
+		return fmt.Errorf("failed to get config from extension: %w", err)
 	}
 	h.extensions[name] = extension{ext, closer}
 
 	return nil
 }
 
-// RegisterInprocExtension registers an extension that is implemented within the same process
-// directly with the host. Please limit the use of this API for unit testing only!
+// RegisterInprocExtension registers an extension that is implemented
+// within the same process directly with the host. Please limit the use
+// of this API for unit testing only!
 func (h *Host) RegisterInprocExtension(name string, ext apiv1.Implementation) {
 	h.log.With("extension", name).Debug("Registered inproc extension")
 	h.extensions[name] = extension{ext, func() error { return nil }}
 }
 
 // getExtensionPath returns the path to an extension binary
-func (h *Host) getExtensionPath(version *resolver.Version, name string) string {
-	homeDir, _ := os.UserHomeDir() //nolint:errcheck // Why: signature doesn't allow it, yet
-	path := filepath.Join(homeDir, ".outreach", ".cache", "stencil", "extensions",
-		name, fmt.Sprintf("@%s", version.Commit), filepath.Base(name))
-	os.MkdirAll(filepath.Dir(path), 0o755) //nolint:errcheck // Why: signature doesn't allow it, yet
-	return path
+func (h *Host) getExtensionPath(version *resolver.Version, name string) (string, error) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", fmt.Errorf("failed to get home directory: %w", err)
+	}
+
+	// Example:
+	// $HOME/.cache/stencil/nativeexts/github.com/rgst-io/plugin/@v1.3.0/plugin
+	path := filepath.Join(
+		// TODO(jaredallard): Support XDG_CACHE_HOME.
+		homeDir, ".cache", "stencil", "nativeexts",
+		name, fmt.Sprintf("@%s", version.Commit), filepath.Base(name),
+	)
+	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+		return "", fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	return path, nil
 }
 
 // getVersionWithCommit retrieves a new version with the commit present.
@@ -170,7 +185,7 @@ func getVersionWithCommit(ctx context.Context, token cfg.SecretData, repoURL str
 			Channel: version.Tag,
 		})
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to get latest version")
+			return nil, fmt.Errorf("failed to get latest version: %w", err)
 		}
 		return v, nil
 	}
@@ -180,7 +195,7 @@ func getVersionWithCommit(ctx context.Context, token cfg.SecretData, repoURL str
 		Constraints: []string{version.Tag},
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get latest version")
+		return nil, fmt.Errorf("failed to get latest version: %w", err)
 	}
 	return v, nil
 }
@@ -194,7 +209,7 @@ func getVersionWithCommit(ctx context.Context, token cfg.SecretData, repoURL str
 //	name: go.rgst.io/stencil-plugin
 func (h *Host) downloadFromRemote(ctx context.Context, name string,
 	version *resolver.Version) (string, error) {
-	token, err := github.GetToken()
+	token, err := github.Token()
 	if err != nil {
 		h.log.WithError(err).Warn("Failed to get github token, falling back to anonymous")
 	}
@@ -202,59 +217,61 @@ func (h *Host) downloadFromRemote(ctx context.Context, name string,
 	repoURL := "https://" + name
 
 	if version.Tag == "" {
-		v, err := resolver.Resolve(ctx, token, &resolver.Criteria{
+		v, err := resolver.Resolve(ctx, cfg.SecretData(token), &resolver.Criteria{
 			URL: repoURL,
 		})
 		if err != nil {
-			return "", errors.Wrap(err, "failed to get latest version")
+			return "", fmt.Errorf("failed to get latest version: %w", err)
 		}
 		version = v
 	}
 
 	if version.Commit == "" {
-		v, err := getVersionWithCommit(ctx, token, repoURL, version)
+		v, err := getVersionWithCommit(ctx, cfg.SecretData(token), repoURL, version)
 		if err != nil {
-			return "", errors.Wrap(err, "retrieving commit")
+			return "", fmt.Errorf("failed to get latest version: %w", err)
 		}
 		version = v
 	}
 
-	// Check if the version we're pulling already exists and is executable before downloading
-	// it again.
-	dlPath := h.getExtensionPath(version, name)
+	// Check if the version we're pulling already exists on disk
+	dlPath, err := h.getExtensionPath(version, name)
+	if err != nil {
+		return "", fmt.Errorf("failed to get extension path: %w", err)
+	}
 	if info, err := os.Stat(dlPath); err == nil && info.Mode() == 0o755 {
 		return dlPath, nil
 	}
 
 	h.log.With("version", version).With("repo", repoURL).Debug("Downloading native extension")
-	a, archiveName, _, err := release.Fetch(ctx, token, &release.FetchOptions{
+	a, archiveName, _, err := release.Fetch(ctx, cfg.SecretData(token), &release.FetchOptions{
 		AssetName: filepath.Base(name) + "_*_" + runtime.GOOS + "_" + runtime.GOARCH + ".tar.gz",
 		RepoURL:   repoURL,
 		Tag:       version.Tag,
 	})
 	if err != nil {
-		return "", errors.Wrap(err, "failed to fetch release")
+		return "", fmt.Errorf("failed to fetch release: %w", err)
 	}
 
 	bin, _, err := archive.Extract(ctx, archiveName, a, archive.WithFilePath(filepath.Base(name)))
 	if err != nil {
-		return "", errors.Wrap(err, "failed to extract archive")
+		return "", fmt.Errorf("failed to extract archive: %w", err)
 	}
 
 	f, err := os.Create(dlPath)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to create file")
+		return "", fmt.Errorf("failed to create file: %w", err)
 	}
 	defer f.Close()
 
 	if _, err := io.Copy(f, bin); err != nil {
-		return "", errors.Wrap(err, "failed to download binary")
+		return "", fmt.Errorf("failed to download binary: %w", err)
 	}
 	f.Close()
 
 	// Ensure the file is executable.
 	if err := os.Chmod(dlPath, 0o755); err != nil {
-		return "", errors.Wrap(err, "failed to ensure plugin is executable")
+		return "", fmt.Errorf("failed to ensure plugin is executable: %w", err)
 	}
 
 	return dlPath, nil
@@ -263,11 +280,11 @@ func (h *Host) downloadFromRemote(ctx context.Context, name string,
 // Close terminates the extension host, which in turn stops
 // all current native extensions
 func (h *Host) Close() error {
-	var result error
+	var errs []error
 	for _, ext := range h.extensions {
 		if err := ext.closer(); err != nil {
-			result = multierror.Append(result, err)
+			errs = append(errs, err)
 		}
 	}
-	return result
+	return errors.Join(errs...)
 }

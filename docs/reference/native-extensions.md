@@ -14,7 +14,7 @@ For details on how to create a native extension, check out the [getting started]
 
 ## Fetching a Native Extension
 
-By default a native extension is fetched from Github releases using semantic-versioning. A binary must exist on the Github release matching [these specific formats](https://github.com/getoutreach/gobox/blob/v1.38.1/pkg/updater/github.go#L455).
+By default a native extension is fetched from Github releases using semantic-versioning. A binary must exist on the Github release matching [these specific formats](https://github.com/rgst-io/stencil/blob/main/internal/modules/nativeext/nativeext.go#L248).
 
 ## Testing a Native Extension
 
@@ -30,12 +30,12 @@ The [`go-plugin`](https://github.com/hashicorp/go-plugin) library does not surfa
 
 Native extensions are implemented using the [go-plugin](https://github.com/hashicorp/go-plugin) using the [`net/rpc`](https://pkg.go.dev/net/rpc) transport layer. go-plugin, in simple terms, implements this by executing a plugin and negotiating with it to create a unix socket to communicate over with the native extension.
 
-Once a connection has been established stencil communicates with the plugin over the following RPC methods (in Go this is the [`Implementation`](https://pkg.go.dev/github.com/getoutreach/stencil/pkg/extensions/apiv1#Implementation) interface).
+Once a connection has been established stencil communicates with the plugin over the following RPC methods (in Go this is the [`Implementation`](https://pkg.go.dev/github.com/rgst-io/stencil/pkg/extensions/apiv1#Implementation) interface).
 
-1. `GetTemplateFunctions` RPC is called, which returns a list of declared functions this native extension implements. The format for this is defined as [`TemplateFunction`](https://pkg.go.dev/github.com/getoutreach/stencil/pkg/extensions/apiv1#TemplateFunction) in Go.
+1. `GetTemplateFunctions` RPC is called, which returns a list of declared functions this native extension implements. The format for this is defined as [`TemplateFunction`](https://pkg.go.dev/github.com/rgst-io/stencil/pkg/extensions/apiv1#TemplateFunction) in Go.
 2. Stencil creates a wrapper go-template function to call the `ExecuteTemplateFunction` rpc based on the data returned by `GetTemplateFunctions`. The function is exposed at `importPath.function` via the `extensions.Call` method.
-3. When the function is called via `extensions.Call "importPath.function"` the rpc `ExecuteTemplateFunction` is called with the arguments passed to the function. The format for this RPC is defined as [`TemplateFunctionExec`](https://pkg.go.dev/github.com/getoutreach/stencil/pkg/extensions/apiv1#TemplateFunctionExec) in Go.
+3. When the function is called via `extensions.Call "importPath.function"` the rpc `ExecuteTemplateFunction` is called with the arguments passed to the function. The format for this RPC is defined as [`TemplateFunctionExec`](https://pkg.go.dev/github.com/rgst-io/stencil/pkg/extensions/apiv1#TemplateFunctionExec) in Go.
 4. The response from the RPC is returned directly to the go-template with no processing.
 
 > [!TIP]
-> While `ExecuteTemplateFunction`'s return value is a `interface{}`, that is actually just a wrapper around the lower level implementation dubbed as [`implementationTransport`](https://github.com/getoutreach/stencil/blob/v1.14.2/pkg/extensions/apiv1/transport.go#L25). The return value of that is `[]byte`, which is expected to be valid JSON to be decoded by stencil before being passed to the template that called it. This is done to ensure typed data is always able to be sent over.
+> While `ExecuteTemplateFunction`'s return value is a `interface{}`, that is actually just a wrapper around the lower level implementation dubbed as [`implementationTransport`](https://github.com/rgst-io/stencil/blob/main/pkg/extensions/apiv1/transport.go#L25). The return value of that is `[]byte`, which is expected to be valid JSON to be decoded by stencil before being passed to the template that called it. This is done to ensure typed data is always able to be sent over.
