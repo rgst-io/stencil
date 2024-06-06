@@ -55,7 +55,7 @@ func NewDefaultManifest() (*Manifest, error) {
 // what files are included
 type Manifest struct {
 	// Name is the name of the project
-	Name string `yaml:"name"`
+	Name string `yaml:"name" jsonschema:"required"`
 
 	// Modules are the template modules that this project depends
 	// on and utilizes
@@ -78,7 +78,7 @@ type Manifest struct {
 // TemplateRepository is a repository of template files.
 type TemplateRepository struct {
 	// Name is the name of this module. This should be a valid go import path
-	Name string `yaml:"name"`
+	Name string `yaml:"name" jsonschema:"required"`
 
 	// Channel is the channel to use for updates to this module
 	// Defaults to "stable"
@@ -96,10 +96,10 @@ type TemplateRepository struct {
 type TemplateRepositoryManifest struct {
 	// Name is the name of this template repository.
 	// This must match the import path.
-	Name string `yaml:"name"`
+	Name string `yaml:"name" jsonschema:"required"`
 
 	// Modules are template repositories that this manifest requires
-	Modules []*TemplateRepository `yaml:"modules"`
+	Modules []*TemplateRepository `yaml:"modules,omitempty"`
 
 	// Type stores a comma-separated list of template repository types served by the current module.
 	// Use the TemplateRepositoryTypes.Contains method to check.
@@ -120,11 +120,11 @@ type TemplateRepositoryManifest struct {
 // friendly name
 type PostRunCommandSpec struct {
 	// Name is the name of the command being ran, used for UX
-	Name string `yaml:"name"`
+	Name string `yaml:"name,omitempty"`
 
 	// Command is the command to be ran, note: this is ran inside
 	// of a bash shell.
-	Command string `yaml:"command"`
+	Command string `yaml:"command" jsonschema:"required"`
 }
 
 // Argument is a user-input argument that can be passed to
@@ -134,20 +134,20 @@ type Argument struct {
 	Description string `yaml:"description"`
 
 	// Required denotes this argument as required.
-	Required bool `yaml:"required"`
+	Required bool `yaml:"required,omitempty"`
 
 	// Default is the default value for this argument if it's not set.
 	// This cannot be set when required is true.
-	Default interface{} `yaml:"default"`
+	Default interface{} `yaml:"default,omitempty"`
 
 	// Schema is a JSON schema, in YAML, for the argument.
-	Schema map[string]interface{} `yaml:"schema"`
+	Schema map[string]any `yaml:"schema"`
 
 	// From is a reference to an argument in another module, if this is
 	// set, all other fields are ignored and instead the module referenced
 	// field's are used instead. The name of the argument, the key in the map,
 	// must be the same across both modules.
-	From string `yaml:"from"`
+	From string `yaml:"from,omitempty"`
 }
 
 // ValidateName ensures that the name of a project in the manifest

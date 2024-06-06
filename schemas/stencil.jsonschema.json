@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "$id": "https://go.rgst.io/stencil/pkg/configuration/manifest",
+  "$ref": "#/$defs/Manifest",
+  "$defs": {
+    "Manifest": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name is the name of the project"
+        },
+        "modules": {
+          "items": { "$ref": "#/$defs/TemplateRepository" },
+          "type": "array",
+          "description": "Modules are the template modules that this project depends\non and utilizes"
+        },
+        "versions": {
+          "additionalProperties": { "type": "string" },
+          "type": "object",
+          "description": "Versions is a map of versions of certain tools, this is used by templates\nand will likely be replaced with something better in the future."
+        },
+        "arguments": {
+          "type": "object",
+          "description": "Arguments is a map of arbitrary arguments to pass to the generator"
+        },
+        "replacements": {
+          "additionalProperties": { "type": "string" },
+          "type": "object",
+          "description": "Replacements is a list of module names to replace their URI.\nExpected format:\n- local file: file://path/to/module\n- remote file: https://github.com/getoutreach/stencil-base"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": ["name", "arguments"],
+      "description": "Manifest is a manifest used to describe a project and impact what files are included"
+    },
+    "TemplateRepository": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name is the name of this module. This should be a valid go import path"
+        },
+        "channel": {
+          "type": "string",
+          "description": "Channel is the channel to use for updates to this module\nDefaults to \"stable\""
+        },
+        "version": {
+          "type": "string",
+          "description": "Version is a semantic version or branch of the template repository\nthat should be downloaded if not set then the latest version is used.\n\nVersion can also be a constraint as supported by the underlying resolver:\nhttps://pkg.go.dev/github.com/getoutreach/gobox/pkg/cli/updater/resolver#Resolve"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": ["name"],
+      "description": "TemplateRepository is a repository of template files."
+    }
+  }
+}
