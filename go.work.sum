@@ -2034,6 +2034,8 @@ github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQD
 github.com/ruudk/golang-pdf417 v0.0.0-20181029194003-1af4ab5afa58/go.mod h1:6lfFZQK844Gfx8o5WFuvpxWRwnSoipWe/p622j1v06w=
 github.com/ruudk/golang-pdf417 v0.0.0-20201230142125-a7e3863a1245/go.mod h1:pQAZKsJ8yyVxGRWYNEm9oFB8ieLgKFnamEyDmSA0BRk=
 github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb6uqfes/u+d4ooFouqFdy9/2g9QGwK3SQygK0Ts=
+github.com/santhosh-tekuri/jsonschema/v6 v6.0.0 h1:tnigFF7+QRJfnw8PQmcq4mvcWxz6RcLY+isSK15D/GI=
+github.com/santhosh-tekuri/jsonschema/v6 v6.0.0/go.mod h1:JXeL+ps8p7/KNMjDQk3TCwPpBy0wYklyWTfbkIzdIFU=
 github.com/satori/go.uuid v1.2.0/go.mod h1:dA0hQrYB0VpLJoorglMZABFdXlWrHn1NEOzdhQKdks0=
 github.com/schollz/progressbar/v3 v3.14.1/go.mod h1:Zc9xXneTzWXF81TGoqL71u0sBPjULtEHYtj/WVgVy8E=
 github.com/schollz/progressbar/v3 v3.14.3/go.mod h1:aT3UQ7yGm+2ZjeXPqsjTenwL3ddUiuZ0kfQ/2tHlyNI=

@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/santhosh-tekuri/jsonschema/v5"
+	"github.com/santhosh-tekuri/jsonschema/v6"
 	"go.rgst.io/stencil/internal/dotnotation"
 	"go.rgst.io/stencil/pkg/configuration"
 )
