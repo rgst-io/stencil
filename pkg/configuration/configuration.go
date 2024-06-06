@@ -41,7 +41,7 @@ func NewManifest(path string) (*Manifest, error) {
 // NewDefaultManifest returns a parsed project manifest
 // from a set default path on disk.
 func NewDefaultManifest() (*Manifest, error) {
-	manifestFiles := []string{".stencil.yaml", "stencil.yaml", "service.yaml"}
+	manifestFiles := []string{"stencil.yaml", "service.yaml"}
 	for _, file := range manifestFiles {
 		if _, err := os.Stat(file); err == nil {
 			return NewManifest(file)
