@@ -5,6 +5,7 @@ package codegen
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"math/rand"
 	"os"
@@ -12,6 +13,7 @@ import (
 	"path"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/go-git/go-billy/v5/util"
@@ -225,6 +227,10 @@ func (s *Stencil) Render(ctx context.Context, log slogext.Logger) ([]*Template, 
 	// Sort module hook data before the next pass
 	s.sortModuleHooks()
 
+	if err := s.calcDirReplacements(vals); err != nil {
+		return nil, err
+	}
+
 	tpls := make([]*Template, 0)
 	for _, t := range tplfiles {
 		log.Debugf("Second pass render of template %s", t.ImportPath())
@@ -237,6 +243,44 @@ func (s *Stencil) Render(ctx context.Context, log slogext.Logger) ([]*Template, 
 	}
 
 	return tpls, nil
+}
+
+// calcDirReplacements calculates all of the final rendered paths for dirReplacements for each module
+// It needs to be in stencil because it uses rendering, which needs the Values object from codegen,
+// so we poke the rendered replacements into the module object for applying later in various ways.
+func (s *Stencil) calcDirReplacements(vals *Values) error {
+	for _, m := range s.modules {
+		reps := map[string]string{}
+		for dsrc, dtmp := range m.Manifest.DirReplacements {
+			// Render replacement
+			nn, err := s.renderDirReplacement(dtmp, m, vals)
+			if err != nil {
+				return err
+			}
+			reps[dsrc] = nn
+		}
+		m.StoreDirReplacements(reps)
+	}
+	return nil
+}
+
+// renderDirReplacement breaks out the actual rendering for calcDirReplacements to make it unit testable
+func (s *Stencil) renderDirReplacement(template string, m *modules.Module, vals *Values) (string, error) {
+	rt, err := NewTemplate(m, "dirReplace", 0o000, time.Time{}, []byte(template), s.log)
+	if err != nil {
+		return "", err
+	}
+
+	if err := rt.Render(s, vals); err != nil {
+		return "", err
+	}
+
+	nn := rt.Files[0].String()
+	if strings.Contains(nn, string(os.PathSeparator)) {
+		return "", fmt.Errorf("directory replacement of %s to %s contains path separator in output", template, nn)
+	}
+
+	return nn, nil
 }
 
 // PostRun runs all post run commands specified in the modules that

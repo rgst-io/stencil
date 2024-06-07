@@ -12,6 +12,7 @@ import (
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
 	"go.rgst.io/stencil/internal/slogext"
+	"go.rgst.io/stencil/internal/testing/testmemfs"
 	"go.rgst.io/stencil/pkg/configuration"
 	"gotest.tools/v3/assert"
 )
@@ -356,4 +357,14 @@ func TestShouldErrorOnTwoDifferentChannels(t *testing.T) {
 		Log: newLogger(t),
 	})
 	assert.ErrorContains(t, err, "previously resolved with channel", "expected GetModulesForProject() to error")
+}
+
+func TestSimpleDirReplacement(t *testing.T) {
+	fs := testmemfs.WithManifest("name: testing\ndirReplacements:\n  a: 'b'\n")
+	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
+	assert.NilError(t, err, "failed to NewWithFS")
+
+	m.StoreDirReplacements(map[string]string{"a": "b"})
+
+	assert.Equal(t, m.ApplyDirReplacements("a/base"), "b/base")
 }

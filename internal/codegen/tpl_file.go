@@ -53,6 +53,7 @@ func (f *TplFile) Block(name string) string {
 //
 //	{{- file.SetPath "new/path/to/file.txt" }}
 func (f *TplFile) SetPath(path string) (out string, err error) {
+	path = f.t.Module.ApplyDirReplacements(path)
 	err = f.f.SetPath(path)
 	return "", err
 }

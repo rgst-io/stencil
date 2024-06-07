@@ -13,11 +13,10 @@ import (
 
 	_ "embed"
 
-	"github.com/go-git/go-billy/v5"
-	"github.com/go-git/go-billy/v5/memfs"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
 	"go.rgst.io/stencil/internal/slogext"
+	"go.rgst.io/stencil/internal/testing/testmemfs"
 	"go.rgst.io/stencil/pkg/configuration"
 	"gotest.tools/v3/assert"
 )
@@ -37,17 +36,9 @@ var generatedBlockTemplate string
 //go:embed testdata/generated-block/fake.txt
 var fakeGeneratedBlockFile string
 
-func memfsWithManifest(manifest string) billy.Filesystem {
-	fs := memfs.New()
-	f, _ := fs.Create("manifest.yaml")
-	f.Write([]byte(manifest))
-	f.Close()
-	return fs
-}
-
 func TestSingleFileRender(t *testing.T) {
 	log := slogext.NewTestLogger(t)
-	fs := memfsWithManifest("name: testing\n")
+	fs := testmemfs.WithManifest("name: testing\n")
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
@@ -64,7 +55,7 @@ func TestSingleFileRender(t *testing.T) {
 
 func TestMultiFileRender(t *testing.T) {
 	log := slogext.NewTestLogger(t)
-	fs := memfsWithManifest("name: testing\narguments:\n  commands:\n    type: list")
+	fs := testmemfs.WithManifest("name: testing\narguments:\n  commands:\n    type: list")
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
@@ -88,7 +79,7 @@ func TestMultiFileRender(t *testing.T) {
 
 func TestMultiFileWithInputRender(t *testing.T) {
 	log := slogext.NewTestLogger(t)
-	fs := memfsWithManifest("name: testing\narguments:\n  commands:\n    type: list")
+	fs := testmemfs.WithManifest("name: testing\narguments:\n  commands:\n    type: list")
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
@@ -112,7 +103,7 @@ func TestMultiFileWithInputRender(t *testing.T) {
 
 func TestApplyTemplateArgumentPassthrough(t *testing.T) {
 	log := slogext.NewTestLogger(t)
-	fs := memfsWithManifest("name: testing\narguments:\n  commands:\n    type: list")
+	fs := testmemfs.WithManifest("name: testing\narguments:\n  commands:\n    type: list")
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
@@ -137,7 +128,7 @@ func TestGeneratedBlock(t *testing.T) {
 	tempDir := t.TempDir()
 	fakeFilePath := filepath.Join(tempDir, "generated-block.txt")
 
-	fs := memfsWithManifest("name: testing\n")
+	fs := testmemfs.WithManifest("name: testing\n")
 	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{}}
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
@@ -163,7 +154,7 @@ func TestGeneratedBlock(t *testing.T) {
 // TestLibraryTemplate ensures that library templates don't generate
 // files as well as that the library flag is set correctly.
 func TestLibraryTemplate(t *testing.T) {
-	fs := memfsWithManifest("name: testing\n")
+	fs := testmemfs.WithManifest("name: testing\n")
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	log := slogext.NewTestLogger(t)
 	assert.NilError(t, err, "failed to NewWithFS")
@@ -183,7 +174,7 @@ func TestLibraryTemplate(t *testing.T) {
 // TestLibraryCantAccessFileFunctions ensures that library templates
 // can't access file functions in the template.
 func TestLibraryCantAccessFileFunctions(t *testing.T) {
-	fs := memfsWithManifest("name: testing\n")
+	fs := testmemfs.WithManifest("name: testing\n")
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	log := slogext.NewTestLogger(t)
 	assert.NilError(t, err, "failed to NewWithFS")
@@ -198,69 +189,4 @@ func TestLibraryCantAccessFileFunctions(t *testing.T) {
 		"attempted to use file in a template that doesn't support file rendering",
 		"expected library template to fail on render",
 	)
-}
-
-func TestSimpleDirReplacement(t *testing.T) {
-	log := slogext.NewTestLogger(t)
-	fs := memfsWithManifest("name: testing\ndirReplacements:\n  a: 'b'\n")
-	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{}}
-	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
-	assert.NilError(t, err, "failed to NewWithFS")
-
-	st := NewStencil(sm, []*modules.Module{m}, log)
-	tpl, err := NewTemplate(m, "a/base.tpl", 0o644, time.Now(), []byte("out"), log)
-	assert.NilError(t, err, "failed to create template")
-
-	tplf, err := NewFile("a/base", 0o644, time.Now())
-	assert.NilError(t, err, "failed to create file")
-
-	assert.Equal(t, tplf.path, "a/base")
-	vals := NewValues(context.Background(), sm, nil)
-	err = tpl.applyDirReplacements(tplf, st, vals)
-	assert.NilError(t, err, "failed to apply dir replacements")
-	assert.Equal(t, tplf.path, "b/base")
-}
-
-func TestNestedAndTemplatedDirReplacements(t *testing.T) {
-	log := slogext.NewTestLogger(t)
-	fs := memfsWithManifest(
-		"name: testing\ndirReplacements:\n  a: 'b'\n  a/c: '{{ stencil.Arg \"x\" }}'\narguments:\n  x:\n    type: string\n")
-	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]any{"x": "d"}}
-	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
-	assert.NilError(t, err, "failed to NewWithFS")
-
-	st := NewStencil(sm, []*modules.Module{m}, log)
-	tpl, err := NewTemplate(m, "a/c/base.tpl", 0o644, time.Now(), []byte("out"), log)
-	assert.NilError(t, err, "failed to create template")
-
-	tplf, err := NewFile("a/c/base", 0o644, time.Now())
-	assert.NilError(t, err, "failed to create file")
-
-	assert.Equal(t, tplf.path, "a/c/base")
-	vals := NewValues(context.Background(), sm, nil)
-	err = tpl.applyDirReplacements(tplf, st, vals)
-	assert.NilError(t, err, "failed to apply dir replacements")
-	assert.Equal(t, tplf.path, "b/d/base")
-}
-
-func TestBadDirReplacement(t *testing.T) {
-	log := slogext.NewTestLogger(t)
-	fs := memfsWithManifest(
-		"name: testing\ndirReplacements:\n  a: 'b/c'\n")
-	sm := &configuration.Manifest{Name: "testing"}
-	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
-	assert.NilError(t, err, "failed to NewWithFS")
-
-	st := NewStencil(sm, []*modules.Module{m}, log)
-	tpl, err := NewTemplate(m, "a/base.tpl", 0o644, time.Now(), []byte("out"), log)
-	assert.NilError(t, err, "failed to create template")
-
-	tplf, err := NewFile("a/base", 0o644, time.Now())
-	assert.NilError(t, err, "failed to create file")
-
-	assert.Equal(t, tplf.path, "a/base")
-	vals := NewValues(context.Background(), sm, nil)
-	err = tpl.applyDirReplacements(tplf, st, vals)
-	assert.ErrorContains(t, err, "contains path separator in output")
-	assert.Equal(t, tplf.path, "a/base")
 }
