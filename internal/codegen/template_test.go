@@ -38,7 +38,8 @@ var fakeGeneratedBlockFile string
 
 func TestSingleFileRender(t *testing.T) {
 	log := slogext.NewTestLogger(t)
-	fs := testmemfs.WithManifest("name: testing\n")
+	fs, err := testmemfs.WithManifest("name: testing\n")
+	assert.NilError(t, err, "failed to testmemfs.WithManifest")
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
@@ -55,7 +56,8 @@ func TestSingleFileRender(t *testing.T) {
 
 func TestMultiFileRender(t *testing.T) {
 	log := slogext.NewTestLogger(t)
-	fs := testmemfs.WithManifest("name: testing\narguments:\n  commands:\n    type: list")
+	fs, err := testmemfs.WithManifest("name: testing\narguments:\n  commands:\n    type: list")
+	assert.NilError(t, err, "failed to testmemfs.WithManifest")
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
@@ -79,7 +81,8 @@ func TestMultiFileRender(t *testing.T) {
 
 func TestMultiFileWithInputRender(t *testing.T) {
 	log := slogext.NewTestLogger(t)
-	fs := testmemfs.WithManifest("name: testing\narguments:\n  commands:\n    type: list")
+	fs, err := testmemfs.WithManifest("name: testing\narguments:\n  commands:\n    type: list")
+	assert.NilError(t, err, "failed to testmemfs.WithManifest")
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
@@ -103,7 +106,8 @@ func TestMultiFileWithInputRender(t *testing.T) {
 
 func TestApplyTemplateArgumentPassthrough(t *testing.T) {
 	log := slogext.NewTestLogger(t)
-	fs := testmemfs.WithManifest("name: testing\narguments:\n  commands:\n    type: list")
+	fs, err := testmemfs.WithManifest("name: testing\narguments:\n  commands:\n    type: list")
+	assert.NilError(t, err, "failed to testmemfs.WithManifest")
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
@@ -128,7 +132,8 @@ func TestGeneratedBlock(t *testing.T) {
 	tempDir := t.TempDir()
 	fakeFilePath := filepath.Join(tempDir, "generated-block.txt")
 
-	fs := testmemfs.WithManifest("name: testing\n")
+	fs, err := testmemfs.WithManifest("name: testing\n")
+	assert.NilError(t, err, "failed to testmemfs.WithManifest")
 	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{}}
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
@@ -154,7 +159,8 @@ func TestGeneratedBlock(t *testing.T) {
 // TestLibraryTemplate ensures that library templates don't generate
 // files as well as that the library flag is set correctly.
 func TestLibraryTemplate(t *testing.T) {
-	fs := testmemfs.WithManifest("name: testing\n")
+	fs, err := testmemfs.WithManifest("name: testing\n")
+	assert.NilError(t, err, "failed to testmemfs.WithManifest")
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	log := slogext.NewTestLogger(t)
 	assert.NilError(t, err, "failed to NewWithFS")
@@ -174,7 +180,8 @@ func TestLibraryTemplate(t *testing.T) {
 // TestLibraryCantAccessFileFunctions ensures that library templates
 // can't access file functions in the template.
 func TestLibraryCantAccessFileFunctions(t *testing.T) {
-	fs := testmemfs.WithManifest("name: testing\n")
+	fs, err := testmemfs.WithManifest("name: testing\n")
+	assert.NilError(t, err, "failed to testmemfs.WithManifest")
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	log := slogext.NewTestLogger(t)
 	assert.NilError(t, err, "failed to NewWithFS")

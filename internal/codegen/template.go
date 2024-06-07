@@ -99,14 +99,9 @@ func (t *Template) Parse(_ *Stencil) error {
 // are rendered onto the Files field of the template struct.
 func (t *Template) Render(st *Stencil, vals *Values) error {
 	if len(t.Files) == 0 && !t.Library {
-		path := strings.TrimSuffix(t.Path, ".tpl")
-
-		if !st.isFirstPass {
-			// Now that everything's been decided, see if we need to replace any file paths from directory manifests
-			path = t.Module.ApplyDirReplacements(path)
-		}
-
-		f, err := NewFile(path, t.mode, t.modTime)
+		p := strings.TrimSuffix(t.Path, ".tpl")
+		p = t.Module.ApplyDirReplacements(p)
+		f, err := NewFile(p, t.mode, t.modTime)
 		if err != nil {
 			return err
 		}

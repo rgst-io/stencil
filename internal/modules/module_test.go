@@ -360,7 +360,8 @@ func TestShouldErrorOnTwoDifferentChannels(t *testing.T) {
 }
 
 func TestSimpleDirReplacement(t *testing.T) {
-	fs := testmemfs.WithManifest("name: testing\ndirReplacements:\n  a: 'b'\n")
+	fs, err := testmemfs.WithManifest("name: testing\ndirReplacements:\n  a: 'b'\n")
+	assert.NilError(t, err, "failed to testmemfs.WithManifest")
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
