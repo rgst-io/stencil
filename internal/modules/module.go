@@ -228,7 +228,6 @@ func (m *Module) StoreDirReplacements(reps map[string]string) {
 // (because the raw paths won't match if you replace the earlier path segments first),
 // and see if there's any replacements to apply
 func (m *Module) ApplyDirReplacements(path string) string {
-	//
 	pp := strings.Split(path, string(os.PathSeparator))
 	for i := len(pp) - 1; i >= 0; i-- {
 		pathPart := strings.Join(pp[0:i+1], string(os.PathSeparator))
