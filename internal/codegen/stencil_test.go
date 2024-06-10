@@ -106,3 +106,39 @@ func TestModuleHookRender(t *testing.T) {
 	assert.Equal(t, len(tpls[1].Files), 1, "expected Render() m2 template to return a single file")
 	assert.Equal(t, strings.TrimSpace(tpls[1].Files[0].String()), "a", "expected Render() m2 to return correct output")
 }
+
+func TestDirReplacementRendering(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]any{"x": "d"}}
+	m1man := &configuration.TemplateRepositoryManifest{
+		Name: "testing1",
+		DirReplacements: map[string]string{
+			"testdata":             `bob`,
+			"testdata/replacement": `{{ stencil.Arg "x" }}`,
+		},
+		Arguments: map[string]configuration.Argument{"x": {Schema: map[string]any{"type": "string"}}},
+	}
+	m1, err := modulestest.NewModuleFromTemplates(m1man, "testdata/replacement/m1.tpl")
+	assert.NilError(t, err, "failed to NewWithFS")
+
+	st := NewStencil(sm, []*modules.Module{m1}, log)
+
+	tps, err := st.Render(context.Background(), log)
+	assert.NilError(t, err, "failed to render template")
+	assert.Equal(t, len(tps), 1)
+	assert.Equal(t, len(tps[0].Files), 1)
+	assert.Equal(t, tps[0].Files[0].path, "bob/d/m1")
+}
+
+func TestBadDirReplacement(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+	sm := &configuration.Manifest{Name: "testing"}
+	m1man := &configuration.TemplateRepositoryManifest{Name: "testing1"}
+	m, err := modulestest.NewModuleFromTemplates(m1man, "testdata/replacement/m1.tpl")
+	assert.NilError(t, err, "failed to NewModuleFromTemplates")
+
+	st := NewStencil(sm, []*modules.Module{m}, log)
+	vals := NewValues(context.Background(), sm, nil)
+	_, err = st.renderDirReplacement("b/c", m, vals)
+	assert.ErrorContains(t, err, "contains path separator in output")
+}

@@ -55,6 +55,11 @@ type Module struct {
 
 	// fs is a cached filesystem
 	fs billy.Filesystem
+
+	// dirReplacementsRendered is a rendered list of dirReplacements from the manifest,
+	// ready to be used for immediate replacements.  It's a mapping of relative paths
+	// to just the replacement name for the last path segment.
+	dirReplacementsRendered map[string]string
 }
 
 // uriIsLocal returns true if the URI is a local file path
@@ -211,4 +216,24 @@ func (m *Module) GetFS(ctx context.Context) (billy.Filesystem, error) {
 	}
 
 	return m.fs, nil
+}
+
+// StoreDirReplacements pokes the template-rendered output from the stencil render
+// function for use by the module rendering later on via ApplyDirReplacements.
+func (m *Module) StoreDirReplacements(reps map[string]string) {
+	m.dirReplacementsRendered = reps
+}
+
+// ApplyDirReplacements hops through the incoming path dir by dir, starting at the end
+// (because the raw paths won't match if you replace the earlier path segments first),
+// and see if there's any replacements to apply
+func (m *Module) ApplyDirReplacements(path string) string {
+	pp := strings.Split(path, string(os.PathSeparator))
+	for i := len(pp) - 1; i >= 0; i-- {
+		pathPart := strings.Join(pp[0:i+1], string(os.PathSeparator))
+		if drepseg, has := m.dirReplacementsRendered[pathPart]; has {
+			pp[i] = drepseg
+		}
+	}
+	return strings.Join(pp, string(os.PathSeparator))
 }
