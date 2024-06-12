@@ -12,11 +12,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"strings"
 
-	"github.com/AlecAivazis/survey/v2"
-	"github.com/blang/semver/v4"
-	"github.com/charmbracelet/glamour"
 	"github.com/pkg/errors"
 	"go.rgst.io/stencil/internal/codegen"
 	"go.rgst.io/stencil/internal/git/vcs/github"
@@ -24,7 +20,6 @@ import (
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
 	"go.rgst.io/stencil/pkg/stencil"
-	"golang.org/x/term"
 	"gopkg.in/yaml.v3"
 )
 
@@ -84,24 +79,13 @@ func NewCommand(log slogext.Logger, s *configuration.Manifest,
 // the templates. This step also does minimal post-processing of the dependencies
 // manifests
 func (c *Command) Run(ctx context.Context) error {
-	if c.frozenLockfile {
-		if err := c.useModulesFromLock(); err != nil {
-			return errors.Wrap(err, "failed to use lockfile for modules")
-		}
-	}
-
 	c.log.Info("Fetching dependencies")
-	mods, err := modules.GetModulesForProject(ctx, &modules.ModuleResolveOptions{
+	mods, err := modules.FetchModules(ctx, &modules.ModuleResolveOptions{
 		Manifest: c.manifest,
-		Token:    c.token,
 		Log:      c.log,
 	})
 	if err != nil {
 		return errors.Wrap(err, "failed to process modules list")
-	}
-
-	if err := c.checkForMajorVersions(ctx, mods); err != nil {
-		return errors.Wrap(err, "failed to handle major version upgrade")
 	}
 
 	for _, m := range mods {
@@ -133,187 +117,6 @@ func (c *Command) Run(ctx context.Context) error {
 	}
 
 	return st.PostRun(ctx, c.log)
-}
-
-// useModulesFromLock uses the modules from the lockfile instead
-// of the latest versions, or manually supplied versions in the
-// project manifest.
-func (c *Command) useModulesFromLock() error {
-	if c.lock == nil {
-		return fmt.Errorf("frozen lockfile requires a lockfile to exist")
-	}
-
-	desiredModulesHM := make(map[string]bool)
-	for _, m := range c.manifest.Modules {
-		desiredModulesHM[m.Name] = true
-	}
-
-	lockfileModulesHM := make(map[string]*stencil.LockfileModuleEntry)
-	for _, m := range c.lock.Modules {
-		lockfileModulesHM[m.Name] = m
-	}
-
-	outOfSync := false
-	outOfSyncReasons := make([]string, 0)
-
-	// iterate over all of the modules that are desired, if
-	// they are not in the lockfile, then the user is unable
-	// to use a frozen lockfile.
-	for _, m := range c.manifest.Modules {
-		if _, ok := lockfileModulesHM[m.Name]; !ok {
-			outOfSync = true
-			outOfSyncReasons = append(outOfSyncReasons,
-				fmt.Sprintf("module %s requested by stencil.yaml but is not in the lockfile", m.Name))
-		}
-	}
-
-	if outOfSync {
-		c.log.With("reasons", outOfSyncReasons).Debug("lockfile out of sync reasons")
-		c.log.Error("Unable to use frozen lockfile, the lockfile is out of sync with the stencil.yaml")
-		return fmt.Errorf("lockfile out of sync")
-	}
-
-	// use the versions from the lockfile
-	for _, l := range c.lock.Modules {
-		if _, ok := desiredModulesHM[l.Name]; !ok {
-			// need to add the module as a top-level dependency so the version
-			// resolver respects it.
-			//
-			// HACK: Ideally we'd do a system to provide constraints, but that'd
-			// require rethinking about how we track the resolution history and how
-			// we present it. This seems good enough for now.
-			c.manifest.Modules = append(c.manifest.Modules, &configuration.TemplateRepository{
-				Name:    l.Name,
-				Version: l.Version,
-			})
-		}
-
-		// ensure that a user doesn't try to frozen-lockfile a replaced
-		// module that uses a directory path, as that would be non-deterministic.
-		if strings.HasPrefix(l.URL, "file://") {
-			return fmt.Errorf("cannot use frozen lockfile for file dependency %q, re-add replacement or run without --frozen-lockfile", l.Name)
-		}
-
-		// set a constraint on the module that is equal
-		// to =<version> so the resolver only considers
-		// the version from the lockfile.
-		for _, m := range c.manifest.Modules {
-			// Set channel to false to avoid accidentally de-selecting the
-			// version from the lockfile.
-			m.Channel = ""
-
-			if m.Name == l.Name {
-				m.Version = l.Version
-			}
-		}
-	}
-
-	return nil
-}
-
-// checkForMajorVersions checks to see if a major version bump has occurred,
-// if it is, we report it to the user before progressing.
-func (c *Command) checkForMajorVersions(ctx context.Context, mods []*modules.Module) error {
-	// skip if no lockfile
-	if c.lock == nil {
-		return nil
-	}
-
-	lastUsedMods := make(map[string]*stencil.LockfileModuleEntry)
-	for _, l := range c.lock.Modules {
-		lastUsedMods[l.Name] = l
-	}
-
-	for _, m := range mods {
-		// skip unknown modules
-		lastm, ok := lastUsedMods[m.Name]
-		if !ok {
-			continue
-		}
-
-		lastV, err := semver.ParseTolerant(lastm.Version)
-		if err != nil {
-			continue
-		}
-
-		newV, err := semver.ParseTolerant(m.Version)
-		if err != nil {
-			continue
-		}
-
-		// skip major versions that are less or equal to our last version
-		if newV.Major <= lastV.Major {
-			continue
-		}
-
-		if err := c.promptMajorVersion(ctx, m, lastm); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// promptMajorVersion prompts the user to upgrade their templates
-func (c *Command) promptMajorVersion(ctx context.Context, m *modules.Module, lastm *stencil.LockfileModuleEntry) error {
-	c.log.Infof("Major version bump detected for %q (%s -> %s)", m.Name, lastm.Version, m.Version)
-	if c.allowMajorVersionUpgrades {
-		c.log.Info("Continuing with major version upgrade, --allow-major-version-upgrades was set")
-		return nil
-	}
-
-	// If we're not a terminal, we can't ask for consent
-	// so we error out informing the user how to fix this.
-	if !term.IsTerminal(int(os.Stdin.Fd())) {
-		return fmt.Errorf(
-			"unable to prompt for major version upgrade, stdin is not a terminal, " +
-				"pass --allow-major-version-upgrades to continue",
-		)
-	}
-
-	gh, err := github.New()
-	if err != nil {
-		return errors.Wrap(err, "failed to fetch release notes (create github client)")
-	}
-
-	spl := strings.Split(m.Name, "/")
-	if len(spl) < 3 {
-		return fmt.Errorf("unsupported major version upgrade for module %q", m.Name)
-	}
-
-	rel, _, err := gh.Repositories.GetReleaseByTag(ctx, spl[1], spl[2], m.Version)
-	if err != nil {
-		return errors.Wrap(err, "failed to fetch release notes")
-	}
-
-	out := rel.GetBody()
-	r, err := glamour.NewTermRenderer(glamour.WithAutoStyle())
-	if err == nil {
-		out, err = r.Render(rel.GetBody())
-		if err != nil {
-			c.log.WithError(err).Warn("Failed to render release notes, using raw release notes")
-		}
-	} else {
-		c.log.WithError(err).Warn("Failed to create markdown render, using raw release notes")
-	}
-
-	fmt.Println(out)
-
-	var proceed bool
-	if err := survey.Ask([]*survey.Question{{
-		Name: "proceed",
-		Prompt: &survey.Confirm{
-			Message: fmt.Sprintf("Proceed with upgrade for module %q (%s -> %s)?", m.Name, lastm.Version, m.Version),
-			Default: true,
-		},
-	}}, &proceed); err != nil {
-		return err
-	}
-	if !proceed {
-		return fmt.Errorf("Not updating, re-run with --frozen-lockfile to proceed")
-	}
-
-	return nil
 }
 
 // writeFile writes a codegen.File to disk based on its current state

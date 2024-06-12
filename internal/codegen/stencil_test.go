@@ -9,6 +9,7 @@ import (
 	"github.com/go-git/go-billy/v5/memfs"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
+	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
@@ -36,7 +37,7 @@ func TestBasicE2ERender(t *testing.T) {
 	assert.NilError(t, err, "failed to NewWithFS")
 	st := NewStencil(&configuration.Manifest{
 		Name:      "test",
-		Arguments: map[string]interface{}{},
+		Arguments: map[string]any{},
 	}, []*modules.Module{tp}, log)
 
 	tpls, err := st.Render(ctx, log)
@@ -52,7 +53,7 @@ func TestBasicE2ERender(t *testing.T) {
 			{
 				Name:    "testing",
 				URL:     "vfs://testing",
-				Version: "vfs",
+				Version: &resolver.Version{Virtual: "vfs"},
 			},
 		},
 		Files: []*stencil.LockfileFileEntry{
