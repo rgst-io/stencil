@@ -24,9 +24,6 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// localModuleVersion is the version string used for local modules
-const localModuleVersion = "local"
-
 // Module is a stencil module that contains template files.
 type Module struct {
 	// t is a shared go-template that is used for this module. This is
