@@ -4,31 +4,20 @@ lintroller:
 
 # Linter settings
 linters-settings:
-  errcheck:
-    check-blank: true
-  govet:
-    check-shadowing: true
-  gocyclo:
-    min-complexity: 25
   dupl:
     threshold: 100
+  errcheck:
+    check-blank: true
+  funlen:
+    lines: 500
+    statements: 50
+  gocyclo:
+    min-complexity: 25
   goconst:
     min-len: 3
     min-occurrences: 3
   lll:
     line-length: 140
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - experimental
-      - opinionated
-      - performance
-      - style
-    disabled-checks:
-      - whyNoLint # Doesn't seem to work properly
-  funlen:
-    lines: 500
-    statements: 50
 
 linters:
   # Inverted configuration with enable-all and disable is not scalable during updates of golangci-lint.
@@ -53,7 +42,7 @@ linters:
     - govet
     - ineffassign
     - lll
-    # - misspell        # The reason we're disabling this right now is because it uses 1/2 of the memory of the run.
+    - misspell
     - nakedret
     - staticcheck
     - typecheck
@@ -92,5 +81,4 @@ issues:
       source: "^//go:generate "
 
 output:
-  format: colored-line-number
   sort-results: true
