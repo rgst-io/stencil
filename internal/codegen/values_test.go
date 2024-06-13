@@ -16,6 +16,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
+	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
@@ -69,8 +70,11 @@ func TestValues(t *testing.T) {
 
 	vals := NewValues(context.Background(), sm, []*modules.Module{
 		{
-			Name:    "testing",
-			Version: "1.2.3",
+			Name: "testing",
+			Version: &resolver.Version{
+				Tag:    "1.2.3",
+				Commit: "abc",
+			},
 		},
 	})
 	assert.DeepEqual(t, &Values{
@@ -87,7 +91,7 @@ func TestValues(t *testing.T) {
 			Modules: modulesSlice{
 				{
 					Name:    "testing",
-					Version: "1.2.3",
+					Version: &resolver.Version{Tag: "1.2.3", Commit: "abc"},
 				},
 			},
 		},
@@ -112,5 +116,8 @@ func TestGeneratedValues(t *testing.T) {
 	}, []*modules.Module{m}, log)
 	tpls, err := st.Render(context.Background(), log)
 	assert.NilError(t, err, "failed to render templates")
-	assert.Equal(t, tpls[0].Files[0].String(), "vfs vfs vfs testdata/values/values.tpl")
+	assert.Equal(t,
+		tpls[0].Files[0].String(),
+		"virtual (source: vfs) virtual (source: vfs) virtual (source: vfs) testdata/values/values.tpl\n",
+	)
 }

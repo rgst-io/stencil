@@ -17,6 +17,7 @@ import (
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/pkg/errors"
 	"go.rgst.io/stencil/internal/modules"
+	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/pkg/configuration"
 	"gopkg.in/yaml.v3"
 )
@@ -72,8 +73,9 @@ func NewModuleFromTemplates(manifest *configuration.TemplateRepositoryManifest,
 
 // NewWithFS creates a module with the specified file system.
 func NewWithFS(ctx context.Context, name string, fs billy.Filesystem) (*modules.Module, error) {
-	return modules.New(ctx, "vfs://"+name, &configuration.TemplateRepository{
-		Name:    name,
-		Version: "vfs",
-	}, fs)
+	return modules.New(ctx, "vfs://"+name, modules.NewModuleOpts{
+		ImportPath: name,
+		Version:    &resolver.Version{Virtual: "vfs"},
+		FS:         fs,
+	})
 }

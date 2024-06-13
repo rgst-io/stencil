@@ -14,9 +14,7 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/getoutreach/gobox/pkg/cfg"
-	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
-	"github.com/pkg/errors"
+	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
 )
@@ -25,23 +23,25 @@ import (
 // stage, keeping track of the constraints that were used to resolve the
 // module's version.
 type resolvedModule struct {
+	// Module is the underlying [Module] that was created for this module.
 	*Module
 
-	// dontResolve is used to prevent a module from being resolved
-	// if it's already been resolved.
-	//
-	// This is generally only used if a module doesn't make sense to be
-	// resolved again. Examples: local modules and in-memory (vfs) modules.
-	dontResolve bool
+	// history is the version resolution history for this module
+	history []history
+
+	// version is the version that was resolved for this module
+	version *resolver.Version
+}
+
+type history struct {
+	// parent is the name of the module that imported this module
+	parent string
 
 	// version is the version that was resolved for this module
 	version *resolver.Version
 
-	// history is the stack of the criteria that was used to resolve
-	// this module. This is used to generate a useful error message if a
-	// constraint, or other import condition, is violated.
-	// This is sorted in descending order.
-	history []resolution
+	// criteria is the criteria that was used to resolve this module
+	criteria *resolver.Criteria
 }
 
 // resolveModule is used to keep track of a module that needs to be resolved
@@ -53,276 +53,215 @@ type resolveModule struct {
 	parent string
 }
 
-// resolution is an entry in the resolution stack that was used to resolve a module
-type resolution struct {
-	// constraint is the string representation of the constraint
-	// used by the parent module to resolve this module
-	constraint string
-
-	// channel is the channel that was used to resolve this module
-	channel string
-
-	// parentModule is the name of the module that imported this module
-	parentModule string
-}
-
 // ModuleResolveOptions contains options for resolving modules
 type ModuleResolveOptions struct {
-	// Token is the token to use to resolve modules
-	Token string
-
 	// Log is the logger to use
 	Log slogext.Logger
 
-	// Manifest is the manifest to resolve modules for.
-	// This can only be supplied if Module is not set.
+	// Manifest is the project manifest to resolve modules for
 	Manifest *configuration.Manifest
-
-	// Module is the module to resolve dependencies for.
-	// This can only be supplied if Manifest is not
-	// set. This module is automatically added as a
-	// Replacement.
-	Module *Module
 
 	// Replacements is a map of modules to use instead of ones specified
 	// in the manifest. This is mainly meant for tests/importing of stencil
-	// as this is not resolved and instead requires a module type to be
-	// passed.
+	// as these modules will be used instead of fetching them.
 	Replacements map[string]*Module
 }
 
-// GetModulesForProject returns a list of modules that have been resolved from the provided
-// project manifest, respecting constraints and channels as needed.
-//
-//nolint:funlen // Why: Will be refactored in the future
-func GetModulesForProject(ctx context.Context, opts *ModuleResolveOptions) ([]*Module, error) {
-	// start resolving the top-level modules
-	modulesToResolve := make([]resolveModule, 0)
+// criteriaForVersionString returns a resolver.Criteria for a given
+// version string. This function will attempt to parse the version
+// string as a constraint, then as a semver. If it's neither, it's
+// assumed the input is a branch.
+func criteriaForVersionString(version string) *resolver.Criteria {
+	// Empty version, default to latest
+	if version == "" {
+		return &resolver.Criteria{
+			Constraint: ">=0.0.0",
+		}
+	}
 
-	// strReplacements are replacements that replace the URL for a module's
-	// provided import path.
-	strReplacements := make(map[string]string)
+	// Attempt to parse as a constraint
+	if c, err := semver.NewConstraint(version); err == nil {
+		return &resolver.Criteria{
+			Constraint: c.String(),
+		}
+	}
 
-	// resolved contains the current modules that have been selected and is used
-	// to track previous resolutions/constraints for re-resolving modules.
-	resolved := make(map[string]*resolvedModule)
+	// Attempt to parse as a version
+	if _, err := semver.NewVersion(version); err == nil {
+		return &resolver.Criteria{
+			Constraint: "=" + version,
+		}
+	}
 
-	if opts.Manifest != nil {
-		sm := opts.Manifest
+	// Otherwise, probably a branch.
+	return &resolver.Criteria{
+		Branch: version,
+	}
+}
 
-		// for each module required by the project manifest
-		// add it to the list of module to be resolved
-		for i := range sm.Modules {
-			modulesToResolve = append(modulesToResolve, resolveModule{
-				conf:   sm.Modules[i],
-				parent: sm.Name + " (top-level)",
-			})
+// resolutionError returns an error for a failed module resolution
+// with a given import path and history of constraints that were used
+// to resolve the module.
+func resolutionError(importPath string, history []history) error {
+	errorString := ""
+	for i := range history {
+		h := &history[i]
+		errorString += strings.Repeat(" ", i*2) + "└─ "
+
+		wants := "*"
+		switch {
+		case h.criteria.Branch != "":
+			wants = "branch " + h.criteria.Branch
+		case h.criteria.Constraint != "":
+			wants = h.criteria.Constraint
 		}
 
-		// add the replacements to the string list of replacements
-		for k, v := range sm.Replacements {
-			strReplacements[k] = v
-		}
-	} else if opts.Module != nil {
-		if opts.Replacements == nil {
-			opts.Replacements = make(map[string]*Module)
-		}
+		errorString += fmt.Sprintln(history[i].parent, "wants", wants)
+	}
 
-		// add the module to the replacements map so that it can be
-		// used as a replacement for itself
-		opts.Replacements[opts.Module.Name] = opts.Module
+	return fmt.Errorf("failed to resolve module '%s' with constraints\n%s", importPath, errorString)
+}
 
-		// add ourself as the top-level module to resolve our
-		// dependencies without duplicating code here
-		modulesToResolve = append(modulesToResolve, resolveModule{
-			conf:   &configuration.TemplateRepository{Name: opts.Module.Name, Version: "vfs"},
-			parent: opts.Module.Name + " (top-level)",
+// FetchModules fetches modules for a given Manifest. See
+// [ModuleResolveOptions] for more information on the various options
+// that this function supports.
+func FetchModules(ctx context.Context, opts *ModuleResolveOptions) ([]*Module, error) {
+	// Used to track which modules to resolve and which one's have been
+	// resolved, for returning later.
+	resolveList := make([]resolveModule, 0)
+	modules := make(map[string]*resolvedModule)
+
+	// Create a new resolver
+	r := resolver.NewResolver()
+
+	// For each module in the manifest, add it to the list of modules
+	// to be resolved.
+	for _, m := range opts.Manifest.Modules {
+		resolveList = append(resolveList, resolveModule{
+			conf:   m,
+			parent: opts.Manifest.Name + " (top-level)",
 		})
 	}
 
-	log := opts.Log
+	// Resolve all versions, adding more to the stack as we go
+	for len(resolveList) > 0 {
+		mod := resolveList[0]
+		importPath := mod.conf.Name
+		wantedVerCriteria := criteriaForVersionString(mod.conf.Version)
+		uri := uriForModule(importPath, opts.Manifest.Replacements[importPath])
 
-	// resolve all versions, adding more to the stack as we go
-	for {
-		// done resolving the modules
-		if len(modulesToResolve) == 0 {
-			break
-		}
+		opts.Log.With("module", importPath).With("criteria", wantedVerCriteria).Debug("Resolving module")
 
-		resolv := modulesToResolve[0]
-		importPath := resolv.conf.Name
-		if _, ok := resolved[importPath]; !ok {
-			resolved[importPath] = &resolvedModule{Module: &Module{}}
-		}
-		rm := resolved[importPath]
+		// version is the version to use for this module
+		var version *resolver.Version
 
-		if resolv.conf.Version != "" {
-			if _, err := semver.NewConstraint(resolv.conf.Version); err != nil {
-				// Attempt to resolve as a branch, which essentially is a channel.
-				// This is a bit of a hack, ideally we'll consolidate this logic when
-				// channels are ripped out of stencil later.
-				resolv.conf.Channel = resolv.conf.Version
-				resolv.conf.Version = ""
+		// Initialize the module if it doesn't exist in the map.
+		if _, ok := modules[importPath]; !ok {
+			modules[importPath] = &resolvedModule{
+				history: []history{},
 			}
 		}
 
-		// if the module has already been resolved and is marked as
-		// "dontResolve", then re-use it.
-		if rm.dontResolve {
-			// this module has already been resolved and should always be used
-			log.With("module", importPath).Debug("Using in-memory module")
-			modulesToResolve = modulesToResolve[1:]
+		// Check if we've already attempted to resolve this module with this
+		// criteria before. If we have, then we can skip resolving it again.
+		var alreadyResolved bool
+		for _, h := range modules[importPath].history {
+			if h.criteria.Equal(wantedVerCriteria) {
+				opts.Log.With("module", importPath).With("version", h.version).Debug("Already resolved module")
+				// Log the attempt and remove the module from the list
+				modules[importPath].history = append(modules[importPath].history, history{
+					parent:   mod.parent,
+					version:  h.version,
+					criteria: wantedVerCriteria,
+				})
+				alreadyResolved = true
+				break
+			}
+		}
+		if alreadyResolved {
+			resolveList = resolveList[1:]
 			continue
 		}
 
-		// log the resolution attempt
-		rm.history = append(rm.history, resolution{
-			constraint:   resolv.conf.Version,
-			channel:      resolv.conf.Channel,
-			parentModule: resolv.parent,
+		// If we're using a local module or a replacement, we don't need to
+		// resolve the version.
+		if uriIsLocal(uri) {
+			version = &resolver.Version{Virtual: "local"}
+		} else if opts.Replacements[importPath] != nil {
+			version = &resolver.Version{Virtual: "in-memory"}
+		}
+
+		// Add an entry to the history for this module. We add this before
+		// looking up the version so that we know what requested this module
+		// at resolve time.
+		modules[importPath].history = append(modules[importPath].history, history{
+			parent:   mod.parent,
+			version:  version,
+			criteria: wantedVerCriteria,
 		})
-		log.With("module", importPath, "parent", resolv.parent).Debug("resolving module")
 
-		uri := "https://" + importPath
-		var version *resolver.Version
+		// No version, need to resolve it.
+		if version == nil {
+			// Use our criteria along with the previous criteria to resolve
+			// the module version, if we have any.
+			criteria := []*resolver.Criteria{wantedVerCriteria}
+			for _, h := range modules[importPath].history {
+				criteria = append(criteria, h.criteria)
+			}
 
-		var m *Module
-
-		// use a different url for the module if it's been replaced
-		if _, ok := strReplacements[importPath]; ok {
-			uri = strReplacements[importPath]
-		}
-
-		// if we're not using a local or in-memory replaced module, resolve the version
-		// (local modules & in-memory modules should be treated as always satisfying constraints)
-		if !uriIsLocal(uri) && opts.Replacements[importPath] == nil {
 			var err error
-			version, err = getLatestModuleForConstraints(ctx, uri, opts.Token, &resolv, resolved)
+			version, err = r.Resolve(ctx, uri, criteria...)
 			if err != nil {
-				return nil, err
-			}
-		} else {
-			// for local + in-memory modules we don't have a version so just stub it
-			version = &resolver.Version{
-				Mutable: true,
+				return nil, resolutionError(importPath, modules[importPath].history)
 			}
 
-			// if uri is local, represent it as "local" instead of the full path
-			if uriIsLocal(uri) {
-				version.Tag = "local"
-			} else {
-				// otherwise assume in-memory
-				version.Tag = "in-memory"
-			}
-			version.Branch = version.Tag
+			// Track that we got this version for this module
+			// TODO(jaredallard): Do this better.
+			modules[importPath].history[len(modules[importPath].history)-1].version = version
 
-			// don't attempt to resolve this module again
-			rm.dontResolve = true
+			// log the attempt
+			opts.Log.With("module", importPath).With("version", version).Debug("Resolved module")
 		}
 
-		// if we have a replacement for the module in-memory, use that instead
-		// of creating a new module that's to be resolved
-		if _, ok := opts.Replacements[importPath]; ok {
+		// Use a module from the replacements if set, otherwise create one
+		// from the resolved version.
+		var m *Module
+		if opts.Replacements[importPath] != nil {
 			m = opts.Replacements[importPath]
 		} else {
 			var err error
-			m, err = New(ctx, uri, &configuration.TemplateRepository{
-				Name:    importPath,
-				Channel: resolv.conf.Channel,
-				Version: version.GitRef(),
-			}, nil)
+			m, err = New(ctx, uri, NewModuleOpts{
+				ImportPath: importPath,
+				Version:    version,
+			})
 			if err != nil {
 				return nil, err
 			}
+
+			opts.Log.With("module", importPath).With("version", version).Debug("Created module")
 		}
 
-		// add the dependencies of this module to the stack to be resolved
+		// Add the dependencies of this module to the stack to be resolved
 		for _, mfm := range m.Manifest.Modules {
-			modulesToResolve = append(modulesToResolve, resolveModule{
+			opts.Log.With("module", importPath).With("dependency", mfm.Name).Debug("Adding dependency")
+			resolveList = append(resolveList, resolveModule{
 				conf:   mfm,
 				parent: importPath + "@" + version.String(),
 			})
 		}
 
-		// set the module on our resolved module
-		rm.Module = m
-		rm.version = version
+		// Update the module with the new version we found.
+		modules[importPath].Module = m
+		modules[importPath].version = version
 
-		log.With("module", importPath, "version", version.GitRef()).Debug("resolved module")
-
-		// resolve the next module
-		modulesToResolve = modulesToResolve[1:]
+		// Resolve the next module
+		resolveList = resolveList[1:]
 	}
 
-	// convert the resolved modules to a list of modules
-	modules := make([]*Module, 0, len(resolved))
-	for _, m := range resolved {
-		modules = append(modules, m.Module)
+	// Convert the resolved modules to a list of modules
+	modulesList := make([]*Module, 0, len(modules))
+	for _, m := range modules {
+		modulesList = append(modulesList, m.Module)
 	}
-	return modules, nil
-}
-
-// getLatestModuleForConstraints returns the latest module that satisfies the provided constraints
-func getLatestModuleForConstraints(ctx context.Context, uri, token string,
-	m *resolveModule, resolved map[string]*resolvedModule) (*resolver.Version, error) {
-	constraints := make([]string, 0)
-	for _, r := range resolved[m.conf.Name].history {
-		if r.constraint != "" {
-			constraints = append(constraints, r.constraint)
-		}
-	}
-
-	channel := m.conf.Channel
-	for _, r := range resolved[m.conf.Name].history {
-		// if we don't have a channel, or the channel is stable, check to see if
-		// the channel we last resolved with doesn't match the current channel requested.
-		//
-		// If it doesn't match, we don't know how to resolve the module, so we error.
-		if channel != "" && channel != resolver.StableChannel && r.channel != channel {
-			return nil, fmt.Errorf("unable to resolve module %s: "+
-				"module was previously resolved with channel %s (parent: %s), but now requires channel %s",
-				m.conf.Name, r.channel, r.parentModule, channel)
-		}
-
-		// use the first history entry that has a channel since we can't have multiple channels
-		channel = r.channel
-		break //nolint:staticcheck // Why: see above comment
-	}
-
-	// If the last version we resolved is mutable, it's impossible for us
-	// to compare the two, so we have to use it.
-	if rm, ok := resolved[m.conf.Name]; ok {
-		if rm.version != nil && rm.version.Mutable {
-			// IDEA(jaredallard): We should log this as it's non-deterministic when we
-			// have a good interface for doing so.
-			return rm.version, nil
-		}
-	}
-
-	v, err := resolver.Resolve(ctx, cfg.SecretData(token), &resolver.Criteria{
-		URL:           uri,
-		Channel:       channel,
-		Constraints:   constraints,
-		AllowBranches: true,
-	})
-	if err != nil {
-		errorString := ""
-		history := resolved[m.conf.Name].history
-		for i := range history {
-			h := &history[i]
-			errorString += strings.Repeat(" ", i*2) + "└─ "
-
-			wants := "*"
-			if h.constraint != "" {
-				wants = h.constraint
-			} else if h.channel != "" {
-				wants = "(channel) " + h.channel
-			}
-
-			errorString += fmt.Sprintln(history[i].parentModule, "wants", wants)
-		}
-		return nil, errors.Wrapf(err, "failed to resolve module %q with constraints\n%s", m.conf.Name, errorString)
-	}
-
-	return v, nil
+	return modulesList, nil
 }

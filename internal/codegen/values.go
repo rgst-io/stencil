@@ -13,6 +13,7 @@ import (
 	gogit "github.com/go-git/go-git/v5"
 	stencilgit "go.rgst.io/stencil/internal/git"
 	"go.rgst.io/stencil/internal/modules"
+	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 )
@@ -74,7 +75,7 @@ type module struct {
 	Name string
 
 	// Version is the version of the current module
-	Version string
+	Version *resolver.Version
 }
 
 // stencilTemplate contains information about the current template
@@ -124,7 +125,7 @@ func (v *Values) Copy() *Values {
 
 // WithModule returns a copy of the current values with the
 // provided module information being set.
-func (v *Values) WithModule(name, ver string) *Values {
+func (v *Values) WithModule(name string, ver *resolver.Version) *Values {
 	nv := v.Copy()
 	nv.Module.Name = name
 	nv.Module.Version = ver

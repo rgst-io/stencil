@@ -87,6 +87,6 @@ func main() {
 
 	if err := app.RunContext(ctx, os.Args); err != nil {
 		//nolint:gocritic // Why: We're OK not canceling context in this case.
-		log.With(err).Error("failed to run")
+		log.WithError(err).Error("failed to run")
 	}
 }

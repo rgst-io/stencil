@@ -13,18 +13,16 @@ import (
 
 	"github.com/Masterminds/sprig/v3"
 	giturls "github.com/chainguard-dev/git-urls"
-	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
+
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/pkg/errors"
 	"go.rgst.io/stencil/internal/git"
 	"go.rgst.io/stencil/internal/modules/nativeext"
+	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/pkg/configuration"
 	"gopkg.in/yaml.v3"
 )
-
-// localModuleVersion is the version string used for local modules
-const localModuleVersion = "local"
 
 // Module is a stencil module that contains template files.
 type Module struct {
@@ -46,8 +44,8 @@ type Module struct {
 	// default, it's equal to the name with the HTTPS scheme.
 	URI string
 
-	// Version is the version of this module
-	Version string
+	// Version is the version of the module to use.
+	Version *resolver.Version
 
 	// fs is underlying filesystem for this module
 	fs billy.Filesystem
@@ -63,41 +61,59 @@ func uriIsLocal(uri string) bool {
 	return !strings.Contains(uri, "://") || strings.HasPrefix(uri, "file://")
 }
 
+// uriForModule returns the URI for a module. If replacement is an
+// empty string, the default URI is used.
+func uriForModule(name, replacement string) string {
+	if replacement == "" {
+		return "https://" + name
+	}
+
+	return replacement
+}
+
+type NewModuleOpts struct {
+	// ImportPath is the import path of the module. This should be the
+	// Name field of [configuration.TemplateRepository].
+	ImportPath string
+
+	// Version is the version of the module to use. This should be a
+	// parsed version of the Version field of
+	// [configuration.TemplateRepository].
+	Version *resolver.Version
+
+	// FS is an optional filesystem to use for the module. When set, it
+	// will be used instead of fetching the module from the network/disk.
+	FS billy.Filesystem
+}
+
 // New creates a new module from a TemplateRepository. Version must be
 // set and can be obtained via the gobox/pkg/cli/updater/resolver
 // package, or by using the GetModulesForProject function.
 //
 // uri is the URI for the module. If it is an empty string
 // https://+name is used instead.
-func New(ctx context.Context, uri string, tr *configuration.TemplateRepository,
-	fs billy.Filesystem) (*Module, error) {
-	if uri == "" {
-		uri = "https://" + tr.Name
+func New(ctx context.Context, uri string, opts NewModuleOpts) (*Module, error) {
+	if opts.ImportPath == "" {
+		return nil, fmt.Errorf("import path must be specified")
 	}
 
-	// check if a url based on if :// is in the uri, this is kinda hacky
-	// but the only way to do this with a URL+file path being allowed.
-	// We also support the "older" file:// scheme.
-	if uriIsLocal(uri) { // Assume it's a path.
-		osPath := strings.TrimPrefix(uri, "file://")
-		if _, err := os.Stat(osPath); err != nil {
-			return nil, errors.Wrapf(err, "failed to find module %s at path %q", tr.Name, osPath)
+	// Handle local modules if the URI is a local file path
+	uri = uriForModule(opts.ImportPath, uri)
+	if uriIsLocal(uri) {
+		opts.Version = &resolver.Version{
+			Virtual: "local",
 		}
-
-		// translate the path into a file:// URI
-		uri = "file://" + osPath
-		tr.Version = localModuleVersion
 	}
-	if tr.Version == "" {
-		return nil, fmt.Errorf("version must be specified for module %q", tr.Name)
+	if opts.Version == nil {
+		return nil, fmt.Errorf("version must be specified for module %q", opts.ImportPath)
 	}
 
 	m := Module{
-		t:       template.New(tr.Name).Funcs(sprig.TxtFuncMap()),
-		Name:    tr.Name,
+		t:       template.New(opts.ImportPath).Funcs(sprig.TxtFuncMap()),
+		Name:    opts.ImportPath,
 		URI:     uri,
-		Version: tr.Version,
-		fs:      fs,
+		Version: opts.Version,
+		fs:      opts.FS,
 	}
 
 	mani, err := m.getManifest(ctx)
@@ -122,11 +138,7 @@ func (m *Module) RegisterExtensions(ctx context.Context, ext *nativeext.Host) er
 	if !m.Manifest.Type.Contains(configuration.TemplateRepositoryTypeExt) {
 		return nil
 	}
-
-	version := &resolver.Version{
-		Tag: m.Version,
-	}
-	return ext.RegisterExtension(ctx, m.URI, m.Name, version)
+	return ext.RegisterExtension(ctx, m.URI, m.Name, m.Version)
 }
 
 // getManifest downloads the module if not already downloaded and
@@ -179,7 +191,7 @@ func (m *Module) GetFS(ctx context.Context) (billy.Filesystem, error) {
 		storageDir = strings.TrimPrefix(m.URI, "file://")
 	} else {
 		var err error
-		storageDir, err = git.Clone(ctx, m.Version, m.URI)
+		storageDir, err = git.Clone(ctx, m.Version.GitRef(), m.URI)
 		if err != nil {
 			return nil, fmt.Errorf("failed to clone module: %w", err)
 		}

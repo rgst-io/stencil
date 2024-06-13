@@ -1,8 +1,10 @@
-version: (devel)
+version: v0.0.0-dev
 modules:
     - name: github.com/rgst-io/stencil-golang
       url: https://github.com/rgst-io/stencil-golang
-      version: v0.4.0
+      version:
+        commit: 3c3213721335c53fd78f4fede1b3704801616615
+        tag: v0.5.0
 files:
     - name: .github/settings.yml
       template: .github/settings.yml.tpl
@@ -29,5 +31,5 @@ files:
       template: CONTRIBUTING.md.tpl
       module: github.com/rgst-io/stencil-golang
     - name: LICENSE
-      template: LICENSE_AGPL-3.0.tpl
+      template: LICENSE_Apache-2.0.tpl
       module: github.com/rgst-io/stencil-golang
