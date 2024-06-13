@@ -66,7 +66,7 @@ func (c *Criteria) Parse() error {
 		}
 
 		// Create a "version" from the constraint
-		// TODO: make a variable for this regexp
+		// TODO(jaredallard): make a variable for this regexp
 		cv := regexp.MustCompile(`^[^v\d]+`).ReplaceAllString(c.Constraint, "")
 
 		// Attempt to parse the constraint as a version for detecting
@@ -118,7 +118,7 @@ func (c *Criteria) Check(v *Version, prerelease, branch string) bool {
 			// We need to add the pre-release to the constraint.
 			c.Constraint = fmt.Sprintf("%s-%s", c.Constraint, prerelease)
 
-			// TODO: Better error handling and location for this logic since
+			// TODO(jaredallard): Better error handling and location for this logic since
 			// doing this on every call is pretty awful and inefficient.
 			var err error
 			c.c, err = semver.NewConstraint(c.Constraint)
@@ -137,17 +137,15 @@ func (c *Criteria) Check(v *Version, prerelease, branch string) bool {
 	return false
 }
 
-// Equals returns true if the criteria is equal to the other criteria.
-func (c *Criteria) Equals(other *Criteria) bool {
-	if c.Constraint != other.Constraint {
-		return false
+// Equal returns true if the criteria is equal to the other criteria.
+func (c *Criteria) Equal(other *Criteria) bool {
+	// If either is nil, they must both be nil.
+	if c == nil || other == nil {
+		return c == other
 	}
 
-	if c.Branch != other.Branch {
-		return false
-	}
-
-	return true
+	// Otherwise, check all fields.
+	return c.Constraint == other.Constraint && c.Branch == other.Branch
 }
 
 // String returns a user-friendly representation of the criteria.

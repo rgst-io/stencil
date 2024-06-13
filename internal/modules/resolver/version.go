@@ -42,6 +42,7 @@ type Version struct {
 	Branch string
 }
 
+// Equal returns true if the two versions are equal.
 func (v *Version) Equal(other *Version) bool {
 	// If either is nil, they must both be nil.
 	if v == nil || other == nil {

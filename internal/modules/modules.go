@@ -166,7 +166,7 @@ func FetchModules(ctx context.Context, opts *ModuleResolveOptions) ([]*Module, e
 		// criteria before. If we have, then we can skip resolving it again.
 		var alreadyResolved bool
 		for _, h := range modules[importPath].history {
-			if h.criteria.Equals(wantedVerCriteria) {
+			if h.criteria.Equal(wantedVerCriteria) {
 				opts.Log.With("module", importPath).With("version", h.version).Debug("Already resolved module")
 				// Log the attempt and remove the module from the list
 				modules[importPath].history = append(modules[importPath].history, history{
