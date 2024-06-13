@@ -30,7 +30,7 @@ func dereference(i interface{}) interface{} {
 }
 
 // quotejoinstrings takes a slice of strings and joins
-// them with the provided seperator, sep, while quoting all
+// them with the provided separator, sep, while quoting all
 // values
 func quotejoinstrings(elems []string, sep string) string {
 	for i := range elems {

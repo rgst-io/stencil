@@ -207,7 +207,7 @@ func buildErrorPath(absoluteKeywordLocation string) (string, error) {
 		return "", fmt.Errorf("could not split provided path")
 	}
 
-	// The path is devided by either "/" or "#/" we want to remove both.
+	// The path is divided by either "/" or "#/" we want to remove both.
 	re := regexp.MustCompile("#*/")
 	split := re.Split(splitOnManifest[1], -1)
 
