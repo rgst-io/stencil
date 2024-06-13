@@ -17,6 +17,7 @@ import (
 	"go.rgst.io/stencil/internal/codegen"
 	"go.rgst.io/stencil/internal/git/vcs/github"
 	"go.rgst.io/stencil/internal/modules"
+	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
 	"go.rgst.io/stencil/pkg/stencil"
@@ -89,7 +90,16 @@ func (c *Command) Run(ctx context.Context) error {
 	}
 
 	for _, m := range mods {
-		c.log.Infof(" -> %s %s", m.Name, m.Version)
+		c.log.Infof(" -> %s %s", m.Name, func(v *resolver.Version) string {
+			switch {
+			case v.Tag != "":
+				return fmt.Sprintf("%s (%s)", v.Tag, v.Commit)
+			case v.Branch != "":
+				return fmt.Sprintf("branch %s (%s)", v.Branch, v.Commit)
+			}
+
+			return v.Commit
+		}(m.Version))
 	}
 
 	st := codegen.NewStencil(c.manifest, mods, c.log)
@@ -150,9 +160,11 @@ func (c *Command) writeFile(f *codegen.File) error {
 	if c.dryRun {
 		msg += " (dry-run)"
 	}
-	c.log.Info(msg)
-	if f.Skipped {
-		c.log.Debug("Skipped file", "reason", f.SkippedReason)
+
+	if !f.Skipped {
+		c.log.Info(msg)
+	} else {
+		c.log.Debug(msg, "reason", f.SkippedReason)
 	}
 	return nil
 }

@@ -26,20 +26,20 @@ import (
 // manually passed in).
 type Version struct {
 	// Commit is the underlying commit hash for this version.
-	Commit string
+	Commit string `yaml:"commit,omitempty"`
 
 	// Tag is the underlying tag for this version, if set.
-	Tag string
+	Tag string `yaml:"tag,omitempty"`
 	sv  *semver.Version
 
 	// Virtual is version that was injected either through the local
 	// file-system or through a replacement. The value of this is set
 	// depending on the context of how this was set. A virtual version is
 	// never returned from a resolver.
-	Virtual string
+	Virtual string `yaml:"virtual,omitempty"`
 
 	// Branch is the underlying branch for this version, if set.
-	Branch string
+	Branch string `yaml:"branch,omitempty"`
 }
 
 // Equal returns true if the two versions are equal.

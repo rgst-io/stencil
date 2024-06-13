@@ -169,7 +169,6 @@ func TestFailOnIncompatibleConstraints(t *testing.T) {
 		Log: newLogger(t),
 	})
 	assert.Error(t, err,
-		//nolint:lll // Why: That's the error :(
 		"failed to resolve module 'github.com/getoutreach/stencil-base' with constraints\n"+
 			"└─ testing-project (top-level) wants >=0.5.0\n"+
 			"  └─ nested_constraint@virtual (source: local) wants ~0.3.0\n",
