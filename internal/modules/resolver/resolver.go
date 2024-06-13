@@ -19,7 +19,6 @@ package resolver
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"sort"
 	"strings"
 	"sync"
@@ -27,162 +26,6 @@ import (
 	"github.com/Masterminds/semver/v3"
 	"go.rgst.io/stencil/internal/git"
 )
-
-// Branches: If specified, we have to always use the latest version.
-// Does that mean we turn it into a commit, again? Maybe that's the only
-// approach able to be taken here?
-// Commits: There's no ability to get build artifacts.
-// Tags: We can get build artifacts and treat them as being essentially
-// immutable.
-
-// Version represents a version found in a Git repository. Versions are
-// only discovered if a tag or branch points to a commit (individual
-// commits will never be automatically discovered unless they are
-// manually passed in).
-type Version struct {
-	// Commit is the underlying commit hash for this version.
-	Commit string
-
-	// Tag is the underlying tag for this version, if set.
-	Tag string
-	sv  *semver.Version
-
-	// Branch is the underlying branch for this version, if set.
-	Branch string
-}
-
-// Version resolver logic:
-// - Versions must be semantically versioned.
-// - When a version is explicitly asked for, that should be considered
-// the _minimum_ version (e.g., ^1.X.X).
-// - If a branch is specified, we should always use that specific
-// branch's latest commit.
-
-// Criteria represents a set of criteria that a version must satisfy to
-// be able to be selected.
-type Criteria struct {
-	// Below are fields for internal use only. Specifically used for
-	// constraint parsing and checking.
-	c          *semver.Constraints
-	prerelease string
-
-	once sync.Once
-
-	// Constraint is a semantic versioning constraint that the version
-	// must satisfy.
-	//
-	// Example: ">=1.0.0 <2.0.0"
-	Constraint string
-
-	// Branch is the branch that the version must point to. This
-	// constraint will only be satisfied if the branch currently points to
-	// the commit being considered.
-	//
-	// If a branch is provided, it will always be used over other
-	// versions. For this reason, top-level modules should only ever use
-	// branches.
-	Branch string
-}
-
-// Parse parses the criteria's constraint into a semver constraint. If
-// the constraint is already parsed, this is a no-op.
-func (c *Criteria) Parse() error {
-	var err error
-	c.once.Do(func() {
-		if c.Constraint == "" {
-			// No constraint, no need to parse.
-			return
-		}
-
-		if strings.Contains(c.Constraint, "||") || strings.Contains(c.Constraint, "&&") {
-			// We don't support complex constraints.
-			err = fmt.Errorf("complex constraints are not supported")
-			return
-		}
-
-		// Create a "version" from the constraint
-		// TODO: make a variable for this regexp
-		cv := regexp.MustCompile(`^[^v\d]+`).ReplaceAllString(c.Constraint, "")
-
-		// Attempt to parse the constraint as a version for detecting
-		// per-release versions.
-		vc, err := semver.NewVersion(cv)
-		if err == nil {
-			c.prerelease = strings.Split(vc.Prerelease(), ".")[0]
-		}
-
-		c.c, err = semver.NewConstraint(c.Constraint)
-		if err != nil {
-			return
-		}
-	})
-
-	return err
-}
-
-// Check returns true if the version satisfies the criteria. If a
-// prerelease is included then the provided criteria will be mutated to
-// support pre-releases as well as ensure that the prerelease string
-// matches the provided version. If a branch is provided, then the
-// criteria will always be satisfied unless the criteria is looking for
-// a specific branch, in which case it will be satisfied only if the
-// branches match.
-func (c *Criteria) Check(v *Version, prerelease, branch string) bool {
-	if c.Branch != "" && v.Branch == c.Branch {
-		return true
-	}
-
-	// Looking for a specific branch, but we're not asking for a branch,
-	// so return success because we cannot compare these versions.
-	if branch != "" && c.Branch == "" {
-		return true
-	}
-
-	if c.c != nil && v.sv != nil {
-		if c.prerelease != "" && c.prerelease != prerelease {
-			// The provided criteria has a pre-release version, but the
-			// version we're checking against does not match. This means
-			// that we should not consider this version.
-			return false
-		}
-
-		// If we're eligible for pre-releases but our constraint doesn't
-		// allow for them, then we need to change our constraint to allow
-		// for pre-releases.
-		if prerelease != "" && c.prerelease == "" {
-			// We need to add the pre-release to the constraint.
-			c.Constraint = fmt.Sprintf("%s-%s", c.Constraint, prerelease)
-
-			// TODO: Better error handling and location for this logic since
-			// doing this on every call is pretty awful and inefficient.
-			var err error
-			c.c, err = semver.NewConstraint(c.Constraint)
-			if err != nil {
-				// This should never happen since we've already parsed
-				// the constraint once.
-				panic(fmt.Sprintf("failed to parse constraint: %v", err))
-			}
-			c.prerelease = prerelease
-		}
-
-		return c.c.Check(v.sv)
-	}
-
-	// Otherwise, doesn't match.
-	return false
-}
-
-// String is a user-friendly representation of the version that can be
-// used in error messages.
-func (v *Version) String() string {
-	if v.Tag != "" {
-		return fmt.Sprintf("tag %s (%s)", v.Tag, v.Commit)
-	}
-	if v.Branch != "" {
-		return fmt.Sprintf("branch %s (%s)", v.Branch, v.Commit)
-	}
-	return v.Commit
-}
 
 // Resolver is an instance of a version resolver that resolves versions
 // based on the provided criteria. Version lists are fetched exactly
@@ -194,6 +37,13 @@ type Resolver struct {
 	// versionsMu is a mutex that protects the versions map, allowing
 	// for concurrent access.
 	versionsMu sync.Mutex
+}
+
+// NewResolver creates a new resolver instance.
+func NewResolver() *Resolver {
+	return &Resolver{
+		versions: make(map[string][]Version),
+	}
 }
 
 // fetchVersionsIfNecessary fetches versions for the provided URI if not

@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
 	"go.rgst.io/stencil/internal/modules/nativeext"
+	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/pkg/slogext"
 	"gotest.tools/v3/assert"
 )

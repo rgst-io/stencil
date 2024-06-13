@@ -16,14 +16,13 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/blang/semver/v4"
 	giturls "github.com/chainguard-dev/git-urls"
 	"github.com/getoutreach/gobox/pkg/cfg"
 	"github.com/getoutreach/gobox/pkg/cli/updater/archive"
 	"github.com/getoutreach/gobox/pkg/cli/updater/release"
-	"github.com/getoutreach/gobox/pkg/cli/updater/resolver"
 	"go.rgst.io/stencil/internal/git/vcs/github"
 	"go.rgst.io/stencil/internal/modules/nativeext/apiv1"
+	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/pkg/slogext"
 )
 
@@ -35,6 +34,7 @@ type generatedTemplateFunc func(...interface{}) (interface{}, error)
 // Host implements an extension host that handles
 // registering extensions and executing them.
 type Host struct {
+	r          *resolver.Resolver
 	log        slogext.Logger
 	extensions map[string]extension
 }
@@ -48,6 +48,7 @@ type extension struct {
 // NewHost creates a new extension host
 func NewHost(log slogext.Logger) *Host {
 	return &Host{
+		r:          resolver.NewResolver(),
 		log:        log,
 		extensions: make(map[string]extension),
 	}
@@ -173,33 +174,6 @@ func (h *Host) getExtensionPath(version *resolver.Version, name string) (string,
 	return path, nil
 }
 
-// getVersionWithCommit retrieves a new version with the commit present.
-func getVersionWithCommit(ctx context.Context, token cfg.SecretData, repoURL string,
-	version *resolver.Version) (*resolver.Version, error) {
-	var v *resolver.Version
-	var err error
-	// We assume that if the tag does not comply with semver it is a channel (e.g. unstable).
-	if _, err := semver.ParseTolerant(version.Tag); err != nil {
-		v, err = resolver.Resolve(ctx, token, &resolver.Criteria{
-			URL:     repoURL,
-			Channel: version.Tag,
-		})
-		if err != nil {
-			return nil, fmt.Errorf("failed to get latest version: %w", err)
-		}
-		return v, nil
-	}
-
-	v, err = resolver.Resolve(ctx, token, &resolver.Criteria{
-		URL:         repoURL,
-		Constraints: []string{version.Tag},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("failed to get latest version: %w", err)
-	}
-	return v, nil
-}
-
 // downloadFromRemote downloads a release from github and extracts it to disk
 //
 // using the example extension module: go.rgst.io/stencil-plugin
@@ -215,24 +189,6 @@ func (h *Host) downloadFromRemote(ctx context.Context, name string,
 	}
 
 	repoURL := "https://" + name
-
-	if version.Tag == "" {
-		v, err := resolver.Resolve(ctx, cfg.SecretData(token), &resolver.Criteria{
-			URL: repoURL,
-		})
-		if err != nil {
-			return "", fmt.Errorf("failed to get latest version: %w", err)
-		}
-		version = v
-	}
-
-	if version.Commit == "" {
-		v, err := getVersionWithCommit(ctx, cfg.SecretData(token), repoURL, version)
-		if err != nil {
-			return "", fmt.Errorf("failed to get latest version: %w", err)
-		}
-		version = v
-	}
 
 	// Check if the version we're pulling already exists on disk
 	dlPath, err := h.getExtensionPath(version, name)

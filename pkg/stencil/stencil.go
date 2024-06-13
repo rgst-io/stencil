@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"go.rgst.io/stencil/internal/modules/resolver"
 	"gopkg.in/yaml.v3"
 )
 
@@ -31,7 +32,7 @@ type LockfileModuleEntry struct {
 
 	// Version is the version of the module that was
 	// downloaded at the time.
-	Version string
+	Version *resolver.Version
 }
 
 // LockfileFileEntry is an entry in the lockfile for a file
