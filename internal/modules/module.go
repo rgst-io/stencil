@@ -1,4 +1,16 @@
-// Copyright 2022 Outreach Corporation. All Rights Reserved.
+// Copyright (C) 2024 stencil contributors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 // Description: This file implements module specific code.
 
@@ -13,6 +25,7 @@ import (
 
 	"github.com/Masterminds/sprig/v3"
 	giturls "github.com/chainguard-dev/git-urls"
+	gogit "github.com/go-git/go-git/v5"
 
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/osfs"
@@ -194,6 +207,19 @@ func (m *Module) GetFS(ctx context.Context) (billy.Filesystem, error) {
 		storageDir, err = git.Clone(ctx, m.Version.GitRef(), m.URI)
 		if err != nil {
 			return nil, fmt.Errorf("failed to clone module: %w", err)
+		}
+
+		// Because this is a new feature, don't fail if we can't open the
+		// repo for now. If we have a commit, ensure it matches the commit
+		// we expect.
+		if m.Version.Commit != "" {
+			if r, err := gogit.PlainOpen(storageDir); err == nil {
+				if ref, err := r.Head(); err == nil {
+					if ref.Hash().String() != m.Version.Commit {
+						return nil, fmt.Errorf("expected commit %q but got %q", m.Version.Commit, ref.Hash().String())
+					}
+				}
+			}
 		}
 	}
 
