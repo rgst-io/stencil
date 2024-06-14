@@ -38,6 +38,10 @@ run = ["go run github.com/thenativeweb/get-next-version@latest --prefix v"]
 description = "Update the TOC in the README"
 run = ["go run sigs.k8s.io/mdtoc@latest --inplace --max-depth=5 README.md"]
 
+[tasks.changelog]
+description = "Generate a changelog"
+run = ["bun run conventional-changelog -p conventionalcommits -o CHANGELOG.md"]
+
 ## <<Stencil::Block(custom)>>
 [settings]
 # Conflicts with bun, and we don't use it anyways.

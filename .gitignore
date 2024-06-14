@@ -42,3 +42,7 @@ vendor
 
 # VSCode debugger launch configs
 launch.json
+
+# We generate the changelog on releases and don't want to commit it
+# accidentally.
+CHANGELOG.md
