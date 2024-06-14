@@ -1,4 +1,4 @@
-// Copyright (C) 2023 stencil contributors
+// Copyright (C) 2024 stencil contributors
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU Affero General Public License as published by
@@ -18,32 +18,30 @@
 package main
 
 import (
-	"context"
-
-	"os"
+	"fmt"
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/pkg/errors"
 	"go.rgst.io/stencil/internal/cmd/stencil"
 	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
 )
 
-// main is the entrypoint for the stencil CLI.
-func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	log := slogext.New()
-
-	app := cli.App{
+// NewStencil returns a new CLI application for stencil.
+func NewStencil(log slogext.Logger) *cli.App {
+	return &cli.App{
 		Version:     version.Version,
 		Name:        "stencil",
 		Description: "a smart templating engine for project development",
 		Action: func(c *cli.Context) error {
 			log.Infof("stencil %s", c.App.Version)
+
+			// We don't accept arguments, a user is likely trying to run a
+			// subcommand here anyways (e.g., typo).
+			if c.NArg() > 0 {
+				return fmt.Errorf("unexpected arguments: %v", c.Args().Slice())
+			}
 
 			if c.Bool("debug") {
 				log.SetLevel(slogext.DebugLevel)
@@ -52,12 +50,10 @@ func main() {
 
 			manifest, err := configuration.NewDefaultManifest()
 			if err != nil {
-				return errors.Wrap(err, "failed to parse stencil.yaml")
+				return fmt.Errorf("failed to parse stencil.yaml: %w", err)
 			}
 
-			cmd := stencil.NewCommand(log, manifest, c.Bool("dry-run"),
-				c.Bool("frozen-lockfile"), c.Bool("allow-major-version-upgrades"))
-			return errors.Wrap(cmd.Run(ctx), "run codegen")
+			return stencil.NewCommand(log, manifest, c.Bool("dry-run")).Run(c.Context)
 		},
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
@@ -66,27 +62,15 @@ func main() {
 				Usage:   "Don't write files to disk",
 			},
 			&cli.BoolFlag{
-				Name:  "frozen-lockfile",
-				Usage: "Use versions from the lockfile instead of the latest",
-			},
-			&cli.BoolFlag{
-				Name:  "allow-major-version-upgrades",
-				Usage: "Allow major version upgrades without confirmation",
-			},
-			&cli.BoolFlag{
 				Name:    "debug",
 				Usage:   "Enables debug logging for version resolution, template renderer, and other useful information",
 				Aliases: []string{"d"},
 			},
 		},
 		Commands: []*cli.Command{
-			NewDescribeCmd(),
+			NewDescribeCommand(),
 			NewCreateCommand(),
+			NewUpgradeCommand(log),
 		},
-	}
-
-	if err := app.RunContext(ctx, os.Args); err != nil {
-		//nolint:gocritic // Why: We're OK not canceling context in this case.
-		log.WithError(err).Error("failed to run")
 	}
 }

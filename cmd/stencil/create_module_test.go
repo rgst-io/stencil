@@ -11,9 +11,14 @@ import (
 	"gotest.tools/v3/assert"
 )
 
-// testRunCommand runs a command with the provided arguments. It does
-// not support global flags.
-func testRunCommand(t *testing.T, cmd *cli.Command, dir string, args ...string) error {
+// prepareTestRun sets up the environment for running a stencil command.
+//
+// dir is the directory to change into before running the command. If
+// dir is an empty string, a temporary directory will be created.
+//
+// The returned function should be called as soon as command has been
+// ran.
+func prepareTestRun(t *testing.T, dir string) func() {
 	// Change into the repo root.
 	// GOMOD: <module path>/go.mod
 	b, err := exec.Command("go", "env", "GOMOD").Output()
@@ -29,7 +34,6 @@ func testRunCommand(t *testing.T, cmd *cli.Command, dir string, args ...string) 
 
 	// Temporarily change os.Args[0] to point to stencil.
 	origArgs := os.Args
-	defer func() { os.Args = origArgs }()
 	os.Args = []string{filepath.Join(repoRoot, "bin", "stencil")}
 
 	// Use a temporary directory for the test if one is not provided.
@@ -37,6 +41,24 @@ func testRunCommand(t *testing.T, cmd *cli.Command, dir string, args ...string) 
 		dir = t.TempDir()
 	}
 	chdir(t, dir)
+
+	return func() {
+		// Reset os.Args.
+		os.Args = origArgs
+	}
+}
+
+// testRunApp runs the provided cli.App with the provided arguments.
+func testRunApp(t *testing.T, dir string, app *cli.App, args ...string) error {
+	defer prepareTestRun(t, dir)()
+
+	return app.Run(append([]string{"test"}, args...))
+}
+
+// testRunCommand runs a command with the provided arguments. It does
+// not support global flags.
+func testRunCommand(t *testing.T, cmd *cli.Command, dir string, args ...string) error {
+	defer prepareTestRun(t, dir)()
 
 	app := cli.NewApp()
 	app.Commands = []*cli.Command{cmd}
@@ -60,7 +82,7 @@ func chdir(t *testing.T, dir string) {
 }
 
 func TestCanCreateModule(t *testing.T) {
-	cmd := NewCreateModule()
+	cmd := NewCreateModuleCommand()
 	assert.Assert(t, cmd != nil)
 	assert.NilError(t, testRunCommand(t, cmd, "", "test-module"))
 
@@ -70,7 +92,7 @@ func TestCanCreateModule(t *testing.T) {
 }
 
 func TestCreateModuleFailsWhenFilesExist(t *testing.T) {
-	cmd := NewCreateModule()
+	cmd := NewCreateModuleCommand()
 	assert.Assert(t, cmd != nil)
 
 	tmpDir := t.TempDir()

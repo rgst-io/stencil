@@ -9,13 +9,12 @@ package stencil
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 
-	"github.com/pkg/errors"
 	"go.rgst.io/stencil/internal/codegen"
-	"go.rgst.io/stencil/internal/git/vcs/github"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/pkg/configuration"
@@ -24,14 +23,16 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Command is a thin wrapper around the codegen package that
-// implements the "stencil" command.
+// Command is a thin wrapper around the codegen package that implements
+// the "stencil" command. It is responsible for fetching dependencies,
+// rendering templates, and writing files to disk using the underlying
+// codegen package.
 type Command struct {
 	// lock is the current stencil lockfile at command creation time
 	lock *stencil.Lockfile
 
-	// manifest is the project manifest that is being used
-	// for this template render
+	// manifest is the project manifest that is being used for this
+	// template render
 	manifest *configuration.Manifest
 
 	// log is the logger used for logging output
@@ -39,40 +40,116 @@ type Command struct {
 
 	// dryRun denotes if we should write files to disk or not
 	dryRun bool
+}
 
-	// frozenLockfile denotes if we should use versions from the lockfile
-	// or not
-	frozenLockfile bool
+// printVersion is a command line friendly version of
+// resolver.Version.String()
+func printVersion(v *resolver.Version) string {
+	switch {
+	case v.Tag != "":
+		return fmt.Sprintf("%s (%s)", v.Tag, v.Commit)
+	case v.Branch != "":
+		return fmt.Sprintf("branch %s (%s)", v.Branch, v.Commit)
+	}
 
-	// allowMajorVersionUpgrade denotes if we should allow major version
-	// upgrades without a prompt or not
-	allowMajorVersionUpgrades bool
-
-	// token is the github token used for fetching modules
-	token string
+	return v.Commit
 }
 
 // NewCommand creates a new stencil command
-func NewCommand(log slogext.Logger, s *configuration.Manifest,
-	dryRun, frozen, allowMajorVersionUpgrades bool) *Command {
+func NewCommand(log slogext.Logger, s *configuration.Manifest, dryRun bool) *Command {
 	l, err := stencil.LoadLockfile("")
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		log.WithError(err).Warn("failed to load lockfile")
 	}
-	token, err := github.Token()
-	if err != nil {
-		log.Warn("failed to get github token, using anonymous access")
-	}
 
 	return &Command{
-		lock:                      l,
-		manifest:                  s,
-		log:                       log,
-		dryRun:                    dryRun,
-		frozenLockfile:            frozen,
-		allowMajorVersionUpgrades: allowMajorVersionUpgrades,
-		token:                     token,
+		lock:     l,
+		manifest: s,
+		log:      log,
+		dryRun:   dryRun,
 	}
+}
+
+// useModulesFromLockfile returns a list of modules from the lockfile
+// that should be used for this run of the stencil command
+func (c *Command) useModulesFromLockfile(ctx context.Context) ([]*modules.Module, error) {
+	mods := make([]*modules.Module, 0, len(c.lock.Modules))
+	for _, me := range c.lock.Modules {
+		m, err := modules.New(ctx, me.URL, modules.NewModuleOpts{
+			ImportPath: me.Name,
+			Version:    me.Version,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("failed to create module: %w", err)
+		}
+
+		mods = append(mods, m)
+	}
+
+	return mods, nil
+}
+
+// resolveModules fetches the modules for the project and returns them.
+// If a lockfile is present, it will use the modules from the lockfile
+// instead of resolving them. If ignoreLockfile is true, it will ignore
+// the lockfile and resolve the modules anyways.
+func (c *Command) resolveModules(ctx context.Context, ignoreLockfile bool) ([]*modules.Module, error) {
+	if c.lock != nil && !ignoreLockfile {
+		return c.useModulesFromLockfile(ctx)
+	}
+
+	// On first run, we need to resolve the modules. Otherwise, the user
+	// will be expected to run 'stencil upgrade' to update the lockfile.
+	return modules.FetchModules(ctx, &modules.ModuleResolveOptions{
+		Manifest: c.manifest,
+		Log:      c.log,
+	})
+}
+
+// Upgrade checks for upgrades to the modules in the project and
+// upgrades them if necessary. If no lockfile is present, it will
+// log a message and return without doing anything.
+func (c *Command) Upgrade(ctx context.Context) error {
+	if c.lock == nil {
+		c.log.Info("No lockfile found, run 'stencil' to fetch dependencies first")
+		return nil
+	}
+
+	c.log.Info("Checking for upgrades")
+	mods, err := c.resolveModules(ctx, true)
+	if err != nil {
+		return err
+	}
+
+	// Convert the lockfile modules to an easy importPath -> version
+	// lookup.
+	lockModules := make(map[string]*resolver.Version)
+	if c.lock != nil {
+		for _, m := range c.lock.Modules {
+			lockModules[m.Name] = m.Version
+		}
+	}
+
+	var hadChanges bool
+	for _, new := range mods {
+		c.log.Debug("Checking", "module", new.Name, "version", printVersion(new.Version))
+		// If the module is in the lockfile, check if the version has
+		// changed. If it has, log the change.
+		if old, ok := lockModules[new.Name]; ok {
+			if old.Equal(new.Version) {
+				continue
+			}
+
+			c.log.Infof(" -> %s (%s -> %s)", new.Name, printVersion(old), printVersion(new.Version))
+			hadChanges = true
+		}
+	}
+	if !hadChanges {
+		c.log.Info("No new versions found")
+		return nil
+	}
+
+	return c.runWithModules(ctx, mods)
 }
 
 // Run fetches dependencies of the root modules and builds the layered filesystem,
@@ -81,27 +158,20 @@ func NewCommand(log slogext.Logger, s *configuration.Manifest,
 // manifests
 func (c *Command) Run(ctx context.Context) error {
 	c.log.Info("Fetching dependencies")
-	mods, err := modules.FetchModules(ctx, &modules.ModuleResolveOptions{
-		Manifest: c.manifest,
-		Log:      c.log,
-	})
+	mods, err := c.resolveModules(ctx, false)
 	if err != nil {
-		return errors.Wrap(err, "failed to process modules list")
+		return err
 	}
 
 	for _, m := range mods {
-		c.log.Infof(" -> %s %s", m.Name, func(v *resolver.Version) string {
-			switch {
-			case v.Tag != "":
-				return fmt.Sprintf("%s (%s)", v.Tag, v.Commit)
-			case v.Branch != "":
-				return fmt.Sprintf("branch %s (%s)", v.Branch, v.Commit)
-			}
-
-			return v.Commit
-		}(m.Version))
+		c.log.Infof(" -> %s %s", m.Name, printVersion(m.Version))
 	}
 
+	return c.runWithModules(ctx, mods)
+}
+
+// runWithModules runs the stencil command with the given modules
+func (c *Command) runWithModules(ctx context.Context, mods []*modules.Module) error {
 	st := codegen.NewStencil(c.manifest, mods, c.log)
 	defer st.Close()
 
@@ -147,11 +217,11 @@ func (c *Command) writeFile(f *codegen.File) error {
 	if action == "Created" || action == "Updated" {
 		if !c.dryRun {
 			if err := os.MkdirAll(filepath.Dir(f.Name()), 0o755); err != nil {
-				return errors.Wrapf(err, "failed to ensure directory for %q existed", f.Name())
+				return fmt.Errorf("failed to create directory %q: %w", filepath.Dir(f.Name()), err)
 			}
 
 			if err := os.WriteFile(f.Name(), f.Bytes(), f.Mode()); err != nil {
-				return errors.Wrapf(err, "failed to create %q", f.Name())
+				return fmt.Errorf("failed to write file %q: %w", f.Name(), err)
 			}
 		}
 	}
@@ -164,6 +234,7 @@ func (c *Command) writeFile(f *codegen.File) error {
 	if !f.Skipped {
 		c.log.Info(msg)
 	} else {
+		// For skipped files, we only log at debug level
 		c.log.Debug(msg, "reason", f.SkippedReason)
 	}
 	return nil
@@ -188,10 +259,16 @@ func (c *Command) writeFiles(st *codegen.Stencil, tpls []*codegen.Template) erro
 	l := st.GenerateLockfile(tpls)
 	f, err := os.Create(stencil.LockfileName)
 	if err != nil {
-		return errors.Wrap(err, "failed to create lockfile")
+		return fmt.Errorf("failed to create lockfile: %w", err)
 	}
 	defer f.Close()
 
-	return errors.Wrap(yaml.NewEncoder(f).Encode(l),
-		"failed to encode lockfile into yaml")
+	enc := yaml.NewEncoder(f)
+	defer enc.Close()
+
+	if err := enc.Encode(l); err != nil {
+		return fmt.Errorf("failed to write lockfile: %w", err)
+	}
+
+	return nil
 }
