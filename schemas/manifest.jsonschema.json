@@ -52,13 +52,9 @@
           "type": "string",
           "description": "Name is the name of this module. This should be a valid go import path"
         },
-        "channel": {
-          "type": "string",
-          "description": "Channel is the channel to use for updates to this module\nDefaults to \"stable\""
-        },
         "version": {
           "type": "string",
-          "description": "Version is a semantic version or branch of the template repository\nthat should be downloaded if not set then the latest version is used.\n\nVersion can also be a constraint as supported by the underlying resolver:\nhttps://pkg.go.dev/github.com/getoutreach/gobox/pkg/cli/updater/resolver#Resolve"
+          "description": "Version is a semantic version or branch of the template repository\nthat should be downloaded if not set then the latest version is used.\n\nVersion can also be a constraint as supported by the underlying\nresolver:\nhttps://pkg.go.dev/go.rgst.io/stencil/internal/modules/resolver\n\nBut note that constraints are currently not locked so the version\nwill change as the module is resolved on subsequent runs.\nEventually, this will be changed to use the lockfile by default."
         }
       },
       "additionalProperties": false,
