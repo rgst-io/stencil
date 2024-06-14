@@ -100,14 +100,12 @@ jobs:
 
           go mod download -modcacherw
           XZ_OPT='-T0 -9' tar -acf "stencil-${NEXT_VERSION}-deps.tar.xz" go-mod
-      - name: Generate CHANGELOG
-        run: mise run changelog
       - name: Create release artifacts and Github Release
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
           version: v${{ steps.goreleaser.outputs.version }}
-          args: release --release-notes CHANGELOG.md --clean
+          args: release --clean
         env:
           BUILD_RC: ${{ github.event.inputs.rc }}
           MACOS_SIGN_P12: ${{ secrets.MACOS_SIGN_P12 }}
