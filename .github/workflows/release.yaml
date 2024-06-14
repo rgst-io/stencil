@@ -2,7 +2,13 @@ name: release
 
 on:
   # Only run when triggered through the Github UI or API.
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      rc:
+        description: "Build a release candidate instead of a stable release"
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -45,13 +51,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: fregante/setup-git-user@v2
+      - uses: anchore/sbom-action/download-syft@v0.16.0
 
       # Bumping logic
       - name: Get next version
         id: next_version
-        uses: thenativeweb/get-next-version@main
-        with:
-          prefix: "v" # optional, defaults to ''
+        env:
+          BUILD_RC: ${{ github.event.inputs.rc }}
+        run: |-
+          echo "version=$(./.github/scripts/get-next-version.sh)" >> "$GITHUB_OUTPUT"
       - name: Wait for manual approval
         uses: trstringer/manual-approval@v1
         with:

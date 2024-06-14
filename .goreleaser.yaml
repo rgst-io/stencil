@@ -1,9 +1,15 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
+version: 2
 project_name: stencil
-before:
-  hooks:
-    - go mod tidy
+
+# Reproducible builds.
+gomod:
+  proxy: true
+report_sizes: true
+metadata:
+  mod_timestamp: "{{ .CommitTimestamp }}"
+
 builds:
   - main: ./cmd/{{ .ProjectName }}
     flags:
@@ -15,17 +21,31 @@ builds:
     env:
       - CGO_ENABLED=0
     goarch:
+      - "386"
       - amd64
+      - arm
       - arm64
+      - ppc64
     goos:
       - linux
       - darwin
+      - windows
+    goarm:
+      - "7"
+    ignore:
+      - goos: windows
+        goarch: arm
+    mod_timestamp: "{{ .CommitTimestamp }}"
 archives:
   - format: tar.xz
+    format_overrides:
+      - format: zip
+        goos: windows
 checksum:
   name_template: "checksums.txt"
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
+
 changelog:
   sort: asc
   use: git
@@ -53,6 +73,19 @@ changelog:
       order: 400
     - title: Other work
       order: 9999
+
+# ---------- Packaging
+notarize:
+  macos:
+    - enabled: '{{ isEnvSet "MACOS_SIGN_P12" }}'
+      sign:
+        certificate: "{{.Env.MACOS_SIGN_P12}}"
+        password: "{{.Env.MACOS_SIGN_PASSWORD}}"
+      notarize:
+        issuer_id: "{{.Env.MACOS_NOTARY_ISSUER_ID}}"
+        key_id: "{{.Env.MACOS_NOTARY_KEY_ID}}"
+        key: "{{.Env.MACOS_NOTARY_KEY}}"
+
 brews:
   - commit_author:
       name: GitHub Actions
@@ -69,6 +102,35 @@ brews:
       owner: rgst-io
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN}}"
+nfpms:
+  - id: packages
+    homepage: https://stencil.rgst.io
+    description: |-
+      A modern living-template engine for evolving repositories.
+    maintainer: Jared Allard <jared@rgst.io>
+    license: MIT
+    vendor: rgst
+    bindir: /usr/bin
+    section: utils
+    contents:
+      - src: ./LICENSE
+        dst: /usr/share/doc/stencil/copyright
+        file_info:
+          mode: 0644
+    formats:
+      - apk
+      - deb
+      - rpm
+    dependencies:
+      - git
+    deb:
+      lintian_overrides:
+        - statically-linked-binary
+        - changelog-file-missing-in-native-package
+
+# ---------- Release
+sboms:
+  - artifacts: archive
 
 release:
   extra_files:
