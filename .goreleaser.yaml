@@ -3,9 +3,6 @@
 version: 2
 project_name: stencil
 
-# Reproducible builds.
-gomod:
-  proxy: true
 report_sizes: true
 metadata:
   mod_timestamp: "{{ .CommitTimestamp }}"
