@@ -32,7 +32,7 @@ run = [
 
 [tasks.next-version]
 description = "Get the version number that would be released if a release was ran right now"
-run = ["go run github.com/thenativeweb/get-next-version@latest"]
+run = ["go run github.com/thenativeweb/get-next-version@latest --prefix v"]
 
 [tasks.update-readme-toc]
 description = "Update the TOC in the README"
