@@ -130,6 +130,7 @@ sboms:
   - artifacts: archive
 
 release:
+  prerelease: "{{ .Env.BUILD_RC }}"
   extra_files:
     - glob: .dist/stencil-*-deps.tar.xz
   footer: |-
