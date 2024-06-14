@@ -69,6 +69,7 @@ jobs:
       - name: Create Tag
         run: |-
           git tag -a "${{ steps.next_version.outputs.version }}" -m "Release ${{ steps.next_version.outputs.version }}"
+          git push origin "${{ steps.next_version.outputs.version }}"
       - name: Create Gentoo Go Dependency Archive
         env:
           NEXT_VERSION: ${{ steps.next_version.outputs.version }}
@@ -88,3 +89,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ steps.homebrew-tap-github-app.outputs.token }}
+
+      # On failure, delete the tag since it's not a valid release.
+      - name: Delete tag
+        if: failure()
+        run: |-
+          git tag -d "${{ steps.next_version.outputs.version }}"
+          git push origin ":${{ steps.next_version.outputs.version }}"
