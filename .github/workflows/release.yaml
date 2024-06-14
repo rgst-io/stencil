@@ -62,6 +62,8 @@ jobs:
           echo "version=$(./.github/scripts/get-next-version.sh)" >> "$GITHUB_OUTPUT"
       - name: Wait for manual approval
         uses: trstringer/manual-approval@v1
+        # Skip if the triggering actor is the same as the approver
+        if: github.triggering_actor != 'jaredallard'
         with:
           secret: ${{ secrets.GITHUB_TOKEN }}
           approvers: "jaredallard"
