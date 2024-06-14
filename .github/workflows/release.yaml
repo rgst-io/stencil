@@ -9,6 +9,11 @@ on:
         required: false
         default: false
         type: boolean
+      version:
+        description: "Set a specific version to release, defaults to automatic versioning based on conventional commits"
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: write
@@ -71,6 +76,7 @@ jobs:
         id: next_version
         env:
           BUILD_RC: ${{ github.event.inputs.rc }}
+          VERSION_OVERRIDE: ${{ github.event.inputs.version }}
         run: |-
           echo "version=$(./.github/scripts/get-next-version.sh)" >> "$GITHUB_OUTPUT"
       - name: Wait for manual approval
