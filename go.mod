@@ -8,7 +8,7 @@ require (
 	github.com/chainguard-dev/git-urls v1.0.2
 	github.com/charmbracelet/log v0.4.0
 	github.com/davecgh/go-spew v1.1.1
-	github.com/getoutreach/gobox v1.91.0
+	github.com/getoutreach/gobox v1.92.1
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/google/go-github/v62 v62.0.0
