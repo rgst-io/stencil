@@ -93,16 +93,6 @@ jobs:
       - name: Generate CHANGELOG
         run: |-
           mise run changelog-release
-      - name: Create Gentoo Go Dependency Archive
-        env:
-          NEXT_VERSION: ${{ steps.next_version.outputs.version }}
-        run: |-
-          export GOMODCACHE="$(pwd)/.dist/go-mod"
-          mkdir -p "${GOMODCACHE}"
-          cd "${GOMODCACHE}/.."
-
-          go mod download -modcacherw
-          XZ_OPT='-T0 -9' tar -acf "stencil-${NEXT_VERSION}-deps.tar.xz" go-mod
       - name: Create release artifacts and Github Release
         uses: goreleaser/goreleaser-action@v6
         with:

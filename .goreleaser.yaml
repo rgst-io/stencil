@@ -105,8 +105,6 @@ sboms:
   - artifacts: archive
 
 release:
-  prerelease: "{{ .Env.BUILD_RC }}"
-  extra_files:
-    - glob: .dist/stencil-*-deps.tar.xz
+  prerelease: "auto"
   footer: |-
     **Full Changelog**: https://github.com/rgst-io/stencil/compare/{{ .PreviousTag }}...{{ .Tag }}
