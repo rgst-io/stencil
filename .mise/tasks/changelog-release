@@ -16,4 +16,10 @@ else
 fi
 
 # Run mise to generate the changelog.
-exec "${args[@]}"
+"${args[@]}"
+
+# If we're on a rc version, fix the header.
+if [[ $CURRENT_TAG == *"-rc"* ]]; then
+  sed -i.bak "s/^## [unreleased]/## $CURRENT_TAG/" CHANGELOG.md
+  rm CHANGELOG.md.bak
+fi
