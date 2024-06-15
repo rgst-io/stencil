@@ -1,6 +1,7 @@
 # Default versions of tools, to update these, set [tools.override]
 [tools]
 golang = "1.22"
+git-cliff = "latest"
 shfmt = "3"
 golangci-lint = "1.59"
 goreleaser = "latest"
@@ -30,6 +31,7 @@ run = [
   "shfmt -w -i 2 -ci -sr .",
 ]
 
+## <<Stencil::Block(custom)>>
 [tasks.next-version]
 description = "Get the version number that would be released if a release was ran right now"
 run = ["go run github.com/thenativeweb/get-next-version@latest --prefix v"]
@@ -38,7 +40,11 @@ run = ["go run github.com/thenativeweb/get-next-version@latest --prefix v"]
 description = "Update the TOC in the README"
 run = ["go run sigs.k8s.io/mdtoc@latest --inplace --max-depth=5 README.md"]
 
-## <<Stencil::Block(custom)>>
+[tasks.changelog]
+description = "Generate a changelog for the current version"
+outputs = ["CHANGELOG.md"]
+run = ["git-cliff --config .cliff.toml --output CHANGELOG.md"]
+
 [settings]
 # Conflicts with bun, and we don't use it anyways.
 disable_tools = ["node"]

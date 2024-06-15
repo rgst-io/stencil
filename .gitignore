@@ -42,3 +42,6 @@ vendor
 
 # VSCode debugger launch configs
 launch.json
+
+# Currently a build artifact
+CHANGELOG.md

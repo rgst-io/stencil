@@ -90,6 +90,9 @@ jobs:
       - name: Create Tag
         run: |-
           git tag -a "${{ steps.next_version.outputs.version }}" -m "Release ${{ steps.next_version.outputs.version }}"
+      - name: Generate CHANGELOG
+        run: |-
+          mise changelog-release
       - name: Create Gentoo Go Dependency Archive
         env:
           NEXT_VERSION: ${{ steps.next_version.outputs.version }}
@@ -105,7 +108,7 @@ jobs:
         with:
           distribution: goreleaser
           version: v${{ steps.goreleaser.outputs.version }}
-          args: release --clean
+          args: release --release-notes CHANGELOG.md --clean
         env:
           BUILD_RC: ${{ github.event.inputs.rc }}
           MACOS_SIGN_P12: ${{ secrets.MACOS_SIGN_P12 }}
