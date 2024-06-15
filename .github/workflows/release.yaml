@@ -92,7 +92,7 @@ jobs:
           git tag -a "${{ steps.next_version.outputs.version }}" -m "Release ${{ steps.next_version.outputs.version }}"
       - name: Generate CHANGELOG
         run: |-
-          mise changelog-release
+          mise run changelog-release
       - name: Create Gentoo Go Dependency Archive
         env:
           NEXT_VERSION: ${{ steps.next_version.outputs.version }}
