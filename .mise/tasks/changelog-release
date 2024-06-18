@@ -35,4 +35,5 @@ if [[ $CURRENT_TAG == *"-rc"* ]]; then
   rm CHANGELOG.md.bak
 fi
 
-bun run prettier --write CHANGELOG.md
+bun install
+bun prettier --write CHANGELOG.md
