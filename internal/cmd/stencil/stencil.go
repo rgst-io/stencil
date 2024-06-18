@@ -142,6 +142,9 @@ func (c *Command) Upgrade(ctx context.Context) error {
 
 			c.log.Infof(" -> %s (%s -> %s)", new.Name, printVersion(old), printVersion(new.Version))
 			hadChanges = true
+		} else {
+			c.log.Infof(" -> %s (%s)", new.Name, printVersion(new.Version))
+			hadChanges = true
 		}
 	}
 	if !hadChanges {
