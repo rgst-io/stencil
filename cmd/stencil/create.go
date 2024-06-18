@@ -13,6 +13,7 @@ import (
 func NewCreateCommand() *cli.Command {
 	return &cli.Command{
 		Name:        "create",
+		Usage:       "create a new stencil project or module",
 		Description: "Commands to create template repositories, or stencil powered repositories",
 		Subcommands: []*cli.Command{
 			NewCreateModuleCommand(),

@@ -28,6 +28,7 @@ import (
 func NewUpgradeCommand(log slogext.Logger) *cli.Command {
 	return &cli.Command{
 		Name:        "upgrade",
+		Usage:       "upgrade stencil modules",
 		Description: "Runs stencil with newer modules and updates stencil.lock to use them",
 		UsageText:   "upgrade",
 		Action: func(c *cli.Context) error {

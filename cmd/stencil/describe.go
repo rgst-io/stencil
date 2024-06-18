@@ -30,6 +30,7 @@ import (
 func NewDescribeCommand() *cli.Command {
 	return &cli.Command{
 		Name:        "describe",
+		Usage:       "describe a file created by stencil",
 		Description: "Print information about a known file rendered by a template",
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {

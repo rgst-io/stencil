@@ -32,17 +32,24 @@ import (
 //
 //nolint:gochecknoinits
 func init() {
-	cli.VersionPrinter = func(c *cli.Context) {
-		fmt.Println(c.App.Version)
+	cli.VersionPrinter = func(_ *cli.Context) {
+		fmt.Println(version.Version.String())
 	}
 }
+
+var description = "" +
+	"Stencil is a smart templating engine that helps you create and manage templates\n" +
+	"for your projects. Using go templates, you can create pluggable modules with\n" +
+	"templates or, native extensions in any language.\n\n" +
+	"Checkout our documentation at https://stencil.rgst.io for more information."
 
 // NewStencil returns a new CLI application for stencil.
 func NewStencil(log slogext.Logger) *cli.App {
 	return &cli.App{
-		Version:     version.Version.String(),
+		Version:     version.Version.GitVersion,
 		Name:        "stencil",
-		Description: "a smart templating engine for project development",
+		Usage:       "a smart templating engine for project development",
+		Description: description,
 		Action: func(c *cli.Context) error {
 			log.Infof("stencil %s", c.App.Version)
 
