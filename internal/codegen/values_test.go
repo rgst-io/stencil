@@ -78,7 +78,7 @@ func TestValues(t *testing.T) {
 		},
 		Runtime: runtime{
 			Generator:        "stencil",
-			GeneratorVersion: version.Version,
+			GeneratorVersion: version.Version.GitVersion,
 			Modules: modulesSlice{
 				{
 					Name:    "testing",

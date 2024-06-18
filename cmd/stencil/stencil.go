@@ -28,10 +28,19 @@ import (
 	"go.rgst.io/stencil/pkg/slogext"
 )
 
+// Set the version printer to do nothing but print the version.
+//
+//nolint:gochecknoinits
+func init() {
+	cli.VersionPrinter = func(c *cli.Context) {
+		fmt.Println(c.App.Version)
+	}
+}
+
 // NewStencil returns a new CLI application for stencil.
 func NewStencil(log slogext.Logger) *cli.App {
 	return &cli.App{
-		Version:     version.Version,
+		Version:     version.Version.String(),
 		Name:        "stencil",
 		Description: "a smart templating engine for project development",
 		Action: func(c *cli.Context) error {

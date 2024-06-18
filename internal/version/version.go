@@ -15,5 +15,35 @@
 // Package version contains the current version of the stencil CLI.
 package version
 
+import goversion "github.com/caarlos0/go-version"
+
+// These variables are set at build time via ldflags.
+var (
+	version   = ""
+	commit    = ""
+	treeState = ""
+	date      = ""
+	builtBy   = ""
+)
+
 // Version is the current version of the stencil CLI.
-var Version = "v0.0.0-dev"
+var Version = goversion.GetVersionInfo(
+	goversion.WithAppDetails("stencil", "A modern living-template engine for evolving repositories.", "stencil.rgst.io"),
+	func(i *goversion.Info) {
+		if commit != "" {
+			i.GitCommit = commit
+		}
+		if treeState != "" {
+			i.GitTreeState = treeState
+		}
+		if date != "" {
+			i.BuildDate = date
+		}
+		if version != "" {
+			i.GitVersion = version
+		}
+		if builtBy != "" {
+			i.BuiltBy = builtBy
+		}
+	},
+)

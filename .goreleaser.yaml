@@ -14,7 +14,11 @@ builds:
     ldflags:
       - -s
       - -w
-      - -X "go.rgst.io/stencil/internal/version.Version={{.Version}}"
+      - -X go.rgst.io/stencil/internal/version.version={{.Version}}
+      - -X go.rgst.io/stencil/internal/version.commit={{.Commit}}
+      - -X go.rgst.io/stencil/internal/version.date={{ .CommitDate }}
+      - -X go.rgst.io/stencil/internal/version.builtBy=goreleaser
+      - -X go.rgst.io/stencil/internal/version.treeState={{ if .IsGitDirty }}dirty{{ else }}clean{{ end }}
     env:
       - CGO_ENABLED=0
     goarch:
@@ -99,10 +103,6 @@ nfpms:
       lintian_overrides:
         - statically-linked-binary
         - changelog-file-missing-in-native-package
-
-# ---------- Release
-sboms:
-  - artifacts: archive
 
 release:
   prerelease: "auto"

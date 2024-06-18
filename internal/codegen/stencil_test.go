@@ -48,7 +48,7 @@ func TestBasicE2ERender(t *testing.T) {
 
 	lock := st.GenerateLockfile(tpls)
 	assert.DeepEqual(t, lock, &stencil.Lockfile{
-		Version: version.Version,
+		Version: version.Version.GitVersion,
 		Modules: []*stencil.LockfileModuleEntry{
 			{
 				Name:    "testing",

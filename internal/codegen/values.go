@@ -143,7 +143,7 @@ func NewValues(ctx context.Context, sm *configuration.Manifest, mods []*modules.
 		Git: git{},
 		Runtime: runtime{
 			Generator:        "stencil",
-			GeneratorVersion: version.Version,
+			GeneratorVersion: version.Version.GitVersion,
 			Modules:          modulesSlice{},
 		},
 		Config: config{

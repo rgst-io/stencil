@@ -141,7 +141,7 @@ func (s *Stencil) RegisterInprocExtensions(name string, ext apiv1.Implementation
 // on a list of templates.
 func (s *Stencil) GenerateLockfile(tpls []*Template) *stencil.Lockfile {
 	l := &stencil.Lockfile{
-		Version: version.Version,
+		Version: version.Version.GitVersion,
 	}
 
 	for _, tpl := range tpls {
