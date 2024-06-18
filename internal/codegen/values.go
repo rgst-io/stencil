@@ -9,7 +9,6 @@ package codegen
 import (
 	"context"
 
-	"github.com/getoutreach/gobox/pkg/box"
 	gogit "github.com/go-git/go-git/v5"
 	stencilgit "go.rgst.io/stencil/internal/git"
 	"go.rgst.io/stencil/internal/modules"
@@ -30,9 +29,6 @@ type runtime struct {
 	// GeneratorVersion is the current version of the generator being
 	// used.
 	GeneratorVersion string
-
-	// Box is org wide configuration that is accessible if configured
-	Box *box.Config
 
 	// Modules contains a list of all modules that are being rendered
 	// in a stencil run
@@ -162,12 +158,6 @@ func NewValues(ctx context.Context, sm *configuration.Manifest, mods []*modules.
 			Name:    m.Name,
 			Version: m.Version,
 		})
-	}
-
-	var err error
-	vals.Runtime.Box, err = box.LoadBox()
-	if err != nil {
-		vals.Runtime.Box = &box.Config{}
 	}
 
 	// If we're a repository, add repository information

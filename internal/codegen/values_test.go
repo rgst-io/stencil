@@ -10,7 +10,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/getoutreach/gobox/pkg/box"
 	gogit "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
@@ -61,13 +60,6 @@ func TestValues(t *testing.T) {
 		Name: "testing",
 	}
 
-	boxConf, _ := box.LoadBox()
-	if boxConf == nil {
-		// Allows this test to pass when a user doesn't have a box
-		// configuration setup.
-		boxConf = &box.Config{}
-	}
-
 	vals := NewValues(context.Background(), sm, []*modules.Module{
 		{
 			Name: "testing",
@@ -87,7 +79,6 @@ func TestValues(t *testing.T) {
 		Runtime: runtime{
 			Generator:        "stencil",
 			GeneratorVersion: version.Version,
-			Box:              boxConf,
 			Modules: modulesSlice{
 				{
 					Name:    "testing",
