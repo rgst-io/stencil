@@ -15,7 +15,12 @@
 // Package version contains the current version of the stencil CLI.
 package version
 
-import goversion "github.com/caarlos0/go-version"
+import (
+	// Used for the ASCII art.
+	_ "embed"
+
+	goversion "github.com/caarlos0/go-version"
+)
 
 // These variables are set at build time via ldflags.
 var (
@@ -26,9 +31,13 @@ var (
 	builtBy   = ""
 )
 
+//go:embed embed/stencil.ascii.txt
+var asciiName string
+
 // Version is the current version of the stencil CLI.
 var Version = goversion.GetVersionInfo(
-	goversion.WithAppDetails("stencil", "A modern living-template engine for evolving repositories.", "stencil.rgst.io"),
+	goversion.WithAppDetails("stencil", "A modern living-template engine for evolving repositories", "\033[4mhttps://stencil.rgst.io\033[0m"),
+	goversion.WithASCIIName("\033[90m"+asciiName+"\033[0m\n"),
 	func(i *goversion.Info) {
 		if commit != "" {
 			i.GitCommit = commit
