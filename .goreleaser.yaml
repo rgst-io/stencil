@@ -104,6 +104,15 @@ nfpms:
         - statically-linked-binary
         - changelog-file-missing-in-native-package
 
+publishers:
+  - name: fury.io
+    ids:
+      - packages
+    env:
+      - "FURY_PUSH_TOKEN={{ .Env.FURY_PUSH_TOKEN }}"
+    cmd: ./.github/scripts/fury-upload.sh {{ .ArtifactName }}
+    disable: '{{ isEnvSet "FURY_PUSH_TOKEN" }}'
+
 release:
   prerelease: "auto"
   footer: |-
