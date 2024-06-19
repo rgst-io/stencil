@@ -5,7 +5,7 @@ set -euo pipefail
 
 # FURY_PUSH_TOKEN is a secret token that is used to push packages to
 # fury (https://fury.io). It is a required environment variable.
-FURY_PUSH_TOKEN="${FURY_PUSH_TOKEN:-}"
+FURY_PUSH_TOKEN="${FURY_PUSH_TOKEN}"
 
 # allowed_exts is an array of allowed file extensions that can be
 # uploaded to fury.
