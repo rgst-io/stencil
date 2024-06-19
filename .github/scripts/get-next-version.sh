@@ -12,6 +12,12 @@ VERSION_OVERRIDE=${VERSION_OVERRIDE:=}
 # will be a release candidate version (-rc.X).
 BUILD_RC=${BUILD_RC:=false}
 
+# As a special case, if the first argument is --rc, the next version
+# will be a release candidate version.
+if [[ "${1:-}" == "--rc" ]]; then
+  BUILD_RC=true
+fi
+
 if [[ -n "$VERSION_OVERRIDE" ]]; then
   echo "Overriding next version with: $VERSION_OVERRIDE" >&2
   echo "$VERSION_OVERRIDE"
@@ -19,7 +25,7 @@ if [[ -n "$VERSION_OVERRIDE" ]]; then
 fi
 
 # Determine the next version as reported by the next-version command.
-next_version=$(mise run next-version 2>/dev/null | sed 's/-rc.*//' | tr -d '\n')
+next_version=$(get-next-version --prefix v 2>/dev/null | sed 's/-rc.*//' | tr -d '\n')
 
 echo "Next release version: $next_version" >&2
 
