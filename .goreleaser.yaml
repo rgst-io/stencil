@@ -111,7 +111,7 @@ publishers:
     env:
       - "FURY_PUSH_TOKEN={{ .Env.FURY_PUSH_TOKEN }}"
     cmd: ./.github/scripts/fury-upload.sh {{ .ArtifactName }}
-    disable: '{{ isEnvSet "FURY_PUSH_TOKEN" }}'
+    disable: '{{ if (isEnvSet "FURY_PUSH_TOKEN") }}false{{ else }}true{{ end }}'
 
 release:
   prerelease: "auto"
