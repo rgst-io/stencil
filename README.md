@@ -27,6 +27,7 @@ information!
 <!-- toc -->
 - [Install](#install)
   - [Homebrew](#homebrew)
+  - [APT](#apt)
   - [Binary](#binary)
   - [<code>go install</code>](#go-install)
 - [Development](#development)
@@ -44,6 +45,20 @@ information!
 
 ```bash
 brew install rgst-io/tap/stencil
+```
+
+### APT
+
+```bash
+sudo apt update -y
+sudo apt install -y gpg sudo wget curl
+sudo install -dm 755 /etc/apt/keyrings
+wget -qO - https://pkg.rgst.io/apt/gpg.key | gpg --dearmor | \
+  sudo tee /etc/apt/keyrings/stencil-archive-keyring.gpg 1>/dev/null
+echo "deb [signed-by=/etc/apt/keyrings/stencil-archive-keyring.gpg] https://pkg.rgst.io/apt /" | \
+  sudo tee /etc/apt/sources.list.d/stencil.list
+sudo apt update
+sudo apt install stencil
 ```
 
 ### Binary
