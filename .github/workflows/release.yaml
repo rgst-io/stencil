@@ -69,7 +69,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: fregante/setup-git-user@v2
-      - uses: anchore/sbom-action/download-syft@v0.16.0
+      - uses: anchore/sbom-action/download-syft@v0.16.1
 
       # Bumping logic
       - name: Get next version
