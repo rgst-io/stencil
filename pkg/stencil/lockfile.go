@@ -126,3 +126,28 @@ func (lf *Lockfile) Write() error {
 
 	return nil
 }
+
+func (lf *Lockfile) Prune() []string {
+	missingList := []*LockfileFileEntry{}
+	for _, lf := range lf.Files {
+		if _, err := os.Stat(lf.Name); !os.IsNotExist(err) {
+			continue
+		}
+
+		missingList = append(missingList, lf)
+	}
+
+	if len(missingList) == 0 {
+		return []string{}
+	}
+
+	ret := []string{}
+	for _, lff := range missingList {
+		fmt.Printf("Pruning missing file %s from lockfile\n", lff.Name)
+		ret = append(ret, lff.Name)
+		idx := slices.Index(lf.Files, lff)
+		lf.Files = slices.Delete(lf.Files, idx, idx+1)
+	}
+
+	return ret
+}

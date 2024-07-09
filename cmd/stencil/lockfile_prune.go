@@ -16,8 +16,6 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"slices"
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
@@ -36,24 +34,14 @@ func NewLockfilePruneCommand() *cli.Command {
 				return errors.Wrap(err, "failed to load lockfile")
 			}
 
-			missingList := []*stencil.LockfileFileEntry{}
-			for _, lf := range l.Files {
-				if _, err := os.Stat(lf.Name); !os.IsNotExist(err) {
-					continue
-				}
-
-				missingList = append(missingList, lf)
-			}
-
-			if len(missingList) == 0 {
+			prunedList := l.Prune()
+			if len(prunedList) == 0 {
 				fmt.Printf("No changes made to lockfile\n")
 				return nil
 			}
 
-			for _, lf := range missingList {
-				fmt.Printf("Pruning missing file %s from lockfile\n", lf.Name)
-				idx := slices.Index(l.Files, lf)
-				l.Files = slices.Delete(l.Files, idx, idx+1)
+			for _, lf := range prunedList {
+				fmt.Printf("Pruned missing file %s from lockfile\n", lf)
 			}
 
 			fmt.Printf("Writing out modified lockfile\n")
