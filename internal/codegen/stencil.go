@@ -29,11 +29,12 @@ import (
 )
 
 // NewStencil creates a new, fully initialized Stencil renderer function
-func NewStencil(m *configuration.Manifest, mods []*modules.Module, log slogext.Logger) *Stencil {
+func NewStencil(m *configuration.Manifest, lock *stencil.Lockfile, mods []*modules.Module, log slogext.Logger) *Stencil {
 	return &Stencil{
 		log:         log,
 		m:           m,
 		ext:         nativeext.NewHost(log),
+		lock:        lock,
 		modules:     mods,
 		isFirstPass: true,
 		sharedData:  newSharedData(),
@@ -48,6 +49,8 @@ type Stencil struct {
 
 	ext       *nativeext.Host
 	extCaller *nativeext.ExtensionCaller
+
+	lock *stencil.Lockfile
 
 	// modules is a list of modules used in this stencil render
 	modules []*modules.Module
@@ -167,14 +170,7 @@ func (s *Stencil) GenerateLockfile(tpls []*Template) *stencil.Lockfile {
 		})
 	}
 
-	// sort based on name to ensure deterministic output
-	sort.SliceStable(l.Files, func(i, j int) bool {
-		return l.Files[i].Name < l.Files[j].Name
-	})
-
-	sort.SliceStable(l.Modules, func(i, j int) bool {
-		return l.Modules[i].Name < l.Modules[j].Name
-	})
+	l.Sort()
 
 	return l
 }

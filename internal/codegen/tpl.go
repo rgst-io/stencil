@@ -25,7 +25,7 @@ func NewFuncMap(st *Stencil, t *Template, log slogext.Logger) template.FuncMap {
 		tplst = &TplStencil{st, t, log}
 	}
 	if t != nil && len(t.Files) > 0 {
-		tplf = &TplFile{t.Files[0], t, log}
+		tplf = &TplFile{t.Files[0], t, st.lock, log}
 	}
 
 	// build the function map

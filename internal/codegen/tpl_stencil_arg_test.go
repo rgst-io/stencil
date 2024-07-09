@@ -56,7 +56,7 @@ func fakeTemplate(t *testing.T, args map[string]interface{},
 		Name:      "testing",
 		Arguments: args,
 		Modules:   []*configuration.TemplateRepository{{Name: m.Name}},
-	}, []*modules.Module{m}, log)
+	}, nil, []*modules.Module{m}, log)
 
 	// use the first template from the module
 	// which we've created earlier after loading the module in the
@@ -124,7 +124,7 @@ func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]interface
 		Name:      "testing",
 		Arguments: manifestArgs,
 		Modules:   moduleTr,
-	}, mods, log)
+	}, nil, mods, log)
 
 	// use the first template from the module
 	// which we've created earlier after loading the module in the

@@ -6,8 +6,11 @@
 package stencil
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
+	"sort"
 
 	"go.rgst.io/stencil/internal/modules/resolver"
 	"gopkg.in/yaml.v3"
@@ -80,4 +83,46 @@ func LoadLockfile(path string) (*Lockfile, error) {
 	var lock *Lockfile
 	err = yaml.NewDecoder(f).Decode(&lock)
 	return lock, err
+}
+
+// MergeMissingFilesFromOlderLockfile merges missing files from the older lockfile into the current one, for use with file.Once.
+func (lf *Lockfile) MergeMissingFilesFromOlderLockfile(older *Lockfile) {
+	for _, f := range older.Files {
+		if !slices.ContainsFunc(lf.Files, func(fe *LockfileFileEntry) bool {
+			return fe.Name == f.Name
+		}) {
+			lf.Files = append(lf.Files, f)
+		}
+	}
+
+	lf.Sort()
+}
+
+// Sort maintains the alphabetic sort of files/modules to ensure deterministic output
+func (lf *Lockfile) Sort() {
+	sort.SliceStable(lf.Files, func(i, j int) bool {
+		return lf.Files[i].Name < lf.Files[j].Name
+	})
+
+	sort.SliceStable(lf.Modules, func(i, j int) bool {
+		return lf.Modules[i].Name < lf.Modules[j].Name
+	})
+}
+
+// Write writes the finished lockfile out to disk
+func (lf *Lockfile) Write() error {
+	f, err := os.Create(LockfileName)
+	if err != nil {
+		return fmt.Errorf("failed to create lockfile: %w", err)
+	}
+	defer f.Close()
+
+	enc := yaml.NewEncoder(f)
+	defer enc.Close()
+
+	if err := enc.Encode(lf); err != nil {
+		return fmt.Errorf("failed to write lockfile: %w", err)
+	}
+
+	return nil
 }

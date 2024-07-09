@@ -48,7 +48,7 @@ func TestSingleFileRender(t *testing.T) {
 
 	sm := &configuration.Manifest{Name: "testing"}
 
-	st := NewStencil(sm, []*modules.Module{m}, log)
+	st := NewStencil(sm, nil, []*modules.Module{m}, log)
 	err = tpl.Render(st, NewValues(context.Background(), sm, nil))
 	assert.NilError(t, err, "expected Render() to not fail")
 	assert.Equal(t, tpl.Files[0].String(), "hello world!", "expected Render() to modify first created file")
@@ -69,7 +69,7 @@ func TestMultiFileRender(t *testing.T) {
 		"commands": []string{"hello", "world", "command"},
 	}}
 
-	st := NewStencil(sm, []*modules.Module{m}, log)
+	st := NewStencil(sm, nil, []*modules.Module{m}, log)
 	err = tpl.Render(st, NewValues(context.Background(), sm, nil))
 	assert.NilError(t, err, "expected Render() to not fail")
 	assert.Equal(t, len(tpl.Files), 3, "expected Render() to create 3 files")
@@ -94,7 +94,7 @@ func TestMultiFileWithInputRender(t *testing.T) {
 		"commands": []string{"hello", "world", "command"},
 	}}
 
-	st := NewStencil(sm, []*modules.Module{m}, log)
+	st := NewStencil(sm, nil, []*modules.Module{m}, log)
 	err = tpl.Render(st, NewValues(context.Background(), sm, nil))
 	assert.NilError(t, err, "expected Render() to not fail")
 	assert.Equal(t, len(tpl.Files), 3, "expected Render() to create 3 files")
@@ -119,7 +119,7 @@ func TestApplyTemplateArgumentPassthrough(t *testing.T) {
 		"commands": []string{"hello", "world", "command"},
 	}}
 
-	st := NewStencil(sm, []*modules.Module{m}, log)
+	st := NewStencil(sm, nil, []*modules.Module{m}, log)
 	err = tpl.Render(st, NewValues(context.Background(), sm, nil))
 	assert.NilError(t, err, "expected Render() to not fail")
 	assert.Equal(t, len(tpl.Files), 1, "expected Render() to create 1 files")
@@ -138,7 +138,7 @@ func TestGeneratedBlock(t *testing.T) {
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
-	st := NewStencil(sm, []*modules.Module{m}, log)
+	st := NewStencil(sm, nil, []*modules.Module{m}, log)
 	assert.NilError(t, os.WriteFile(fakeFilePath, []byte(fakeGeneratedBlockFile), 0o644),
 		"failed to write generated file")
 
@@ -170,7 +170,7 @@ func TestLibraryTemplate(t *testing.T) {
 	assert.Equal(t, tpl.Library, true, "expected library template to be marked as such")
 
 	assert.NilError(t, tpl.Render(
-		NewStencil(&configuration.Manifest{Name: "testing"}, []*modules.Module{m},
+		NewStencil(&configuration.Manifest{Name: "testing"}, nil, []*modules.Module{m},
 			log), NewValues(context.Background(), &configuration.Manifest{Name: "testing"}, nil)),
 		"expected library template to not fail on render")
 
@@ -190,7 +190,7 @@ func TestLibraryCantAccessFileFunctions(t *testing.T) {
 	assert.NilError(t, err, "failed to create basic template")
 	assert.Equal(t, tpl.Library, true, "expected library template to be marked as such")
 
-	err = tpl.Render(NewStencil(&configuration.Manifest{Name: "testing"}, []*modules.Module{m}, log),
+	err = tpl.Render(NewStencil(&configuration.Manifest{Name: "testing"}, nil, []*modules.Module{m}, log),
 		NewValues(context.Background(), &configuration.Manifest{Name: "testing"}, nil))
 	assert.ErrorContains(t, err,
 		"attempted to use file in a template that doesn't support file rendering",

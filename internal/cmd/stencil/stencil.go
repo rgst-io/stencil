@@ -20,7 +20,6 @@ import (
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
 	"go.rgst.io/stencil/pkg/stencil"
-	"gopkg.in/yaml.v3"
 )
 
 // Command is a thin wrapper around the codegen package that implements
@@ -175,7 +174,7 @@ func (c *Command) Run(ctx context.Context) error {
 
 // runWithModules runs the stencil command with the given modules
 func (c *Command) runWithModules(ctx context.Context, mods []*modules.Module) error {
-	st := codegen.NewStencil(c.manifest, mods, c.log)
+	st := codegen.NewStencil(c.manifest, c.lock, mods, c.log)
 	defer st.Close()
 
 	c.log.Info("Loading native extensions")
@@ -260,18 +259,10 @@ func (c *Command) writeFiles(st *codegen.Stencil, tpls []*codegen.Template) erro
 	}
 
 	l := st.GenerateLockfile(tpls)
-	f, err := os.Create(stencil.LockfileName)
-	if err != nil {
-		return fmt.Errorf("failed to create lockfile: %w", err)
-	}
-	defer f.Close()
-
-	enc := yaml.NewEncoder(f)
-	defer enc.Close()
-
-	if err := enc.Encode(l); err != nil {
-		return fmt.Errorf("failed to write lockfile: %w", err)
+	if c.lock != nil {
+		// Pull in older missing files (if any) from the last lock file
+		l.MergeMissingFilesFromOlderLockfile(c.lock)
 	}
 
-	return nil
+	return l.Write()
 }
