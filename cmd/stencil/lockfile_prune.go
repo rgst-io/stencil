@@ -27,16 +27,20 @@ func NewLockfilePruneCommand(log slogext.Logger) *cli.Command {
 	return &cli.Command{
 		Name:        "prune",
 		Description: "Prunes any non-existent files from the lockfile (will recreate any file.Once files on next run)",
-		Args:        true,
-		ArgsUsage: "[filename] [filename 2] [...] - if any names are passed, prune only checks passed filenames for " +
-			"pruning instead of all",
+
+		Flags: []cli.Flag{
+			&cli.StringSliceFlag{
+				Name:  "file",
+				Usage: "If any file options are passed, prune only checks the passed filenames for pruning",
+			},
+		},
 		Action: func(c *cli.Context) error {
 			l, err := stencil.LoadLockfile("")
 			if err != nil {
 				return errors.Wrap(err, "failed to load lockfile")
 			}
 
-			prunedList := l.Prune(c.Args().Slice())
+			prunedList := l.Prune(c.StringSlice("file"))
 			if len(prunedList) == 0 {
 				log.Info("No changes made to lockfile")
 				return nil
