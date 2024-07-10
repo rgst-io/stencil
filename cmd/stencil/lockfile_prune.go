@@ -15,36 +15,37 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
+	"go.rgst.io/stencil/pkg/slogext"
 	"go.rgst.io/stencil/pkg/stencil"
 )
 
 // NewLockfilePruneCommand returns a new urfave/cli.Command for the
 // lockfile prune command.
-func NewLockfilePruneCommand() *cli.Command {
+func NewLockfilePruneCommand(log slogext.Logger) *cli.Command {
 	return &cli.Command{
 		Name:        "prune",
 		Description: "Prunes any non-existent files from the lockfile (will recreate any file.Once files on next run)",
-		Action: func(_ *cli.Context) error {
+		Args:        true,
+		ArgsUsage:   "[filename] [filename 2] [...] - only prunes passed filenames from the lockfile",
+		Action: func(c *cli.Context) error {
 			l, err := stencil.LoadLockfile("")
 			if err != nil {
 				return errors.Wrap(err, "failed to load lockfile")
 			}
 
-			prunedList := l.Prune()
+			prunedList := l.Prune(c.Args().Slice())
 			if len(prunedList) == 0 {
-				fmt.Printf("No changes made to lockfile\n")
+				log.Info("No changes made to lockfile")
 				return nil
 			}
 
 			for _, lf := range prunedList {
-				fmt.Printf("Pruned missing file %s from lockfile\n", lf)
+				log.Infof("Pruned missing file %s from lockfile", lf)
 			}
 
-			fmt.Printf("Writing out modified lockfile\n")
+			log.Info("Writing out modified lockfile")
 			return l.Write()
 		},
 	}

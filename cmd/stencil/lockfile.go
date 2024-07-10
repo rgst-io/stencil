@@ -18,16 +18,17 @@ package main
 
 import (
 	"github.com/urfave/cli/v2"
+	"go.rgst.io/stencil/pkg/slogext"
 )
 
 // NewLockfileCommand returns a new urfave/cli.Command for the
 // lockfile command set
-func NewLockfileCommand() *cli.Command {
+func NewLockfileCommand(log slogext.Logger) *cli.Command {
 	return &cli.Command{
 		Name:  "lockfile",
 		Usage: "modify/examine the current lockfile (stencil.lock)",
 		Subcommands: []*cli.Command{
-			NewLockfilePruneCommand(),
+			NewLockfilePruneCommand(log),
 		},
 	}
 }
