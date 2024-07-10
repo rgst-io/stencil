@@ -13,6 +13,7 @@ require (
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/google/go-github/v62 v62.0.0
+	github.com/google/go-github/v63 v63.0.0
 	github.com/hashicorp/go-hclog v1.6.3
 	github.com/hashicorp/go-plugin v1.6.1
 	github.com/mitchellh/hashstructure/v2 v2.0.2
