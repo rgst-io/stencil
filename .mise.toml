@@ -34,6 +34,9 @@ run = [
 ]
 
 ## <<Stencil::Block(custom)>>
+[tasks.docgen]
+run = "go run ./tools/docgen/docgen.go"
+
 [tasks.next-version]
 description = """Get the version number that would be released if a release was ran right now.
 Pass --rc to get the next release candidate version.
