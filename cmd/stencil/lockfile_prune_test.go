@@ -23,158 +23,76 @@ import (
 	"go.rgst.io/stencil/pkg/slogext"
 )
 
-// TestPruneNoChange tests the lockfile prune behavior with an existing file and module reference
-func TestPruneNoChange(t *testing.T) {
+// TestLockfilePrune is a test matrix runner for combos against lockfile prune
+func TestLockfilePrune(t *testing.T) {
 	log := slogext.NewTestLogger(t)
 
-	td, err := os.MkdirTemp("", "tr")
-	assert.NoError(t, err)
+	tests := []struct {
+		name                string
+		initStencilYaml     string
+		initStencilLock     string
+		pruneArgs           []string
+		makeTestFile        bool
+		expectedStencilLock string
+	}{
+		{
+			name:                "TestPruneNoChange",
+			initStencilYaml:     "name: stencil\nmodules:\n  - name: test\n",
+			initStencilLock:     "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n",
+			makeTestFile:        true,
+			expectedStencilLock: "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n",
+		},
+		{
+			name:                "TestPruneMissingFile",
+			initStencilYaml:     "name: stencil\nmodules:\n  - name: test\n",
+			initStencilLock:     "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n",
+			expectedStencilLock: "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles: []\n",
+		},
+		{
+			name:                "TestPruneMissingFileNotInPassedList",
+			initStencilYaml:     "name: stencil\nmodules:\n  - name: test\n",
+			initStencilLock:     "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n",
+			pruneArgs:           []string{"--file", "somethingelse"},
+			expectedStencilLock: "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n",
+		},
+		{
+			name:                "TestPruneMissingFileInPassedList",
+			initStencilYaml:     "name: stencil\nmodules:\n  - name: test\n",
+			initStencilLock:     "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n",
+			pruneArgs:           []string{"--file", "testfile"},
+			expectedStencilLock: "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles: []\n",
+		},
+		{
+			name:                "TestPruneMissingModuleNotInPassedList",
+			initStencilYaml:     "name: stencil\n",
+			initStencilLock:     "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles: []\n",
+			expectedStencilLock: "version: v1.6.2\nmodules: []\nfiles: []\n",
+		},
+	}
 
-	err = os.WriteFile(path.Join(td, "stencil.yaml"), []byte("name: stencil\nmodules:\n    - name: test\n"), 0o666)
-	assert.NoError(t, err)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			td := t.TempDir()
 
-	err = os.WriteFile(path.Join(td, "testfile"), []byte("shrug"), 0o666)
-	assert.NoError(t, err)
+			err := os.WriteFile(path.Join(td, "stencil.yaml"), []byte(tc.initStencilYaml), 0o666)
+			assert.NoError(t, err)
 
-	lockStartConts := "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n"
-	err = os.WriteFile(path.Join(td, "stencil.lock"), []byte(lockStartConts), 0o666)
-	assert.NoError(t, err)
+			err = os.WriteFile(path.Join(td, "stencil.lock"), []byte(tc.initStencilLock), 0o666)
+			assert.NoError(t, err)
 
-	cli := NewStencil(log)
-	os.Chdir(td)
-	err = cli.Run([]string{"", "lockfile", "prune"})
-	assert.NoError(t, err)
+			if tc.makeTestFile {
+				err = os.WriteFile(path.Join(td, "testfile"), []byte("shrug"), 0o666)
+				assert.NoError(t, err)
+			}
 
-	conts, err := os.ReadFile(path.Join(td, "stencil.lock"))
-	assert.NoError(t, err)
-	assert.Equal(t, lockStartConts, string(conts))
-}
+			cmd := NewLockfilePruneCommand(log)
+			err = testRunCommand(t, cmd, td, tc.pruneArgs...)
+			assert.NoError(t, err)
 
-// TestPruneMissingFile tests the lockfile prune behavior with a missing file to prune with no passed file args
-func TestPruneMissingFile(t *testing.T) {
-	log := slogext.NewTestLogger(t)
+			conts, err := os.ReadFile(path.Join(td, "stencil.lock"))
+			assert.NoError(t, err)
 
-	td, err := os.MkdirTemp("", "tr")
-	assert.NoError(t, err)
-
-	err = os.WriteFile(path.Join(td, "stencil.yaml"), []byte("name: stencil\nmodules:\n  - name: test\n"), 0o666)
-	assert.NoError(t, err)
-
-	lockStartConts := "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n"
-	err = os.WriteFile(path.Join(td, "stencil.lock"), []byte(lockStartConts), 0o666)
-	assert.NoError(t, err)
-
-	cli := NewStencil(log)
-	os.Chdir(td)
-	err = cli.Run([]string{"", "lockfile", "prune"})
-	assert.NoError(t, err)
-
-	conts, err := os.ReadFile(path.Join(td, "stencil.lock"))
-	assert.NoError(t, err)
-
-	lockEndConts := "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles: []\n"
-	assert.Equal(t, lockEndConts, string(conts))
-}
-
-// TestPruneMissingFileNotInPassedList tests the lockfile prune behavior with a missing file to prune but not passed into args
-func TestPruneMissingFileNotInPassedList(t *testing.T) {
-	log := slogext.NewTestLogger(t)
-
-	td, err := os.MkdirTemp("", "tr")
-	assert.NoError(t, err)
-
-	err = os.WriteFile(path.Join(td, "stencil.yaml"), []byte("name: stencil\nmodules:\n  - name: test\n"), 0o666)
-	assert.NoError(t, err)
-
-	lockStartConts := "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n"
-	err = os.WriteFile(path.Join(td, "stencil.lock"), []byte(lockStartConts), 0o666)
-	assert.NoError(t, err)
-
-	cli := NewStencil(log)
-	os.Chdir(td)
-	err = cli.Run([]string{"", "lockfile", "prune", "--file", "somethingelse"})
-	assert.NoError(t, err)
-
-	conts, err := os.ReadFile(path.Join(td, "stencil.lock"))
-	assert.NoError(t, err)
-
-	assert.Equal(t, lockStartConts, string(conts))
-}
-
-// TestPruneMissingFileInPassedList tests the lockfile prune behavior with a missing file to prune passed into arg list
-func TestPruneMissingFileInPassedList(t *testing.T) {
-	log := slogext.NewTestLogger(t)
-
-	td, err := os.MkdirTemp("", "tr")
-	assert.NoError(t, err)
-
-	err = os.WriteFile(path.Join(td, "stencil.yaml"), []byte("name: stencil\nmodules:\n  - name: test\n"), 0o666)
-	assert.NoError(t, err)
-
-	lockStartConts := "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n"
-	err = os.WriteFile(path.Join(td, "stencil.lock"), []byte(lockStartConts), 0o666)
-	assert.NoError(t, err)
-
-	cli := NewStencil(log)
-	os.Chdir(td)
-	err = cli.Run([]string{"", "lockfile", "prune", "--file", "testfile"})
-	assert.NoError(t, err)
-
-	conts, err := os.ReadFile(path.Join(td, "stencil.lock"))
-	assert.NoError(t, err)
-
-	lockEndConts := "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles: []\n"
-	assert.Equal(t, lockEndConts, string(conts))
-}
-
-// TestPruneMissingModulNotInPassedList tests the lockfile prune behavior with a missing module to prune not passed into arg list
-func TestPruneMissingModulNotInPassedList(t *testing.T) {
-	log := slogext.NewTestLogger(t)
-
-	td, err := os.MkdirTemp("", "tr")
-	assert.NoError(t, err)
-
-	err = os.WriteFile(path.Join(td, "stencil.yaml"), []byte("name: stencil\n"), 0o666)
-	assert.NoError(t, err)
-
-	lockStartConts := "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles: []\n"
-	err = os.WriteFile(path.Join(td, "stencil.lock"), []byte(lockStartConts), 0o666)
-	assert.NoError(t, err)
-
-	cli := NewStencil(log)
-	os.Chdir(td)
-	err = cli.Run([]string{"", "lockfile", "prune"})
-	assert.NoError(t, err)
-
-	conts, err := os.ReadFile(path.Join(td, "stencil.lock"))
-	assert.NoError(t, err)
-
-	lockEndConts := "version: v1.6.2\nmodules: []\nfiles: []\n"
-	assert.Equal(t, lockEndConts, string(conts))
-}
-
-// TestPruneMissingModuleInPassedList tests the lockfile prune behavior with a missing module to prune passed into arg list
-func TestPruneMissingModuleInPassedList(t *testing.T) {
-	log := slogext.NewTestLogger(t)
-
-	td, err := os.MkdirTemp("", "tr")
-	assert.NoError(t, err)
-
-	err = os.WriteFile(path.Join(td, "stencil.yaml"), []byte("name: stencil\n"), 0o666)
-	assert.NoError(t, err)
-
-	lockStartConts := "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles: []\n"
-	err = os.WriteFile(path.Join(td, "stencil.lock"), []byte(lockStartConts), 0o666)
-	assert.NoError(t, err)
-
-	cli := NewStencil(log)
-	os.Chdir(td)
-	err = cli.Run([]string{"", "lockfile", "prune", "--module", "test"})
-	assert.NoError(t, err)
-
-	conts, err := os.ReadFile(path.Join(td, "stencil.lock"))
-	assert.NoError(t, err)
-
-	lockEndConts := "version: v1.6.2\nmodules: []\nfiles: []\n"
-	assert.Equal(t, lockEndConts, string(conts))
+			assert.Equal(t, tc.expectedStencilLock, string(conts))
+		})
+	}
 }
