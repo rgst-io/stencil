@@ -7,9 +7,11 @@ package codegen
 
 import (
 	"os"
+	"slices"
 	"time"
 
 	"go.rgst.io/stencil/pkg/slogext"
+	"go.rgst.io/stencil/pkg/stencil"
 )
 
 // TplFile is the current file we're writing output to in a
@@ -23,6 +25,9 @@ type TplFile struct {
 
 	// t is the current template
 	t *Template
+
+	// lock is the original lockfile passed in
+	lock *stencil.Lockfile
 
 	// log is the logger to use for debugging
 	log slogext.Logger
@@ -102,6 +107,24 @@ func (f *TplFile) Static() (out string, err error) {
 		return f.Skip("Static file, output already exists")
 	}
 
+	return "", nil
+}
+
+// Once will only generate this file a single time, and store that fact
+//
+// The first time a Once file is generated, it has its provenance stored
+// in the stencil.lock file.  Going forward, Once checks the lock file
+// for history of the file, and if it finds it, it performs the same
+// action as file.Skip.
+//
+//	{{ file.Once }}
+func (f *TplFile) Once() (out string, err error) {
+	// if the file already exists in the lockfile, skip it
+	if f.lock != nil && slices.ContainsFunc(f.lock.Files, func(ff *stencil.LockfileFileEntry) bool { return ff.Name == f.f.path }) {
+		f.log.With("template", f.t.Path, "path", f.f.path).
+			Debug("Skipping once file because it already exists in the lockfile")
+		return f.Skip("Once file, already in lockfile")
+	}
 	return "", nil
 }
 
