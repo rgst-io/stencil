@@ -15,8 +15,11 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
+	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
 	"go.rgst.io/stencil/pkg/stencil"
 )
@@ -33,6 +36,10 @@ func NewLockfilePruneCommand(log slogext.Logger) *cli.Command {
 				Name:  "file",
 				Usage: "If any file options are passed, prune only checks the passed filenames for pruning",
 			},
+			&cli.StringSliceFlag{
+				Name:  "module",
+				Usage: "If any module options are passed, prune only checks the passed modulenames for pruning",
+			},
 		},
 		Action: func(c *cli.Context) error {
 			l, err := stencil.LoadLockfile("")
@@ -40,14 +47,31 @@ func NewLockfilePruneCommand(log slogext.Logger) *cli.Command {
 				return errors.Wrap(err, "failed to load lockfile")
 			}
 
-			prunedList := l.Prune(c.StringSlice("file"))
-			if len(prunedList) == 0 {
-				log.Info("No changes made to lockfile")
-				return nil
+			manifest, err := configuration.NewDefaultManifest()
+			if err != nil {
+				return fmt.Errorf("failed to parse stencil.yaml: %w", err)
 			}
 
-			for _, lf := range prunedList {
+			prunedFiles := l.PruneFiles(c.StringSlice("file"))
+
+			for _, lf := range prunedFiles {
 				log.Infof("Pruned missing file %s from lockfile", lf)
+			}
+
+			newModules := []string{}
+			for _, m := range manifest.Modules {
+				newModules = append(newModules, m.Name)
+			}
+
+			prunedModules := l.PruneModules(newModules, c.StringSlice("module"))
+
+			for _, lf := range prunedModules {
+				log.Infof("Pruned missing module %s from lockfile", lf)
+			}
+
+			if len(prunedFiles) == 0 && len(prunedModules) == 0 {
+				log.Info("No changes made to lockfile")
+				return nil
 			}
 
 			log.Info("Writing out modified lockfile")

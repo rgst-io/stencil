@@ -85,13 +85,21 @@ func LoadLockfile(path string) (*Lockfile, error) {
 	return lock, err
 }
 
-// MergeMissingFilesFromOlderLockfile merges missing files from the older lockfile into the current one, for use with file.Once.
-func (lf *Lockfile) MergeMissingFilesFromOlderLockfile(older *Lockfile) {
+// MergeMissingInfoFromOlderLockfile merges missing files and modules from the older lockfile into the current one, for use with file.Once.
+func (lf *Lockfile) MergeMissingInfoFromOlderLockfile(older *Lockfile) {
 	for _, f := range older.Files {
 		if !slices.ContainsFunc(lf.Files, func(fe *LockfileFileEntry) bool {
 			return fe.Name == f.Name
 		}) {
 			lf.Files = append(lf.Files, f)
+		}
+	}
+
+	for _, f := range older.Modules {
+		if !slices.ContainsFunc(lf.Modules, func(fe *LockfileModuleEntry) bool {
+			return fe.Name == f.Name
+		}) {
+			lf.Modules = append(lf.Modules, f)
 		}
 	}
 
@@ -127,29 +135,48 @@ func (lf *Lockfile) Write() error {
 	return nil
 }
 
-func (lf *Lockfile) Prune(files []string) []string {
-	missingList := []*LockfileFileEntry{}
+func (lf *Lockfile) PruneFiles(onlyFiles []string) []string {
+	missingFilesList := []*LockfileFileEntry{}
 	for _, lf := range lf.Files {
-		if len(files) > 0 && !slices.Contains(files, lf.Name) {
+		if len(onlyFiles) > 0 && !slices.Contains(onlyFiles, lf.Name) {
 			continue
 		}
 		if _, err := os.Stat(lf.Name); !os.IsNotExist(err) {
 			continue
 		}
 
-		missingList = append(missingList, lf)
+		missingFilesList = append(missingFilesList, lf)
 	}
 
-	if len(missingList) == 0 {
-		return []string{}
-	}
-
-	ret := []string{}
-	for _, lff := range missingList {
-		ret = append(ret, lff.Name)
+	missingFilenames := []string{}
+	for _, lff := range missingFilesList {
+		missingFilenames = append(missingFilenames, lff.Name)
 		idx := slices.Index(lf.Files, lff)
 		lf.Files = slices.Delete(lf.Files, idx, idx+1)
 	}
 
-	return ret
+	return missingFilenames
+}
+
+func (lf *Lockfile) PruneModules(newModuleNames []string, onlyModules []string) []string {
+	missingModulesList := []*LockfileModuleEntry{}
+	for _, lf := range lf.Modules {
+		if len(onlyModules) > 0 && !slices.Contains(onlyModules, lf.Name) {
+			continue
+		}
+		if slices.Contains(newModuleNames, lf.Name) {
+			continue
+		}
+
+		missingModulesList = append(missingModulesList, lf)
+	}
+
+	missingModuleNames := []string{}
+	for _, lff := range missingModulesList {
+		missingModuleNames = append(missingModuleNames, lff.Name)
+		idx := slices.Index(lf.Modules, lff)
+		lf.Modules = slices.Delete(lf.Modules, idx, idx+1)
+	}
+
+	return missingModuleNames
 }

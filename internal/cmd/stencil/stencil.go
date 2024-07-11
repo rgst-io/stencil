@@ -261,7 +261,7 @@ func (c *Command) writeFiles(st *codegen.Stencil, tpls []*codegen.Template) erro
 	l := st.GenerateLockfile(tpls)
 	if c.lock != nil {
 		// Pull in older missing files (if any) from the last lock file
-		l.MergeMissingFilesFromOlderLockfile(c.lock)
+		l.MergeMissingInfoFromOlderLockfile(c.lock)
 	}
 
 	return l.Write()
