@@ -19,8 +19,8 @@ import (
 	"path"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"go.rgst.io/stencil/pkg/slogext"
+	"gotest.tools/v3/assert"
 )
 
 // TestLockfilePrune is a test matrix runner for combos against lockfile prune
@@ -75,22 +75,22 @@ func TestLockfilePrune(t *testing.T) {
 			td := t.TempDir()
 
 			err := os.WriteFile(path.Join(td, "stencil.yaml"), []byte(tc.initStencilYaml), 0o666)
-			assert.NoError(t, err)
+			assert.NilError(t, err)
 
 			err = os.WriteFile(path.Join(td, "stencil.lock"), []byte(tc.initStencilLock), 0o666)
-			assert.NoError(t, err)
+			assert.NilError(t, err)
 
 			if tc.makeTestFile {
 				err = os.WriteFile(path.Join(td, "testfile"), []byte("shrug"), 0o666)
-				assert.NoError(t, err)
+				assert.NilError(t, err)
 			}
 
 			cmd := NewLockfilePruneCommand(log)
 			err = testRunCommand(t, cmd, td, tc.pruneArgs...)
-			assert.NoError(t, err)
+			assert.NilError(t, err)
 
 			conts, err := os.ReadFile(path.Join(td, "stencil.lock"))
-			assert.NoError(t, err)
+			assert.NilError(t, err)
 
 			assert.Equal(t, tc.expectedStencilLock, string(conts))
 		})
