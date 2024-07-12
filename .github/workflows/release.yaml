@@ -28,6 +28,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      ## <<Stencil::Block(releaseSetup)>>
       - uses: actions/create-github-app-token@v1
         id: homebrew-tap-github-app
         with:
@@ -36,6 +37,7 @@ jobs:
           private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: homebrew-tap
+      ## <</Stencil::Block>>
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -68,8 +70,10 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: fregante/setup-git-user@v2
-      - uses: anchore/sbom-action/download-syft@v0.16.1
+      - name: Set up git user
+        uses: fregante/setup-git-user@v2
+      - name: Download syft (SBOM)
+        uses: anchore/sbom-action/download-syft@v0.16.1
 
       # Bumping logic
       - name: Get next version
@@ -79,14 +83,6 @@ jobs:
           VERSION_OVERRIDE: ${{ github.event.inputs.version }}
         run: |-
           echo "version=$(./.github/scripts/get-next-version.sh)" >> "$GITHUB_OUTPUT"
-      - name: Wait for manual approval
-        uses: trstringer/manual-approval@v1
-        # Skip if the triggering actor is the same as the approver
-        if: github.triggering_actor != 'jaredallard'
-        with:
-          secret: ${{ secrets.GITHUB_TOKEN }}
-          approvers: "jaredallard"
-          issue-title: "Release ${{ steps.next_version.outputs.version }}"
       - name: Create Tag
         run: |-
           git tag -a "${{ steps.next_version.outputs.version }}" -m "Release ${{ steps.next_version.outputs.version }}"
@@ -100,15 +96,17 @@ jobs:
           version: v${{ steps.goreleaser.outputs.version }}
           args: release --release-notes CHANGELOG.md --clean
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ## <<Stencil::Block(goreleaseEnvVars)>>
           BUILD_RC: ${{ github.event.inputs.rc }}
           FURY_PUSH_TOKEN: ${{ secrets.FURY_PUSH_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HOMEBREW_TAP_GITHUB_TOKEN: ${{ steps.homebrew-tap-github-app.outputs.token }}
           MACOS_SIGN_P12: ${{ secrets.MACOS_SIGN_P12 }}
           MACOS_SIGN_PASSWORD: ${{ secrets.MACOS_SIGN_PASSWORD }}
           MACOS_NOTARY_ISSUER_ID: ${{ secrets.MACOS_NOTARY_ISSUER_ID }}
           MACOS_NOTARY_KEY_ID: ${{ secrets.MACOS_NOTARY_KEY_ID }}
           MACOS_NOTARY_KEY: ${{ secrets.MACOS_NOTARY_KEY }}
+          ## <</Stencil::Block>>
       - uses: actions/attest-build-provenance@v1
         with:
           # We attest all generated _archives_ because those are what we

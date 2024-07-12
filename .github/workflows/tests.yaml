@@ -1,3 +1,5 @@
+# TODO(jaredallard): Deviated from stencil-golang.
+# Removed golangci-lint because we put it in linters.yaml
 name: tests
 on:
   push:

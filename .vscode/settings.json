@@ -1,4 +1,5 @@
 {
+	// TODO(jaredallard): Deviated from stencil-golang.
 	"go.lintTool": "golangci-lint",
 	"go.formatTool": "goimports",
 	"go.useLanguageServer": true,
@@ -15,13 +16,7 @@
 	"gopls": {
 		"build.buildFlags": ["-tags=or_dev"]
 	},
-	"cSpell.words": [
-		"codegen",
-		"getoutreach",
-		"gogit",
-		"templating",
-		"worktree"
-	],
+	"cSpell.words": ["codegen", "getoutreach", "gogit", "templating", "worktree"],
 
 	// Schema support OOTB.
 	"yaml.schemas": {

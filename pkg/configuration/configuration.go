@@ -69,8 +69,9 @@ type Manifest struct {
 	Arguments map[string]interface{} `yaml:"arguments"`
 
 	// Replacements is a list of module names to replace their URI.
+	//
 	// Expected format:
-	// - local file: file://path/to/module
+	// - local file: path/to/module
 	// - remote file: https://github.com/getoutreach/stencil-base
 	Replacements map[string]string `yaml:"replacements,omitempty"`
 }
