@@ -22,14 +22,28 @@ jobs:
           experimental: true
         env:
           GH_TOKEN: ${{ github.token }}
+      - name: Get Go directories
+        id: go
+        run: |
+          echo "cache_dir=$(go env GOCACHE)" >> "$GITHUB_OUTPUT"
+          echo "mod_cache_dir=$(go env GOMODCACHE)" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.go.outputs.cache_dir }}
+          key: ${{ runner.os }}-go-build-cache
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.go.outputs.mod_cache_dir }}
+          key: ${{ runner.os }}-go-mod-cache-${{ hashFiles('go.sum') }}
       - name: Setup prettier
         run: bun install
-      - run: mise run generate fmt
+      - run: mise run generate
+      - run: mise run fmt
       - name: Check for changes
         run: |-
           git diff --exit-code HEAD || \
             ( echo \
-              && echo "Formatting issues or stale documentation found. Please run 'mise run generate fmt'." \
+              && echo "Formatting issues or stale documentation found. Please run the 'generate' and 'fmt' tasks." \
               && exit 1)
 
   golangci-lint:
