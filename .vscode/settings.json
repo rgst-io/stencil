@@ -1,25 +1,31 @@
 {
-  "go.lintTool": "golangci-lint",
-  "go.formatTool": "goimports",
-  "go.useLanguageServer": true,
-  "go.buildTags": "or_dev",
-  "files.trimTrailingWhitespace": true,
-  "editor.formatOnSave": true,
-  "shellcheck.customArgs": ["-P", "SCRIPTDIR", "-x"],
-  "[markdown]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[yaml]": {
-    "editor.defaultFormatter": "redhat.vscode-yaml"
-  },
-  "gopls": {
-    "build.buildFlags": ["-tags=or_dev"]
-  },
-  "cSpell.words": ["codegen", "getoutreach", "gogit", "templating", "worktree"],
+	"go.lintTool": "golangci-lint",
+	"go.formatTool": "goimports",
+	"go.useLanguageServer": true,
+	"go.buildTags": "or_dev",
+	"files.trimTrailingWhitespace": true,
+	"editor.formatOnSave": true,
+	"shellcheck.customArgs": ["-P", "SCRIPTDIR", "-x"],
+	"[markdown]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[yaml]": {
+		"editor.defaultFormatter": "redhat.vscode-yaml"
+	},
+	"gopls": {
+		"build.buildFlags": ["-tags=or_dev"]
+	},
+	"cSpell.words": [
+		"codegen",
+		"getoutreach",
+		"gogit",
+		"templating",
+		"worktree"
+	],
 
-  // Schema support OOTB.
-  "yaml.schemas": {
-    "schemas/manifest.jsonschema.json": ["manifest.yaml"],
-    "schemas/stencil.jsonschema.json": ["stencil.yaml"]
-  }
+	// Schema support OOTB.
+	"yaml.schemas": {
+		"schemas/manifest.jsonschema.json": ["manifest.yaml"],
+		"schemas/stencil.jsonschema.json": ["stencil.yaml"]
+	}
 }

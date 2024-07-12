@@ -16,14 +16,14 @@ file_ext="${1##*.}"
 
 is_allowed=false
 for ext in "${allowed_exts[@]}"; do
-  if [[ "$ext" == "$file_ext" ]]; then
-    is_allowed=true
-    break
-  fi
+	if [[ "$ext" == "$file_ext" ]]; then
+		is_allowed=true
+		break
+	fi
 done
 
 if [[ "$is_allowed" == "false" ]]; then
-  exit 0
+	exit 0
 fi
 
 cd dist
@@ -31,7 +31,7 @@ echo "uploading $1"
 status="$(curl -s -q -o /dev/null -w "%{http_code}" -F package="@$1" "https://${FURY_PUSH_TOKEN}@push.fury.io/rgst-io/")"
 echo "got: $status"
 if [[ "$status" == "200" ]] || [[ "$status" == "409" ]]; then
-  exit 0
+	exit 0
 fi
 
 # Otherwise, exit with an error

@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"go/build"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -114,11 +113,7 @@ func saveMarkdown(log slogext.Logger, files []file) error {
 		}
 	}
 
-	log.Info("Running prettier")
-	cmd := exec.Command("bun", "prettier", "--write", "docs/functions/*.md")
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	return errors.Wrap(cmd.Run(), "failed to run prettier")
+	return nil
 }
 
 func main() {

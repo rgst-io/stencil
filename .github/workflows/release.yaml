@@ -21,7 +21,7 @@ permissions:
   issues: write
 
 concurrency:
-  group: stencil-release-${{ github.head_ref }}
+  group: ${{ github.workflow }}-${{ github.head_ref }}
   cancel-in-progress: true
 
 jobs:
@@ -53,7 +53,7 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ${{ steps.go.outputs.cache_dir }}
-          key: ${{ runner.os }}-go-build-cache
+          key: ${{ runner.os }}-go-build-cache-${{ hashFiles('**/go.sum') }}
       - uses: actions/cache@v4
         with:
           path: ${{ steps.go.outputs.mod_cache_dir }}
