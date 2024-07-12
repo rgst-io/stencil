@@ -85,9 +85,12 @@ func (f *TplFile) Skip(reason string) (output string, err error) {
 // Delete deletes the current file being rendered
 //
 //	{{ file.Delete }}
-func (f *TplFile) Delete() error {
+func (f *TplFile) Delete() (out string, err error) {
+	if f.lock != nil {
+		f.lock.Files = slices.DeleteFunc(f.lock.Files, func(ff *stencil.LockfileFileEntry) bool { return ff.Name == f.f.path })
+	}
 	f.f.Deleted = true
-	return nil
+	return "", nil
 }
 
 // Static marks the current file as static
