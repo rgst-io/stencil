@@ -26,7 +26,7 @@
 				"replacements": {
 					"additionalProperties": { "type": "string" },
 					"type": "object",
-					"description": "Replacements is a list of module names to replace their URI.\nExpected format:\n- local file: file://path/to/module\n- remote file: https://github.com/getoutreach/stencil-base"
+					"description": "Replacements is a list of module names to replace their URI.\n\nExpected format:\n- local file: path/to/module\n- remote file: https://github.com/getoutreach/stencil-base"
 				}
 			},
 			"additionalProperties": false,

@@ -1,13 +1,15 @@
+
 # Default versions of tools, to update these, set [tools.override]
 [tools]
-golang = "1.22"
 git-cliff = "latest"
+golang = "1.22"
 golangci-lint = "1.59"
 goreleaser = "latest"
-bun = "latest"
-"go:mvdan.cc/sh/v3/cmd/shfmt" = "latest"
 "go:gotest.tools/gotestsum" = "v1.12.0"
 "go:golang.org/x/tools/cmd/goimports" = "latest"
+"go:mvdan.cc/sh/v3/cmd/shfmt" = "latest"
+# TODO(jaredallard): Deviated from stencil-golang.
+bun = "latest"
 "go:github.com/thenativeweb/get-next-version" = "latest"
 "go:sigs.k8s.io/mdtoc" = "latest"
 
@@ -15,13 +17,10 @@ bun = "latest"
 description = "Build a binary for the current platform/architecture"
 run = "go build -trimpath -o ./bin/ -v ./cmd/..."
 
-[tasks.test]
-description = "Run tests"
-run = "gotestsum"
-
-[tasks.lint]
-description = "Run linters"
-run = "golangci-lint run"
+[tasks.changelog]
+description = "Generate a changelog for the current version"
+outputs = ["CHANGELOG.md"]
+run = ["git-cliff --config .cliff.toml --output CHANGELOG.md"]
 
 [tasks.fmt]
 alias = "format"
@@ -31,8 +30,23 @@ run = [
 	"gofmt -s -w .",
 	"goimports -w .",
 	"shfmt -w .",
+	# TODO(jaredallard): Deviated from stencil-golang.
 	"bun node_modules/.bin/prettier --write '**/*.{json,yaml,yml,md,jsonschema.json}'",
 ]
+
+[tasks.lint]
+description = "Run linters"
+run = "golangci-lint run"
+
+[tasks.next-version]
+description = """Get the version number that would be released if a release was ran right now.
+Pass --rc to get the next release candidate version.
+"""
+run = ["./.github/scripts/get-next-version.sh"]
+
+[tasks.test]
+description = "Run tests"
+run = "gotestsum"
 
 ## <<Stencil::Block(custom)>>
 [tasks.generate]
@@ -47,20 +61,9 @@ run = "go run ./tools/docgen/docgen.go"
 description = "Generate JSON schema files for stencil configuration files"
 run = "go run ./tools/schemagen/schemagen.go"
 
-[tasks.next-version]
-description = """Get the version number that would be released if a release was ran right now.
-Pass --rc to get the next release candidate version.
-"""
-run = ["./.github/scripts/get-next-version.sh"]
-
 [tasks.update-readme-toc]
 description = "Update the TOC in the README"
 run = ["mdtoc --inplace --max-depth=5 README.md"]
-
-[tasks.changelog]
-description = "Generate a changelog for the current version"
-outputs = ["CHANGELOG.md"]
-run = ["git-cliff --config .cliff.toml --output CHANGELOG.md"]
 
 [settings]
 # Conflicts with bun, and we don't use it anyways.
