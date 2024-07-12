@@ -19,6 +19,9 @@ permissions:
   contents: write
   packages: write
   issues: write
+  # Below are required for attestations
+  id-token: write
+  attestations: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
