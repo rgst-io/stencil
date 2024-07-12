@@ -1,17 +1,14 @@
 root = true
 
-# Unix-style newlines with a newline ending every file
 [*]
+charset = utf-8
 end_of_line = lf
 insert_final_newline = true
-
-[*.go,Makefile]
+max_line_length = 72
+trim_trailing_whitespace = true
 indent_style = tab
 
-[*.{bash,rb,sh,slim,yml,yaml}]
+# yaml is forced to use spaces :/
+[*.{yml,yaml}]
 indent_style = space
 indent_size  = 2
-
-## <<Stencil::Block(editorconfig)>>
-
-## <</Stencil::Block>>

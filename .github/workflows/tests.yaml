@@ -34,23 +34,3 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./cover.out
           fail_ci_if_error: true
-
-  golangci-lint:
-    name: golangci-lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jdx/mise-action@v2
-        with:
-          experimental: true
-        env:
-          GH_TOKEN: ${{ github.token }}
-      - name: Retrieve golangci-lint version
-        run: |
-          echo "version=$(mise current golangci-lint)" >> "$GITHUB_OUTPUT"
-        id: golangci_lint
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: v${{ steps.golangci_lint.outputs.version }}
-          args: --timeout=30m

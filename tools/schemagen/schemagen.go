@@ -86,12 +86,11 @@ func main() {
 		}
 	}
 
-	// Run prettier on the generated schema(s)
-	cmd := exec.Command("bun", "prettier", "--write", "schemas/*.jsonschema.json")
+	cmd := exec.Command("mise", "run", "fmt")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
-		fmt.Printf("error running prettier: %v\n", err)
+		fmt.Printf("error running %s: %v\n", cmd.String(), err)
 		os.Exit(1)
 	}
 

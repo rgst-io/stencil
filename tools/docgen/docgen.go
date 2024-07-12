@@ -114,11 +114,11 @@ func saveMarkdown(log slogext.Logger, files []file) error {
 		}
 	}
 
-	log.Info("Running prettier")
-	cmd := exec.Command("bun", "prettier", "--write", "docs/functions/*.md")
+	log.Info("Running fmt")
+	cmd := exec.Command("mise", "run", "fmt")
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
-	return errors.Wrap(cmd.Run(), "failed to run prettier")
+	return errors.Wrapf(cmd.Run(), "failed to run %s", cmd.String())
 }
 
 func main() {

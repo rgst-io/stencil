@@ -27,14 +27,20 @@ run = "golangci-lint run"
 alias = "format"
 description = "Format code"
 run = [
-  "go mod tidy",
-  "gofmt -s -w .",
-  "goimports -w .",
-  "shfmt -w -i 2 -ci -sr .",
+	"go mod tidy",
+	"gofmt -s -w .",
+	"goimports -w .",
+	"shfmt -w .",
+	"bun node_modules/.bin/prettier --write **/*.{json,yaml,yml,md,jsonschema.json}",
 ]
 
 ## <<Stencil::Block(custom)>>
+[tasks.generate]
+description = "Generate code and documentation"
+run = ["go generate ./...", "mise run docgen", "go run ./tools/schemagen"]
+
 [tasks.docgen]
+description = "Generate documentation based on Stencil template functions"
 run = "go run ./tools/docgen/docgen.go"
 
 [tasks.next-version]
