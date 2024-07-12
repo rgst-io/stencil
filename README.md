@@ -25,6 +25,7 @@ information!
 
 <!-- mise run update-readme-toc -->
 <!-- toc -->
+
 - [Install](#install)
   - [Homebrew](#homebrew)
   - [APT](#apt)
@@ -79,8 +80,8 @@ go install github.com/rgst-io/stencil@latest
 from `.tool-versions` manually.
 
 - [mise](https://github.com/jdx/mise?tab=readme-ov-file#quickstart) -
-Ensure that you add the appropriate activations to your shell
-rc/profiles (details in the mise README)
+  Ensure that you add the appropriate activations to your shell
+  rc/profiles (details in the mise README)
 
 Install the dependencies:
 
