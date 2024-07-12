@@ -37,11 +37,15 @@ run = [
 ## <<Stencil::Block(custom)>>
 [tasks.generate]
 description = "Generate code and documentation"
-run = ["go generate ./...", "mise run docgen", "go run ./tools/schemagen"]
+run = ["go generate ./...", "mise run docgen", "mise run schemagen"]
 
 [tasks.docgen]
 description = "Generate documentation based on Stencil template functions"
 run = "go run ./tools/docgen/docgen.go"
+
+[tasks.schemagen]
+description = "Generate JSON schema files for stencil configuration files"
+run = "go run ./tools/schemagen/schemagen.go"
 
 [tasks.next-version]
 description = """Get the version number that would be released if a release was ran right now.

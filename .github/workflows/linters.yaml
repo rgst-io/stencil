@@ -13,8 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check-generated-files:
-    name: check-generated-files
+  check-generated-files-and-fmt:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,32 +24,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
       - name: Setup prettier
         run: bun install
-      - run: mise run generate
+      - run: mise run generate fmt
       - name: Check for changes
         run: |-
-          git diff-index --quiet HEAD || \
+          git diff --exit-code HEAD || \
             ( echo \
-              echo "Generated files are out of date. Please run 'mise run generate'." \
-              && exit 1)
-
-  check-fmt:
-    name: check-fmt
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: jdx/mise-action@v2
-        with:
-          experimental: true
-        env:
-          GH_TOKEN: ${{ github.token }}
-      - name: Setup prettier
-        run: bun install
-      - run: mise run fmt
-      - name: Check for changes
-        run: |-
-          git diff-index --quiet HEAD || \
-            ( echo \
-              echo "Formatting issues found. Please run 'mise run fmt'." \
+              && echo "Formatting issues or stale documentation found. Please run 'mise run generate fmt'." \
               && exit 1)
 
   golangci-lint:

@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"go/build"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -114,11 +113,7 @@ func saveMarkdown(log slogext.Logger, files []file) error {
 		}
 	}
 
-	log.Info("Running fmt")
-	cmd := exec.Command("mise", "run", "fmt")
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
-	return errors.Wrapf(cmd.Run(), "failed to run %s", cmd.String())
+	return nil
 }
 
 func main() {
