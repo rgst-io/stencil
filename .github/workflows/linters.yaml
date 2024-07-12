@@ -37,10 +37,9 @@ jobs:
           key: ${{ runner.os }}-go-mod-cache-${{ hashFiles('**/go.sum') }}
       - name: Setup prettier
         run: bun install
+      - run: git diff --exit-code HEAD
       - run: mise run generate
       - run: mise run fmt
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
       - name: Check for changes
         run: |-
           git diff --exit-code HEAD || \
