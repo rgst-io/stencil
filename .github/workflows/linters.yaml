@@ -23,6 +23,8 @@ jobs:
           experimental: true
         env:
           GH_TOKEN: ${{ github.token }}
+      - name: Setup prettier
+        run: bun install
       - run: mise run generate
       - name: Check for changes
         run: |-
@@ -41,6 +43,8 @@ jobs:
           experimental: true
         env:
           GH_TOKEN: ${{ github.token }}
+      - name: Setup prettier
+        run: bun install
       - run: mise run fmt
       - name: Check for changes
         run: |-

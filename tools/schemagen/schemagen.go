@@ -93,5 +93,4 @@ func main() {
 		fmt.Printf("error running %s: %v\n", cmd.String(), err)
 		os.Exit(1)
 	}
-
 }
