@@ -9,6 +9,9 @@ on:
 
 permissions:
   contents: read
+  # Below are required for attestations
+  id-token: write
+  attestations: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
