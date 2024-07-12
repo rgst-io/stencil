@@ -5,7 +5,6 @@
 	"go.buildTags": "or_dev",
 	"files.trimTrailingWhitespace": true,
 	"editor.formatOnSave": true,
-	"shellformat.useEditorConfig": true,
 	"shellcheck.customArgs": ["-P", "SCRIPTDIR", "-x"],
 	"[markdown]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
