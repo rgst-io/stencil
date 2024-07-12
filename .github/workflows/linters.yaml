@@ -28,7 +28,7 @@ jobs:
       - run: mise run generate
       - name: Check for changes
         run: |-
-          git diff --exit-code || \
+          git diff-index --quiet HEAD || \
             ( echo \
               echo "Generated files are out of date. Please run 'mise run generate'." \
               && exit 1)
@@ -48,7 +48,7 @@ jobs:
       - run: mise run fmt
       - name: Check for changes
         run: |-
-          git diff --exit-code || \
+          git diff-index --quiet HEAD || \
             ( echo \
               echo "Formatting issues found. Please run 'mise run fmt'." \
               && exit 1)
