@@ -4,6 +4,7 @@
 	"go.formatTool": "goimports",
 	"go.useLanguageServer": true,
 	"go.buildTags": "or_dev",
+	"go.testFlags": ["-v"],
 	"files.trimTrailingWhitespace": true,
 	"editor.formatOnSave": true,
 	"shellcheck.customArgs": ["-P", "SCRIPTDIR", "-x"],
