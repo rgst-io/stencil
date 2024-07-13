@@ -43,6 +43,32 @@ var description = "" +
 	"templates or, native extensions in any language.\n\n" +
 	"Checkout our documentation at https://stencil.rgst.io for more information."
 
+// NewStencilAction returns a new cli.ActionFunc for the plain stencil
+// command.
+func NewStencilAction(log slogext.Logger) cli.ActionFunc {
+	return func(c *cli.Context) error {
+		log.Infof("stencil %s", c.App.Version)
+
+		// We don't accept arguments, a user is likely trying to run a
+		// subcommand here anyways (e.g., typo).
+		if c.NArg() > 0 {
+			return fmt.Errorf("unexpected arguments: %v", c.Args().Slice())
+		}
+
+		if c.Bool("debug") {
+			log.SetLevel(slogext.DebugLevel)
+			log.Debug("Debug logging enabled")
+		}
+
+		manifest, err := configuration.NewDefaultManifest()
+		if err != nil {
+			return fmt.Errorf("failed to parse stencil.yaml: %w", err)
+		}
+
+		return stencil.NewCommand(log, manifest, c.Bool("dry-run")).Run(c.Context)
+	}
+}
+
 // NewStencil returns a new CLI application for stencil.
 func NewStencil(log slogext.Logger) *cli.App {
 	return &cli.App{
@@ -50,27 +76,7 @@ func NewStencil(log slogext.Logger) *cli.App {
 		Name:        "stencil",
 		Usage:       "a smart templating engine for project development",
 		Description: description,
-		Action: func(c *cli.Context) error {
-			log.Infof("stencil %s", c.App.Version)
-
-			// We don't accept arguments, a user is likely trying to run a
-			// subcommand here anyways (e.g., typo).
-			if c.NArg() > 0 {
-				return fmt.Errorf("unexpected arguments: %v", c.Args().Slice())
-			}
-
-			if c.Bool("debug") {
-				log.SetLevel(slogext.DebugLevel)
-				log.Debug("Debug logging enabled")
-			}
-
-			manifest, err := configuration.NewDefaultManifest()
-			if err != nil {
-				return fmt.Errorf("failed to parse stencil.yaml: %w", err)
-			}
-
-			return stencil.NewCommand(log, manifest, c.Bool("dry-run")).Run(c.Context)
-		},
+		Action:      NewStencilAction(log),
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:    "dry-run",
@@ -85,7 +91,7 @@ func NewStencil(log slogext.Logger) *cli.App {
 		},
 		Commands: []*cli.Command{
 			NewDescribeCommand(),
-			NewCreateCommand(),
+			NewCreateCommand(log),
 			NewUpgradeCommand(log),
 			NewLockfileCommand(log),
 		},

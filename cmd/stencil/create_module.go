@@ -15,20 +15,21 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
-	"os/exec"
 	"path"
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
 	"go.rgst.io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/pkg/slogext"
 	"gopkg.in/yaml.v3"
 )
 
 // NewCreateModuleCommand returns a new urfave/cli.Command for the
 // create module command.
-func NewCreateModuleCommand() *cli.Command {
+func NewCreateModuleCommand(log slogext.Logger) *cli.Command {
 	return &cli.Command{
 		Name:        "module",
 		Description: "Creates a module with the provided name in the current directory",
@@ -75,12 +76,8 @@ func NewCreateModuleCommand() *cli.Command {
 				return err
 			}
 
-			//nolint:gosec // Why: intentional
-			cmd := exec.CommandContext(c.Context, os.Args[0])
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-			cmd.Stdin = os.Stdin
-			return errors.Wrap(cmd.Run(), "failed to run stencil")
+			// Run the standard stencil command.
+			return NewStencilAction(log)(cli.NewContext(c.App, flag.NewFlagSet("", flag.ExitOnError), c))
 		},
 	}
 }
