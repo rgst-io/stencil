@@ -29,6 +29,7 @@ import (
 func NewLockfilePruneCommand(log slogext.Logger) *cli.Command {
 	return &cli.Command{
 		Name:        "prune",
+		Usage:       "Prunes non-existent files from the lockfile",
 		Description: "Prunes any non-existent files from the lockfile (will recreate any file.Once files on next run)",
 
 		Flags: []cli.Flag{
