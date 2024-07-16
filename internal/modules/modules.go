@@ -62,8 +62,9 @@ type ModuleResolveOptions struct {
 	Manifest *configuration.Manifest
 
 	// Replacements is a map of modules to use instead of ones specified
-	// in the manifest. This is mainly meant for tests/importing of stencil
-	// as these modules will be used instead of fetching them.
+	// in the manifest. This is mainly used by tests but also in cases
+	// where a specific version of a module should be used (e.g.,
+	// lockfile).
 	Replacements map[string]*Module
 }
 
@@ -228,6 +229,7 @@ func FetchModules(ctx context.Context, opts *ModuleResolveOptions) ([]*Module, e
 		var m *Module
 		if opts.Replacements[importPath] != nil {
 			m = opts.Replacements[importPath]
+			opts.Log.Debug("Using forced module version", "module", importPath, "version", m.Version)
 		} else {
 			var err error
 			m, err = New(ctx, uri, NewModuleOpts{
