@@ -119,8 +119,17 @@ func TestResolveShouldNotUpgradeOtherModulesWhenUpgradingOne(t *testing.T) {
 	mods, err := s.resolveModules(context.Background(), false)
 	assert.NilError(t, err, "failed to resolve modules")
 	assert.Equal(t, len(mods), 2, "expected exactly two modules")
-	assert.Equal(t, mods[0].Version.Commit, "3c3213721335c53fd78f4fede1b3704801616615", "expected v0.5.0")
-	assert.Equal(t, mods[1].Version.String(), s.lock.Modules[1].Version.String(), "expected other module to not be mutated")
+
+	modsHM := slicesMap(mods, func(m *modules.Module) string { return m.Name })
+
+	assert.Equal(t,
+		modsHM["github.com/rgst-io/stencil-golang"].Version.Commit, "3c3213721335c53fd78f4fede1b3704801616615",
+		"expected v0.5.0",
+	)
+	assert.Equal(t,
+		modsHM["github.com/getoutreach/devbase"].Version.String(), s.lock.Modules[1].Version.String(),
+		"expected other module to not be mutated",
+	)
 }
 
 // TestResolveModulesShouldUpdateReplacements ensures that stencil will
