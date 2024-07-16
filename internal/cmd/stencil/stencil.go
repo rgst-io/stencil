@@ -122,6 +122,15 @@ func (c *Command) resolveModules(ctx context.Context, ignoreLockfile bool) ([]*m
 		// determine which ones have changed.
 		changed := make(map[string]struct{})
 		for _, m := range c.lock.Modules {
+			// If a version was changed to be replaced with a local version,
+			// we also need to re-resolve it. We check before determining if
+			// we're a "latest" module because we do want to allow
+			// replacements to override those.
+			if c.manifest.Replacements[m.Name] != "" && m.Version.Virtual != "local" {
+				changed[m.Name] = struct{}{}
+				continue
+			}
+
 			manifestEntryVer, ok := manifestModulesHM[m.Name]
 			if manifestEntryVer == "" {
 				// We shouldn't automatically re-resolve modules that don't ask
@@ -141,13 +150,6 @@ func (c *Command) resolveModules(ctx context.Context, ignoreLockfile bool) ([]*m
 			// version at this stage), we do a lame string check against all
 			// of the version types.
 			if !slices.Contains([]string{m.Version.Commit, m.Version.Tag, m.Version.Branch}, manifestEntryVer) {
-				changed[m.Name] = struct{}{}
-				continue
-			}
-
-			// If a version was changed to be replaced with a local version,
-			// we also need to re-resolve it.
-			if c.manifest.Replacements[m.Name] != "" && m.Version.Virtual != "local" {
 				changed[m.Name] = struct{}{}
 				continue
 			}

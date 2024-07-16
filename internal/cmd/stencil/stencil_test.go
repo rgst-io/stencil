@@ -16,6 +16,7 @@ package stencil
 
 import (
 	"context"
+	"path/filepath"
 	"testing"
 
 	"go.rgst.io/stencil/internal/modules/resolver"
@@ -119,4 +120,33 @@ func TestResolveShouldNotUpgradeOtherModulesWhenUpgradingOne(t *testing.T) {
 	assert.Equal(t, len(mods), 2, "expected exactly two modules")
 	assert.Equal(t, mods[0].Version.Commit, "3c3213721335c53fd78f4fede1b3704801616615", "expected v0.5.0")
 	assert.Equal(t, mods[1].Version.String(), s.lock.Modules[1].Version.String(), "expected other module to not be mutated")
+}
+
+// TestResolveModulesShouldUpdateReplacements ensures that stencil will
+// 'upgrade' modules when a replacement is added.
+func TestResolveModulesShouldUpdateReplacements(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", t.Name()),
+		},
+	}, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "bd265e16cf75c06e2569b6658735d38b025599e2",
+				Branch: "main",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(context.Background(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+	assert.Equal(t, len(mods), 1, "expected exactly one module")
+	assert.Equal(t, mods[0].Version.Virtual, "local", "expected local module to be used")
 }
