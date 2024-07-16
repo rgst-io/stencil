@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 
 	"go.rgst.io/stencil/internal/codegen"
 	"go.rgst.io/stencil/internal/modules"
@@ -70,10 +71,21 @@ func NewCommand(log slogext.Logger, s *configuration.Manifest, dryRun bool) *Com
 }
 
 // useModulesFromLockfile returns a list of modules from the lockfile
-// that should be used for this run of the stencil command
-func (c *Command) useModulesFromLockfile(ctx context.Context) ([]*modules.Module, error) {
+// that should be used for this run of the stencil command.
+//
+// Modules import paths provided in 'skip' will be skipped and not
+// returned in the modules slice.
+func (c *Command) useModulesFromLockfile(ctx context.Context, skip map[string]struct{}) ([]*modules.Module, error) {
+	if skip == nil {
+		skip = make(map[string]struct{})
+	}
+
 	mods := make([]*modules.Module, 0, len(c.lock.Modules))
 	for _, me := range c.lock.Modules {
+		if _, ok := skip[me.Name]; ok {
+			continue
+		}
+
 		m, err := modules.New(ctx, me.URL, modules.NewModuleOpts{
 			ImportPath: me.Name,
 			Version:    me.Version,
@@ -93,15 +105,71 @@ func (c *Command) useModulesFromLockfile(ctx context.Context) ([]*modules.Module
 // instead of resolving them. If ignoreLockfile is true, it will ignore
 // the lockfile and resolve the modules anyways.
 func (c *Command) resolveModules(ctx context.Context, ignoreLockfile bool) ([]*modules.Module, error) {
+	// replacements contains module versions that should be used instead
+	// of being resolved.
+	replacements := make([]*modules.Module, 0)
+
+	// If we have a lockfile, we also need to check if the modules list
+	// has changed since the last run. If it has, we need to re-resolve
+	// the changed modules.
 	if c.lock != nil && !ignoreLockfile {
-		return c.useModulesFromLockfile(ctx)
+		manifestModulesHM := make(map[string]string)
+		for _, m := range c.manifest.Modules {
+			manifestModulesHM[m.Name] = m.Version
+		}
+
+		// Compare the modules from the lockfile vs the manifest to
+		// determine which ones have changed.
+		changed := make(map[string]struct{})
+		for _, m := range c.lock.Modules {
+			// If a version was changed to be replaced with a local version,
+			// we also need to re-resolve it. We check before determining if
+			// we're a "latest" module because we do want to allow
+			// replacements to override those.
+			if c.manifest.Replacements[m.Name] != "" && m.Version.Virtual != "local" {
+				changed[m.Name] = struct{}{}
+				continue
+			}
+
+			manifestEntryVer, ok := manifestModulesHM[m.Name]
+			if manifestEntryVer == "" {
+				// We shouldn't automatically re-resolve modules that don't ask
+				// for a version, since that would be an unintended upgrade.
+				continue
+			}
+
+			// If it doesn't exist anymore, ignore it. Ideally, we'd trigger a
+			// re-resolve of the entire project, but because we can't track
+			// direct dependencies we can't do this yet.
+			if !ok {
+				continue
+			}
+
+			// Check if the version changed. Because we can't create a
+			// resolver.Version right now (we don't know if it's a branch or
+			// version at this stage), we do a lame string check against all
+			// of the version types.
+			if !slices.Contains([]string{m.Version.Commit, m.Version.Tag, m.Version.Branch}, manifestEntryVer) {
+				changed[m.Name] = struct{}{}
+				continue
+			}
+		}
+
+		var err error
+		replacements, err = c.useModulesFromLockfile(ctx, changed)
+		if err != nil {
+			return nil, fmt.Errorf("failed to use modules from lock: %w", err)
+		}
 	}
+
+	replacementsHM := slicesMap(replacements, func(m *modules.Module) string { return m.Name })
 
 	// On first run, we need to resolve the modules. Otherwise, the user
 	// will be expected to run 'stencil upgrade' to update the lockfile.
 	return modules.FetchModules(ctx, &modules.ModuleResolveOptions{
-		Manifest: c.manifest,
-		Log:      c.log,
+		Manifest:     c.manifest,
+		Log:          c.log,
+		Replacements: replacementsHM,
 	})
 }
 
