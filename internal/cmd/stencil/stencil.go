@@ -151,12 +151,12 @@ func (c *Command) resolveModules(ctx context.Context, ignoreLockfile bool) ([]*m
 				changed[m.Name] = struct{}{}
 				continue
 			}
+		}
 
-			var err error
-			replacements, err = c.useModulesFromLockfile(ctx, changed)
-			if err != nil {
-				return nil, fmt.Errorf("failed to use modules from lock: %w", err)
-			}
+		var err error
+		replacements, err = c.useModulesFromLockfile(ctx, changed)
+		if err != nil {
+			return nil, fmt.Errorf("failed to use modules from lock: %w", err)
 		}
 	}
 

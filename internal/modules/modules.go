@@ -126,6 +126,8 @@ func resolutionError(importPath string, history []history) error {
 // FetchModules fetches modules for a given Manifest. See
 // [ModuleResolveOptions] for more information on the various options
 // that this function supports.
+//
+//nolint:funlen // Why(jaredallard): Refactoring later.
 func FetchModules(ctx context.Context, opts *ModuleResolveOptions) ([]*Module, error) {
 	// Used to track which modules to resolve and which one's have been
 	// resolved, for returning later.

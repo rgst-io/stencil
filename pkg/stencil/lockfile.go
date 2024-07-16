@@ -71,8 +71,8 @@ type Lockfile struct {
 	Files []*LockfileFileEntry `yaml:"files"`
 }
 
-// LoadLockfile loads a lockfile from a bootstrap
-// repository path
+// LoadLockfile loads a lockfile at the specified path. If 'path' is
+// empty, the default path (curdir+LockfileName) is used.
 func LoadLockfile(path string) (*Lockfile, error) {
 	f, err := os.Open(filepath.Join(path, LockfileName))
 	if err != nil {
