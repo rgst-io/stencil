@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
@@ -132,7 +133,7 @@ func TestResolveModulesShouldUpdateReplacements(t *testing.T) {
 			Name: "github.com/rgst-io/stencil-golang",
 		}},
 		Replacements: map[string]string{
-			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", t.Name()),
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stub-module"),
 		},
 	}, false)
 	s.lock = &stencil.Lockfile{
@@ -149,4 +150,38 @@ func TestResolveModulesShouldUpdateReplacements(t *testing.T) {
 	assert.NilError(t, err, "failed to resolve modules")
 	assert.Equal(t, len(mods), 1, "expected exactly one module")
 	assert.Equal(t, mods[0].Version.Virtual, "local", "expected local module to be used")
+}
+
+// TestResolveModulesShouldAllowAdds ensures that stencil supports
+// adding new modules without running 'upgrade'.
+func TestResolveModulesShouldAllowAdds(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{
+			{
+				Name:    "github.com/rgst-io/stencil-golang",
+				Version: "v0.5.0", // 3c3213721335c53fd78f4fede1b3704801616615
+			}, {
+				// TODO(jaredallard): We need some more test live repos.
+				Name: "github.com/getoutreach/devbase",
+			},
+		},
+	}, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/getoutreach/devbase",
+			Version: &resolver.Version{
+				Commit: "9395dd53daf6ba1b1e2c5fa04c49eceb4465f05d",
+				Branch: "main",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(context.Background(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+	assert.Equal(t, len(mods), 2, "expected exactly one module")
+
+	mod := slicesMap(mods, func(m *modules.Module) string { return m.Name })["github.com/rgst-io/stencil-golang"]
+	assert.Equal(t, mod.Version.Commit, "3c3213721335c53fd78f4fede1b3704801616615", "expected correct module ver to be used")
 }
