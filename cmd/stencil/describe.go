@@ -16,6 +16,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -32,12 +33,13 @@ func NewDescribeCommand() *cli.Command {
 		Name:        "describe",
 		Usage:       "describe a file created by stencil",
 		Description: "Print information about a known file rendered by a template",
+		Args:        true,
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
 				return errors.New("expected exactly one argument, path to file")
 			}
 
-			return describeFile(c.Args().First())
+			return describeFile(c.Args().First(), os.Stdout)
 		},
 	}
 }
@@ -62,10 +64,10 @@ func cleanPath(path string) (string, error) {
 }
 
 // describeFile prints information about a file rendered by a template
-func describeFile(filePath string) error {
+func describeFile(filePath string, out io.Writer) error {
 	l, err := stencil.LoadLockfile("")
 	if err != nil {
-		return errors.Wrap(err, "failed to load lockfile")
+		return fmt.Errorf("failed to load lockfile: %w", err)
 	}
 
 	// check if the file exists on disk before we try to find
@@ -76,12 +78,12 @@ func describeFile(filePath string) error {
 
 	relativeFilePath, err := cleanPath(filePath)
 	if err != nil {
-		return errors.Wrap(err, "failed to clean path for searching lockfile")
+		return err
 	}
 
 	for _, f := range l.Files {
 		if f.Name == relativeFilePath {
-			fmt.Printf("%s was created by module https://%s (template: %s)\n", f.Name, f.Module, f.Template)
+			fmt.Fprintf(out, "%s was created by module https://%s (template: %s)\n", f.Name, f.Module, f.Template)
 			return nil
 		}
 	}

@@ -1,16 +1,4 @@
-// Copyright (C) 2024 stencil contributors
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//        http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+//go:build !test_no_internet
 
 package stencil
 
@@ -44,8 +32,8 @@ func TestResolveModulesShouldUseModulesFromLockfile(t *testing.T) {
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
 			Version: &resolver.Version{
-				Commit: "bd265e16cf75c06e2569b6658735d38b025599e2",
-				Branch: "main",
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
 			},
 		}},
 	}
@@ -53,7 +41,7 @@ func TestResolveModulesShouldUseModulesFromLockfile(t *testing.T) {
 	mods, err := s.resolveModules(context.Background(), false)
 	assert.NilError(t, err, "failed to resolve modules")
 	assert.Equal(t, len(mods), 1, "expected exactly one module")
-	assert.Equal(t, mods[0].Version.String(), s.lock.Modules[0].Version.String(), "expected same version to be used")
+	assert.DeepEqual(t, mods[0].Version, s.lock.Modules[0].Version)
 }
 
 // TestResolveModulesShouldUpgradeWhenExplicitlyAsked ensures that when
@@ -80,7 +68,10 @@ func TestResolveModulesShouldUpgradeWhenExplicitlyAsked(t *testing.T) {
 	mods, err := s.resolveModules(context.Background(), false)
 	assert.NilError(t, err, "failed to resolve modules")
 	assert.Equal(t, len(mods), 1, "expected exactly one module")
-	assert.Equal(t, mods[0].Version.Commit, "3c3213721335c53fd78f4fede1b3704801616615", "expected v0.5.0")
+	assert.DeepEqual(t, mods[0].Version, &resolver.Version{
+		Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+		Tag:    "v0.5.0",
+	})
 }
 
 // TestResolveShouldNotUpgradeOtherModulesWhenUpgradingOne tests that
@@ -110,8 +101,8 @@ func TestResolveShouldNotUpgradeOtherModulesWhenUpgradingOne(t *testing.T) {
 		}, {
 			Name: "github.com/getoutreach/devbase",
 			Version: &resolver.Version{
-				Commit: "9395dd53daf6ba1b1e2c5fa04c49eceb4465f05d",
-				Branch: "main",
+				Commit: "850cae0d50691772bd56267d2056b9dd1b246176",
+				Tag:    "v2.27.1",
 			},
 		}},
 	}
@@ -122,14 +113,13 @@ func TestResolveShouldNotUpgradeOtherModulesWhenUpgradingOne(t *testing.T) {
 
 	modsHM := slicesMap(mods, func(m *modules.Module) string { return m.Name })
 
-	assert.Equal(t,
-		modsHM["github.com/rgst-io/stencil-golang"].Version.Commit, "3c3213721335c53fd78f4fede1b3704801616615",
-		"expected v0.5.0",
-	)
-	assert.Equal(t,
-		modsHM["github.com/getoutreach/devbase"].Version.String(), s.lock.Modules[1].Version.String(),
-		"expected other module to not be mutated",
-	)
+	assert.DeepEqual(t, modsHM["github.com/rgst-io/stencil-golang"].Version, &resolver.Version{
+		Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+		Tag:    "v0.5.0",
+	})
+
+	// other module shouldn't be changed
+	assert.DeepEqual(t, modsHM["github.com/getoutreach/devbase"].Version, s.lock.Modules[1].Version)
 }
 
 // TestResolveModulesShouldUpdateReplacements ensures that stencil will
@@ -149,8 +139,8 @@ func TestResolveModulesShouldUpdateReplacements(t *testing.T) {
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
 			Version: &resolver.Version{
-				Commit: "bd265e16cf75c06e2569b6658735d38b025599e2",
-				Branch: "main",
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
 			},
 		}},
 	}
@@ -158,7 +148,7 @@ func TestResolveModulesShouldUpdateReplacements(t *testing.T) {
 	mods, err := s.resolveModules(context.Background(), false)
 	assert.NilError(t, err, "failed to resolve modules")
 	assert.Equal(t, len(mods), 1, "expected exactly one module")
-	assert.Equal(t, mods[0].Version.Virtual, "local", "expected local module to be used")
+	assert.DeepEqual(t, mods[0].Version, &resolver.Version{Virtual: "local"})
 }
 
 // TestResolveModulesShouldAllowAdds ensures that stencil supports
@@ -181,8 +171,8 @@ func TestResolveModulesShouldAllowAdds(t *testing.T) {
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/getoutreach/devbase",
 			Version: &resolver.Version{
-				Commit: "9395dd53daf6ba1b1e2c5fa04c49eceb4465f05d",
-				Branch: "main",
+				Commit: "850cae0d50691772bd56267d2056b9dd1b246176",
+				Tag:    "v2.27.1",
 			},
 		}},
 	}
@@ -192,5 +182,5 @@ func TestResolveModulesShouldAllowAdds(t *testing.T) {
 	assert.Equal(t, len(mods), 2, "expected exactly one module")
 
 	mod := slicesMap(mods, func(m *modules.Module) string { return m.Name })["github.com/rgst-io/stencil-golang"]
-	assert.Equal(t, mod.Version.Commit, "3c3213721335c53fd78f4fede1b3704801616615", "expected correct module ver to be used")
+	assert.DeepEqual(t, mod.Version, &resolver.Version{Tag: "v0.5.0", Commit: "3c3213721335c53fd78f4fede1b3704801616615"})
 }

@@ -5,9 +5,15 @@
 package main
 
 import (
+	"bytes"
 	"os"
 	"path/filepath"
 	"testing"
+
+	"go.rgst.io/stencil/internal/modules/resolver"
+	"go.rgst.io/stencil/pkg/stencil"
+	"gopkg.in/yaml.v3"
+	"gotest.tools/v3/assert"
 )
 
 func Test_cleanPath(t *testing.T) {
@@ -70,4 +76,40 @@ func Test_cleanPath(t *testing.T) {
 			}
 		})
 	}
+}
+
+// Test_describeFile_shouldFunction ensures that describeFile can read a
+// file out of a lockfile, when present.
+func Test_describeFile_shouldFunction(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	chdir(t, tmpDir)
+
+	lock := &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "test-module",
+			URL:  "vfs://",
+			Version: &resolver.Version{
+				Commit: "xyz",
+			},
+		}},
+		Files: []*stencil.LockfileFileEntry{{
+			Name:     "hello-world",
+			Template: "hello-world.tpl",
+			Module:   "test-module",
+		}},
+	}
+
+	// write the lockfile
+	b, err := yaml.Marshal(lock)
+	assert.NilError(t, err)
+	assert.NilError(t, os.WriteFile(stencil.LockfileName, b, 0o600))
+	assert.NilError(t, os.WriteFile("hello-world", []byte{}, 0o644))
+	out := &bytes.Buffer{}
+
+	assert.NilError(t, describeFile("hello-world", out))
+	assert.Equal(t,
+		out.String(),
+		"hello-world was created by module https://test-module (template: hello-world.tpl)\n",
+	)
 }

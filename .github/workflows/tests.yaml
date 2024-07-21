@@ -14,6 +14,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
   cancel-in-progress: true
 
+env:
+  COVERFILE: coverage.out
+
 jobs:
   gotest:
     name: go test
@@ -40,12 +43,11 @@ jobs:
           key: ${{ runner.os }}-go-mod-cache-${{ hashFiles('go.sum') }}
       - name: Download dependencies
         run: go mod download
-      - name: Run go test
-        run: |
-          gotestsum -- -coverprofile=cover.out ./...
+      - name: Run Go tests
+        run: mise run coverage
       - name: Upload test coverage
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./cover.out
+          files: ${{ env.COVERFILE }}
           fail_ci_if_error: true

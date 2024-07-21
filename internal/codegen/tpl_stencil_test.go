@@ -6,6 +6,7 @@
 package codegen
 
 import (
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"go.rgst.io/stencil/internal/modules/modulestest"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
+	"gotest.tools/v3/assert"
 )
 
 func TestTplStencil_ReadBlocks(t *testing.T) {
@@ -56,7 +58,8 @@ func TestTplStencil_ReadBlocks(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &TplStencil{}
+			log := slogext.NewTestLogger(t)
+			s := &TplStencil{log: log}
 			got, err := s.ReadBlocks(tt.args.fpath)
 
 			// String checking because errors.Is isn't working
@@ -84,15 +87,15 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		inserts []interface{}
+		inserts []any
 		args    args
-		want    []interface{}
+		want    []any
 	}{
 		{
-			inserts: []interface{}{
+			inserts: []any{
 				[]string{"abc"},
 				[]string{"def"},
-				[]interface{}{map[string]interface{}{
+				[]any{map[string]any{
 					"abc": "def",
 				}},
 				[]string{"abc"},
@@ -100,9 +103,9 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 			args: args{
 				name: "name",
 			},
-			want: []interface{}{
+			want: []any{
 				// This is what the hashing resulted in
-				map[string]interface{}{
+				map[string]any{
 					"abc": "def",
 				},
 				"def",
@@ -112,8 +115,8 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		log := slogext.NewTestLogger(t)
 		t.Run(tt.name, func(t *testing.T) {
+			log := slogext.NewTestLogger(t)
 			s := &TplStencil{
 				t: must(
 					NewTemplate(
@@ -158,4 +161,91 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestGlobals contains tests for ensuring that the Set/GetGlobal
+// functions work as expected.
+func TestGlobals(t *testing.T) {
+	type args struct {
+		name string
+		data any
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "can insert data",
+			args: args{
+				name: "hello-world",
+				data: "abc",
+			},
+			want: "abc",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			log := slogext.NewTestLogger(t)
+			s := &TplStencil{
+				t: must(
+					NewTemplate(
+						must(modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{
+							Name: "test",
+						})),
+						"not-a-real-template.tpl",
+						0o755,
+						time.Now(),
+						[]byte{},
+						log,
+					),
+				),
+				s:   &Stencil{sharedData: &sharedData{globals: make(map[string]global)}},
+				log: log,
+			}
+
+			s.s.isFirstPass = true
+			s.SetGlobal(tt.args.name, tt.args.data)
+
+			// Ensure we return nothing during the first pass.
+			assert.Equal(t, s.GetGlobal(tt.args.name), nil)
+			s.s.isFirstPass = false
+
+			// Ensure we return data after the first pass. SetGlobal should
+			// still take effect during the first pass.
+			assert.DeepEqual(t, s.GetGlobal(tt.args.name), tt.want)
+		})
+	}
+}
+
+func TestTplStencil_ReadFile(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+	s := &TplStencil{
+		t: must(
+			NewTemplate(
+				must(modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{
+					Name: "test",
+				})),
+				"not-a-real-template.tpl",
+				0o755,
+				time.Now(),
+				[]byte{},
+				log,
+			),
+		),
+		s:   &Stencil{sharedData: &sharedData{globals: make(map[string]global)}},
+		log: log,
+	}
+
+	actualContents, err := os.ReadFile("testdata/blocks-test.txt")
+	assert.NilError(t, err, "expected os.ReadFile to succeed")
+
+	contents, err := s.ReadFile("testdata/blocks-test.txt")
+	assert.NilError(t, err, "expected ReadFile to succeed when file exists")
+
+	assert.Equal(t, string(actualContents), contents)
+
+	// fails when file doesn't exist
+	_, err = s.ReadFile("file/that/doesnt/exist")
+	assert.Error(t, err, `file "file/that/doesnt/exist" does not exist`)
 }
