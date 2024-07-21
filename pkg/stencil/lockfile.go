@@ -30,7 +30,7 @@ type LockfileModuleEntry struct {
 	// package.
 	Name string
 
-	// URL is the url of the module that was used.
+	// URL is the full URL that was used for this module.
 	URL string
 
 	// Version is the version of the module that was
@@ -50,7 +50,8 @@ type LockfileFileEntry struct {
 	// module.
 	Template string
 
-	// Module is the URL of the module that generated this file.
+	// Module is the import path (Name) of the module that generated this
+	// file.
 	Module string
 }
 

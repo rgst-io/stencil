@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# mise description="Run tests with coverage reporting enabled"
+set -euo pipefail
+
+# TEST_TAGS are Go build tags to apply to the test run. This is meant
+# for configuring specific tests, primarily used for internet
+# connectivity limited environments. All tags specified here are
+# prefixed with `test_`.
+#
+# shellcheck disable=SC2206
+TEST_TAGS=(${TEST_TAGS:-""})
+
+# CI denotes if we're running in a CI environment or not. CI
+# environments will generate machine readable coverage reports instead
+# of opening a browser.
+CI="${CI:-false}"
+
+# OUTPUT_FORMAT determines the output format for the coverage report.
+# The default format is 'html'.
+#
+# Formats:
+# - html (HTML format, when CI is false this will only be respected if
+#   the current terminal is interactive)
+OUTPUT_FORMAT="${OUTPUT_FORMAT:-html}"
+
+# COVERFILE is the file to write the coverage report to. Defaults to a
+# random file created by mktemp.
+COVERFILE="${COVERFILE:-$(mktemp)}"
+
+# Run tests via gotestsum which has a better UI and support
+test_args=(
+	"-coverprofile=$COVERFILE"
+	"-covermode=atomic"
+)
+
+if [[ -n "${TEST_TAGS[*]}" ]]; then
+	test_args+=("-tags")
+	tags_str=""
+	for tag in "${TEST_TAGS[@]}"; do
+		tags_str+="test_${tag}"
+	done
+	test_args+=("$tags_str")
+fi
+
+(
+	set -x
+	exec gotestsum -- "${test_args[@]}" "./..."
+) || exit $?
+
+# If we're not running in CI and we're in an interactive session we can
+# exit into an interactive viewer.
+if [[ "$CI" == "false" ]]; then
+	if [[ "$OUTPUT_FORMAT" != "html" ]]; then
+		echo "Unsupported OUTPUT_FORMAT for non-CI environment: $OUTPUT_FORMAT" >&2
+		exit 1
+	fi
+
+	if [[ ! -t 0 ]]; then
+		# stdin was not a terminal, noop.
+		exit
+	fi
+
+	# Run 'go tool' to generate the HTML and optionally open it.
+	exec go tool cover -html="$COVERFILE"
+fi
+
+# TODO: What formats do we need to support for CI?

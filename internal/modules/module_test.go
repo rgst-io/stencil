@@ -1,6 +1,4 @@
-// Copyright 2022 Outreach Corporation. All Rights Reserved.
-
-// Description: This file contains tests for the modules package
+//go:build !test_no_internet
 
 package modules_test
 

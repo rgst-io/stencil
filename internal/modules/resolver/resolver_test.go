@@ -1,3 +1,5 @@
+//go:build !test_no_internet
+
 package resolver_test
 
 import (

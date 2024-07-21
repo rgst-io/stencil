@@ -77,10 +77,10 @@ func (s *TplStencil) GetModuleHook(name string) []any {
 //
 //	{{- /* This writes a global into the current context of the template module repository */}}
 //	{{- stencil.SetGlobal "IsGeorgeCool" true -}}
-func (s *TplStencil) SetGlobal(name string, data interface{}) (output string, err error) {
+func (s *TplStencil) SetGlobal(name string, data any) string {
 	// Only modify on first pass
 	if !s.s.isFirstPass {
-		return "", nil
+		return ""
 	}
 
 	k := s.s.sharedData.key(s.t.Module.Name, name)
@@ -92,7 +92,7 @@ func (s *TplStencil) SetGlobal(name string, data interface{}) (output string, er
 		value:    data,
 	}
 
-	return "", nil
+	return ""
 }
 
 // GetGlobal retrieves a global variable set by SetGlobal. The data returned from this function
@@ -101,27 +101,29 @@ func (s *TplStencil) SetGlobal(name string, data interface{}) (output string, er
 //
 //	{{- /* This retrieves a global from the current context of the template module repository */}}
 //	{{ $isGeorgeCool := stencil.GetGlobal "IsGeorgeCool" }}
-func (s *TplStencil) GetGlobal(name string) interface{} {
+func (s *TplStencil) GetGlobal(name string) any {
+	// Never return any data during the first pass because that would be
+	// non-deterministic.
+	if s.s.isFirstPass {
+		return nil
+	}
+
 	k := s.s.sharedData.key(s.t.Module.Name, name)
 
-	if v, ok := s.s.sharedData.globals[k]; ok {
-		s.log.With(
-			"template", s.t.ImportPath(),
-			"path", k,
-			"data", spew.Sdump(v),
-			"definingTemplate", v.template,
-		).Debug("retrieved data from global store")
-
-		return v.value
-	}
-
-	// Don't log on the first pass because we haven't rendered all the templates yet
-	if !s.s.isFirstPass {
+	v, ok := s.s.sharedData.globals[k]
+	if !ok {
 		s.log.With("template", s.t.ImportPath(), "path", k).
 			Warn("failed to retrieved data from global store")
+		return nil
 	}
 
-	return nil
+	s.log.With(
+		"template", s.t.ImportPath(),
+		"path", k,
+		"data", spew.Sdump(v),
+		"definingTemplate", v.template,
+	).Debug("retrieved data from global store")
+	return v.value
 }
 
 // AddToModuleHook adds to a hook in another module
