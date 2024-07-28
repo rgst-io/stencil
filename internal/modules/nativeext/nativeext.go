@@ -16,7 +16,6 @@ import (
 	"runtime"
 	"strings"
 
-	giturls "github.com/chainguard-dev/git-urls"
 	"github.com/getoutreach/gobox/pkg/cli/updater/archive"
 	"github.com/jaredallard/vcs/releases"
 	"github.com/jaredallard/vcs/resolver"
@@ -105,24 +104,18 @@ func (h *Host) GetExtensionCaller(_ context.Context) (*ExtensionCaller, error) {
 	return &ExtensionCaller{funcMap}, nil
 }
 
-// TODO(jaredallard)[DTSS-1926]: Refactor a lot of this RegisterExtension code.
-
 // RegisterExtension registers a ext from a given source
 // and compiles/downloads it. A client is then created
 // that is able to communicate with the ext.
 func (h *Host) RegisterExtension(ctx context.Context, source, name string, version *resolver.Version) error { //nolint:lll // Why: OK length.
 	h.log.With("extension", name).With("source", source).Debug("Registered extension")
 
-	u, err := giturls.Parse(source)
-	if err != nil {
-		return fmt.Errorf("failed to parse extension URL: %w", err)
-	}
-
 	var extPath string
-	if u.Scheme == "file" {
-		extPath = filepath.Join(strings.TrimPrefix(source, "file://"), "bin", "plugin")
+	var err error
+	if version.Virtual == "local" {
+		extPath = filepath.Join(source, "bin", "plugin")
 	} else {
-		extPath, err = h.downloadFromRemote(ctx, name, version)
+		extPath, err = h.downloadFromRemote(ctx, source, name, version)
 	}
 	if err != nil {
 		return fmt.Errorf("failed to setup extension: %w", err)
@@ -153,17 +146,22 @@ func (h *Host) RegisterInprocExtension(name string, ext apiv1.Implementation) {
 
 // getExtensionPath returns the path to an extension binary
 func (h *Host) getExtensionPath(version *resolver.Version, name string) (string, error) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return "", fmt.Errorf("failed to get home directory: %w", err)
+	cacheDir := os.Getenv("XDG_CACHE_HOME")
+	if cacheDir == "" { // default to $HOME/.cache as per XDG spec
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			return "", fmt.Errorf("failed to get home directory: %w", err)
+		}
+		cacheDir = filepath.Join(homeDir, ".cache")
 	}
 
 	// Example:
-	// $HOME/.cache/stencil/nativeexts/github.com/rgst-io/plugin/@v1.3.0/plugin
+	//
+	// $XDG_CACHE_HOME/stencil/nativeexts/github.com--rgst-io--plugin/v1.3.0/plugin
 	path := filepath.Join(
-		// TODO(jaredallard): Support XDG_CACHE_HOME.
-		homeDir, ".cache", "stencil", "nativeexts",
-		name, fmt.Sprintf("@%s", version.Commit), filepath.Base(name),
+		cacheDir, "stencil", "nativeexts",
+		strings.ReplaceAll(name, "/", "--"), version.Commit,
+		filepath.Base(name),
 	)
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return "", fmt.Errorf("failed to create directory: %w", err)
@@ -172,17 +170,9 @@ func (h *Host) getExtensionPath(version *resolver.Version, name string) (string,
 	return path, nil
 }
 
-// downloadFromRemote downloads a release from github and extracts it to disk
-//
-// using the example extension module: go.rgst.io/stencil-plugin
-//
-//	org: getoutreach
-//	repo: stencil-plugin
-//	name: go.rgst.io/stencil-plugin
-func (h *Host) downloadFromRemote(ctx context.Context, name string,
-	version *resolver.Version) (string, error) {
-	repoURL := "https://" + name
-
+// downloadFromRemote downloads a release from github and extracts it to
+// disk
+func (h *Host) downloadFromRemote(ctx context.Context, source, name string, version *resolver.Version) (string, error) {
 	// Check if the version we're pulling already exists on disk
 	dlPath, err := h.getExtensionPath(version, name)
 	if err != nil {
@@ -192,10 +182,10 @@ func (h *Host) downloadFromRemote(ctx context.Context, name string,
 		return dlPath, nil
 	}
 
-	h.log.With("version", version).With("repo", repoURL).Debug("Downloading native extension")
+	h.log.With("version", version).With("repo", source).Debug("Downloading native extension")
 	resp, fi, err := releases.Fetch(ctx, &releases.FetchOptions{
 		AssetName: filepath.Base(name) + "_*_" + runtime.GOOS + "_" + runtime.GOARCH + ".tar.gz",
-		RepoURL:   repoURL,
+		RepoURL:   source,
 		Tag:       version.Tag,
 	})
 	if err != nil {
