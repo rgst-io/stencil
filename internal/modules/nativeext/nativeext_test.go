@@ -12,9 +12,15 @@ import (
 	"gotest.tools/v3/assert"
 )
 
+// TestCanImportNativeExtension ensures that we can resolve a repo's
+// version, download the release, extract it, register it with the
+// extension host, and then finally execute a template function provided
+// by the extension.
 func TestCanImportNativeExtension(t *testing.T) {
 	if os.Getenv("CI") == "true" {
-		t.Skip("Doesn't work with Github Actions token right now")
+		// Override GITHUB_TOKEN because it doesn't have access to the repo
+		// in question right now.
+		t.Setenv("GITHUB_TOKEN", "")
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
