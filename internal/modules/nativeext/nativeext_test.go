@@ -3,7 +3,6 @@ package nativeext_test
 import (
 	"context"
 	"os"
-	"os/exec"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
@@ -24,12 +23,6 @@ func TestCanImportNativeExtension(t *testing.T) {
 
 		assert.NilError(t, os.Unsetenv("GITHUB_TOKEN"))
 		assert.NilError(t, os.Unsetenv("GH_TOKEN"))
-
-		// debugging
-		cmd := exec.Command("gh", "auth", "status")
-		cmd.Stderr = os.Stderr
-		cmd.Stdout = os.Stdout
-		assert.NilError(t, cmd.Run())
 
 		// restore later
 		t.Cleanup(func() {
