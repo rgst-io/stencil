@@ -18,9 +18,17 @@ import (
 // by the extension.
 func TestCanImportNativeExtension(t *testing.T) {
 	if os.Getenv("CI") == "true" {
-		// Override GITHUB_TOKEN because it doesn't have access to the repo
-		// in question right now.
-		t.Setenv("GITHUB_TOKEN", "")
+		originalGITHUB := os.Getenv("GITHUB_TOKEN")
+		originalGH := os.Getenv("GH_TOKEN")
+
+		os.Unsetenv("GITHUB_TOKEN")
+		os.Unsetenv("GH_TOKEN")
+
+		// restore later
+		t.Cleanup(func() {
+			assert.NilError(t, os.Setenv("GITHUB_TOKEN", originalGITHUB))
+			assert.NilError(t, os.Setenv("GH_TOKEN", originalGH))
+		})
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
