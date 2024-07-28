@@ -17,12 +17,10 @@ import (
 	"strings"
 
 	giturls "github.com/chainguard-dev/git-urls"
-	"github.com/getoutreach/gobox/pkg/cfg"
 	"github.com/getoutreach/gobox/pkg/cli/updater/archive"
-	"github.com/getoutreach/gobox/pkg/cli/updater/release"
-	"go.rgst.io/stencil/internal/git/vcs/github"
+	"github.com/jaredallard/vcs/releases"
+	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/internal/modules/nativeext/apiv1"
-	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/pkg/slogext"
 )
 
@@ -183,11 +181,6 @@ func (h *Host) getExtensionPath(version *resolver.Version, name string) (string,
 //	name: go.rgst.io/stencil-plugin
 func (h *Host) downloadFromRemote(ctx context.Context, name string,
 	version *resolver.Version) (string, error) {
-	token, err := github.Token()
-	if err != nil {
-		h.log.WithError(err).Warn("Failed to get github token, falling back to anonymous")
-	}
-
 	repoURL := "https://" + name
 
 	// Check if the version we're pulling already exists on disk
@@ -200,7 +193,7 @@ func (h *Host) downloadFromRemote(ctx context.Context, name string,
 	}
 
 	h.log.With("version", version).With("repo", repoURL).Debug("Downloading native extension")
-	a, archiveName, _, err := release.Fetch(ctx, cfg.SecretData(token), &release.FetchOptions{
+	resp, fi, err := releases.Fetch(ctx, &releases.FetchOptions{
 		AssetName: filepath.Base(name) + "_*_" + runtime.GOOS + "_" + runtime.GOARCH + ".tar.gz",
 		RepoURL:   repoURL,
 		Tag:       version.Tag,
@@ -209,7 +202,7 @@ func (h *Host) downloadFromRemote(ctx context.Context, name string,
 		return "", fmt.Errorf("failed to fetch release: %w", err)
 	}
 
-	bin, _, err := archive.Extract(ctx, archiveName, a, archive.WithFilePath(filepath.Base(name)))
+	bin, _, err := archive.Extract(ctx, fi.Name(), resp, archive.WithFilePath(filepath.Base(name)))
 	if err != nil {
 		return "", fmt.Errorf("failed to extract archive: %w", err)
 	}

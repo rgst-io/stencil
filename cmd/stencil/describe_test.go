@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"go.rgst.io/stencil/internal/modules/resolver"
+	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/pkg/stencil"
 	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"

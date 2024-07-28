@@ -10,9 +10,9 @@ import (
 	"context"
 
 	gogit "github.com/go-git/go-git/v5"
-	stencilgit "go.rgst.io/stencil/internal/git"
+	vcsgit "github.com/jaredallard/vcs/git"
+	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/internal/modules"
-	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 )
@@ -162,7 +162,7 @@ func NewValues(ctx context.Context, sm *configuration.Manifest, mods []*modules.
 
 	// If we're a repository, add repository information
 	if r, err := gogit.PlainOpen(""); err == nil {
-		db, err := stencilgit.GetDefaultBranch(ctx, "")
+		db, err := vcsgit.GetDefaultBranch(ctx, "")
 		if err != nil {
 			db = "main"
 		}
