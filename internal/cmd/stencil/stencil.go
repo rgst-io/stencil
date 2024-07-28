@@ -15,9 +15,9 @@ import (
 	"path/filepath"
 	"slices"
 
+	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/internal/codegen"
 	"go.rgst.io/stencil/internal/modules"
-	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
 	"go.rgst.io/stencil/pkg/stencil"

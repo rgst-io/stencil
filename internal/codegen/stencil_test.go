@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/go-git/go-billy/v5/memfs"
+	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
-	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"

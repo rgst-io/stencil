@@ -6,9 +6,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
-	"go.rgst.io/stencil/internal/modules/resolver"
 	"go.rgst.io/stencil/internal/testing/testmemfs"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"

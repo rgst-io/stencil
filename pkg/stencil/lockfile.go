@@ -12,7 +12,7 @@ import (
 	"slices"
 	"sort"
 
-	"go.rgst.io/stencil/internal/modules/resolver"
+	"github.com/jaredallard/vcs/resolver"
 	"gopkg.in/yaml.v3"
 )
 

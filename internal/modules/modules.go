@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
-	"go.rgst.io/stencil/internal/modules/resolver"
+	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
 )
