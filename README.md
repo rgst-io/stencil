@@ -25,6 +25,7 @@ information!
 
 <!-- mise run update-readme-toc -->
 <!-- toc -->
+
 - [Install](#install)
 - [Development](#development)
   - [Prerequisites](#prerequisites)

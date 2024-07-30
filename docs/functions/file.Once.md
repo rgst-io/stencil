@@ -14,5 +14,5 @@ history of the file, and if it finds it, it performs the same action as
 file.Skip.
 
 ```go
-{{ file.Once }}
+{{- file.Once }}
 ```

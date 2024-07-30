@@ -9,5 +9,5 @@ order: 1003
 Delete deletes the current file being rendered
 
 ```go
-{{ file.Delete }}
+{{- file.Delete }}
 ```

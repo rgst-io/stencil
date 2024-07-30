@@ -11,5 +11,5 @@ SetContents sets the contents of file being rendered to the value
 This is useful for programmatic file generation within a template.
 
 ```go
-{{ file.SetContents "Hello, world!" }}
+{{- file.SetContents "Hello, world!" }}
 ```

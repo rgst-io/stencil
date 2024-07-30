@@ -85,7 +85,7 @@ type Manifest struct {
 	//
 	// Expected format:
 	// - local file: path/to/module
-	// - remote file: https://github.com/getoutreach/stencil-base
+	// - remote file: https://github.com/rgst-io/stencil-base
 	Replacements map[string]string `yaml:"replacements,omitempty"`
 }
 

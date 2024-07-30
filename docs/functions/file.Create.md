@@ -12,6 +12,8 @@ If the template has a single file with no contents this file replaces
 it.
 
 ```go
+{{- /* Skip the file that generates other files */}
+{{- file.Skip }}
 {{- define "command" }}
 package main
 

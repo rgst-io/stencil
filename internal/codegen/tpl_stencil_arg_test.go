@@ -335,21 +335,21 @@ func TestBuildErrorPath(t *testing.T) {
 		{
 			name: "simple schema",
 			//nolint:lll // Why: realistic test case
-			absoluteKeywordLocation: "file:///home/test/getoutreach/stencil/manifest.yaml/arguments/releaseOptions.allowMajorVersions#/type",
+			absoluteKeywordLocation: "file:///home/test/rgst-io/stencil/manifest.yaml/arguments/releaseOptions.allowMajorVersions#/type",
 			expected:                "arguments.releaseOptions.allowMajorVersions",
 			expectErr:               false,
 		},
 		{
 			name: "complex schema",
 			//nolint:lll // Why: realistic test case
-			absoluteKeywordLocation: "file:///Users/test/getoutreach/stencil-smartstore/testapps/orgschemagrpc/manifest.yaml/arguments/postgreSQL#/items/properties/name/pattern",
+			absoluteKeywordLocation: "file:///Users/test/rgst-io/stencil-smartstore/testapps/orgschemagrpc/manifest.yaml/arguments/postgreSQL#/items/properties/name/pattern",
 			expected:                "arguments.postgreSQL.items.properties.name",
 			expectErr:               false,
 		},
 		{
 			name: "missing manifest",
 			//nolint:lll // Why: realistic test case
-			absoluteKeywordLocation: "file:///Users/test/getoutreach/stencil-smartstore/testapps/orgschemagrpc/arguments/postgreSQL#/items/properties/name/pattern",
+			absoluteKeywordLocation: "file:///Users/test/rgst-io/stencil-smartstore/testapps/orgschemagrpc/arguments/postgreSQL#/items/properties/name/pattern",
 			expected:                "arguments.postgreSQL.items.properties.name",
 			expectErr:               true,
 		},

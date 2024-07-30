@@ -9,19 +9,19 @@ order: 1001
 Block returns the contents of a given block
 
 ```go
-###Block(name)
+## <<Stencil::Block(name)>>
 Hello, world!
-###EndBlock(name)
+## <</Stencil::Block>>
 
-###Block(name)
+## <<Stencil::Block(name)>>
 {{- /* Only output if the block is set */}}
 {{- if not (empty (file.Block "name")) }}
 {{ file.Block "name" }}
 {{- end }}
-###EndBlock(name)
+## <</Stencil::Block>>
 
-###Block(name)
-{{ - /* Short hand syntax, but adds newline if no contents */}}
+## <<Stencil::Block(name)>>
+{{- /* Short hand syntax. Adds newline if no contents */}}
 {{ file.Block "name" }}
-###EndBlock(name)
+## <</Stencil::Block>>
 ```

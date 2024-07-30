@@ -9,5 +9,5 @@ order: 1006
 RemoveAll deletes all the contents in the provided path
 
 ```go
-{{ file.RemoveAll "path" }}
+{{- file.RemoveAll "path" }}
 ```

@@ -50,7 +50,7 @@ type Module struct {
 	Manifest *configuration.TemplateRepositoryManifest
 
 	// Name is the name of a module. This should be a valid go
-	// import path. For example: github.com/getoutreach/stencil-base
+	// import path. For example: github.com/rgst-io/stencil-base
 	Name string
 
 	// URI is the location of the module for fetching purposes. By

@@ -14,5 +14,5 @@ want to generate but only once. It's generally recommended that you do
 not do this as it limits your ability to change the file in the future.
 
 ```go
-{{ file.Static }}
+{{- file.Static }}
 ```
