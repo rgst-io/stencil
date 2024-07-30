@@ -35,21 +35,21 @@ type TplFile struct {
 
 // Block returns the contents of a given block
 //
-//	###Block(name)
+//	## <<Stencil::Block(name)>>
 //	Hello, world!
-//	###EndBlock(name)
+//	## <</Stencil::Block>>
 //
-//	###Block(name)
+//	## <<Stencil::Block(name)>>
 //	{{- /* Only output if the block is set */}}
 //	{{- if not (empty (file.Block "name")) }}
 //	{{ file.Block "name" }}
 //	{{- end }}
-//	###EndBlock(name)
+//	## <</Stencil::Block>>
 //
-//	###Block(name)
-//	{{ - /* Short hand syntax, but adds newline if no contents */}}
+//	## <<Stencil::Block(name)>>
+//	{{- /* Short hand syntax. Adds newline if no contents */}}
 //	{{ file.Block "name" }}
-//	###EndBlock(name)
+//	## <</Stencil::Block>>
 func (f *TplFile) Block(name string) string {
 	return f.f.Block(name)
 }
@@ -67,7 +67,7 @@ func (f *TplFile) SetPath(path string) (out string, err error) {
 //
 // This is useful for programmatic file generation within a template.
 //
-//	{{ file.SetContents "Hello, world!" }}
+//	{{- file.SetContents "Hello, world!" }}
 func (f *TplFile) SetContents(contents string) error {
 	f.f.SetContents(contents)
 	return nil
@@ -84,7 +84,7 @@ func (f *TplFile) Skip(reason string) (output string, err error) {
 
 // Delete deletes the current file being rendered
 //
-//	{{ file.Delete }}
+//	{{- file.Delete }}
 func (f *TplFile) Delete() (out string, err error) {
 	if f.lock != nil {
 		f.lock.Files = slices.DeleteFunc(f.lock.Files, func(ff *stencil.LockfileFileEntry) bool { return ff.Name == f.f.path })
@@ -101,7 +101,7 @@ func (f *TplFile) Delete() (out string, err error) {
 // recommended that you do not do this as it limits your ability to change
 // the file in the future.
 //
-//	{{ file.Static }}
+//	{{- file.Static }}
 func (f *TplFile) Static() (out string, err error) {
 	// if the file already exists, skip it
 	if _, err := os.Stat(f.f.path); err == nil {
@@ -120,7 +120,7 @@ func (f *TplFile) Static() (out string, err error) {
 // for history of the file, and if it finds it, it performs the same
 // action as file.Skip.
 //
-//	{{ file.Once }}
+//	{{- file.Once }}
 func (f *TplFile) Once() (out string, err error) {
 	// if the file already exists in the lockfile, skip it
 	if f.lock != nil && slices.ContainsFunc(f.lock.Files, func(ff *stencil.LockfileFileEntry) bool { return ff.Name == f.f.path }) {
@@ -143,6 +143,8 @@ func (f *TplFile) Path() string {
 // If the template has a single file with no contents
 // this file replaces it.
 //
+//	{{- /* Skip the file that generates other files */}
+//	{{- file.Skip }}
 //	{{- define "command" }}
 //	package main
 //
@@ -171,7 +173,7 @@ func (f *TplFile) Create(path string, mode os.FileMode, modTime time.Time) (out,
 
 // RemoveAll deletes all the contents in the provided path
 //
-//	{{ file.RemoveAll "path" }}
+//	{{- file.RemoveAll "path" }}
 func (f *TplFile) RemoveAll(path string) (out, err error) {
 	if err := os.RemoveAll(path); err != nil {
 		return err, err

@@ -1,7 +1,3 @@
-// Copyright 2022 Outreach Corporation. All Rights Reserved.
-
-// Description: This file contains tests for the configuration pac
-
 package configuration_test
 
 import (

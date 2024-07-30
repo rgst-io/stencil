@@ -1,8 +1,3 @@
-// Copyright 2022 Outreach Corporation. All Rights Reserved.
-
-// Description: This file contains the public API for templates
-// for stencil
-
 package codegen
 
 import (

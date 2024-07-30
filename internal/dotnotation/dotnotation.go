@@ -1,7 +1,17 @@
-// Copyright 2022 Outreach Corporation. All Rights Reserved.
-
-// Description: This file implements a dotnotation parser for
-// accessing a map[string]interface{}
+// Copyright (C) 2024 stencil contributors
+// Copyright (C) 2022-2023 Outreach Corporation
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//        http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 // Package dotnotation implements a dotnotation (hello.world) for
 // accessing fields within a map[string]interface{}
