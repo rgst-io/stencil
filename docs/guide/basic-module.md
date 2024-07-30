@@ -150,7 +150,7 @@ If we add contents to the block and re-run stencil they'll be persisted across t
 
 One of the powerful parts of stencil is the ability to create an arbitrary number of files with a single template. This is done with the [`file.Create`](/functions/file.Create) function. Let's create a `greeter.go.tpl` template in the `templates/` directory that'll create `<greeting>.go` based on the `greetings` argument.
 
-```
+```tpl
 # This is important! We don't want to create a greeter.go file
 
 {{- $_ := file.Skip "Generates multiple files" }}
@@ -185,8 +185,8 @@ Now let's modify the `manifest.yaml` to accept the argument `greetings`:
 
 ```yaml
 arguments:
-	greetings:
-		description: A list of greetings to use
+  greetings:
+    description: A list of greetings to use
 type: list
 require: true
 default: ["hello", "goodbye"]

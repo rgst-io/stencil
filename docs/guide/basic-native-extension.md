@@ -126,19 +126,20 @@ mkdir testapp; cd testapp
 cat > stencil.yaml <<EOF
 name: testapp
 modules:
-	- name: github.com/yourorg/testmodule
+  - name: github.com/yourorg/testmodule
 replacements:
-	# Note: Replace these directories with their actual paths. This assumes they're
-	# right behind our application in the directory tree.
+  # Note: Replace these directories with their actual paths. This assumes they're
+  # right behind our application in the directory tree.
   github.com/yourorg/helloworld: ../helloworld
   github.com/yourorg/testmodule: ../testmodule
+EOF
 ```
 
 Now, if we run `stencil` we should get a `hello.txt` file in our test application.
 
 ```bash
 testapp ❯ stencil
-INFO stencil v0.5.0
+INFO stencil v0.8.0
 INFO Fetching dependencies
 INFO  -> github.com/yourorg/helloworld local
 INFO Loading native extensions

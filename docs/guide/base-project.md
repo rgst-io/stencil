@@ -59,8 +59,7 @@ drwxr-xr-x 9 jaredallard wheel 288B May 4 20:16 ..
 > You'll notice there's a `stencil.lock` file here.
 >
 > ```yaml
-> version: v1.14.2
-> generated: 2022-05-05T03:16:44.903458Z
+> version: 0.8.0
 > modules: []
 > files: []
 > ```
@@ -73,12 +72,12 @@ Now that we've created our first stencil application, you're going to want to im
 
 ```yaml
 name: github.com/getoutreach/stencil-base
-...
+---
 arguments:
-description:
-required: true
-type: string
-description: The purpose of this repository.
+  description:
+    required: true
+    type: string
+    description: The purpose of this repository
 ```
 
 We can see that `description` is a required argument, so let's add it! Modify the `stencil.yaml` to set `arguments.description` to `"My awesome service!"`
@@ -131,7 +130,7 @@ drwxr-xr-x   4 jaredallard  wheel   128B May  4 20:26 scripts
 -rw-r--r--   1 jaredallard  wheel   118B May  4 20:26 stencil.yaml
 ```
 
-# Step 4: Modifying a Block
+## Step 4: Modifying a Block
 
 One of the key features in stencil is the notion of "blocks". Modules expose a block where they want developers to modify the code. Let's look at the `stencil-base` module to see what blocks are available.
 
@@ -140,21 +139,13 @@ In `README.md` we can see a basic block called "overview":
 ```md
 # helloworld
 
-[![go.dev reference](https://img.shields.io/badge/go.dev-reference-007d9c?logo=go&logoColor=white)](https://pkg.go.dev/github.com/getoutreach/helloworld)
-[![Generated via Stencil](https://img.shields.io/badge/Outreach-Bootstrap-%235951ff)](https://github.com/getoutreach/stencil)
-[![Coverage Status](https://coveralls.io/repos/github/getoutreach/helloworld/badge.svg?branch=main)](https://coveralls.io/github/getoutreach/helloworld?branch=)
-
-My awesome service!
-
-## Contributing
-
-Please read the [CONTRIBUTING.md](CONTRIBUTING.md) document for guidelines on developing and contributing changes.
+...
 
 ## High-level Overview
 
-<!--- Block(overview) -->
+<!--- <<Stencil::Block(overview)>> -->
 
-<!--- EndBlock(overview) -->
+<!--- <</Stencil::Block>> -->
 ```
 
 Let’s add some content in two places. One inside the block, one outside:
@@ -166,25 +157,25 @@ Let’s add some content in two places. One inside the block, one outside:
 
 hello, world!
 
-<!--- Block(overview) -->
+<!--- <<Stencil::Block(overview)>> -->
 
 hello, world!
 
-<!--- EndBlock(overview) -->
+<!--- <</Stencil::Block>> -->
 ```
 
 If we re-run stencil, notice how the contents of `README.md` have changed:
 
-```
+```md
 ...
 
 ## High-level Overview
 
-<!--- Block(overview) -->
+<!--- <<Stencil::Block(overview)>> -->
 
 hello, world!
 
-<!--- EndBlock(overview) -->
+<!--- <</Stencil::Block>> -->
 ```
 
 The contents of `README.md` have changed, but the contents within the block have not. This is the power of blocks, modules are able to change the content _around_ a user's content without affecting the user's content. This can be taken even further if a template decides to parse the code within a block at runtime, for example using the ast package to rewrite go code.
