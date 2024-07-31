@@ -14,7 +14,7 @@ require (
 	github.com/go-git/go-git/v5 v5.12.0
 	github.com/hashicorp/go-hclog v1.6.3
 	github.com/hashicorp/go-plugin v1.6.1
-	github.com/jaredallard/vcs v0.1.2
+	github.com/jaredallard/vcs v0.2.0
 	github.com/mitchellh/hashstructure/v2 v2.0.2
 	github.com/pkg/errors v0.9.1
 	github.com/princjef/gomarkdoc v1.1.0
@@ -54,7 +54,7 @@ require (
 	github.com/hashicorp/yamux v0.1.1 // indirect
 	github.com/huandu/xstrings v1.4.0 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
-	github.com/jaredallard/cmdexec v1.0.0 // indirect
+	github.com/jaredallard/cmdexec v1.2.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
