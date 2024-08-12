@@ -29,7 +29,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/getoutreach/gobox/pkg/cli/updater/archive"
+	"github.com/jaredallard/archives"
 	"github.com/jaredallard/vcs/releases"
 	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/internal/modules/nativeext/apiv1"
@@ -205,9 +205,24 @@ func (h *Host) downloadFromRemote(ctx context.Context, source, name string, vers
 		return "", fmt.Errorf("failed to fetch release: %w", err)
 	}
 
-	bin, _, err := archive.Extract(ctx, fi.Name(), resp, archive.WithFilePath(filepath.Base(name)))
+	// TODO(jaredallard): The library should handle detecting this for us.
+	var ext string
+	if strings.Contains(fi.Name(), ".tar.") {
+		ext = ".tar" + filepath.Ext(fi.Name())
+	} else {
+		ext = filepath.Ext(fi.Name())
+	}
+
+	a, err := archives.Open(resp, archives.OpenOptions{
+		Extension: ext,
+	})
 	if err != nil {
-		return "", fmt.Errorf("failed to extract archive: %w", err)
+		return "", fmt.Errorf("failed to open archive: %w", err)
+	}
+
+	bin, err := archives.Pick(a, archives.PickFilterByName(filepath.Base(name)))
+	if err != nil {
+		return "", fmt.Errorf("failed to grab binary from archive: %w", err)
 	}
 
 	f, err := os.Create(dlPath)
