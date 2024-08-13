@@ -138,18 +138,6 @@ func (v *Values) Copy() *Values {
 	return &nv
 }
 
-// CopyMap returns a copy of the current values as a map
-func (v *Values) CopyMap() map[string]interface{} {
-	c := v.Copy()
-	return map[string]any{
-		"Git":      c.Git,
-		"Runtime":  c.Runtime,
-		"Config":   c.Config,
-		"Module":   c.Module,
-		"Template": c.Template,
-	}
-}
-
 // WithModule returns a copy of the current values with the
 // provided module information being set.
 func (v *Values) WithModule(name string, ver *resolver.Version) *Values {
