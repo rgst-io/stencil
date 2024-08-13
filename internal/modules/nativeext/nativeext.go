@@ -197,9 +197,12 @@ func (h *Host) downloadFromRemote(ctx context.Context, source, name string, vers
 
 	h.log.With("version", version).With("repo", source).Debug("Downloading native extension")
 	resp, fi, err := releases.Fetch(ctx, &releases.FetchOptions{
-		AssetName: filepath.Base(name) + "_*_" + runtime.GOOS + "_" + runtime.GOARCH + ".*",
-		RepoURL:   source,
-		Tag:       version.Tag,
+		AssetNames: []string{
+			filepath.Base(name) + "_*_" + runtime.GOOS + "_" + runtime.GOARCH + ".tar.*",
+			filepath.Base(name) + "_*_" + runtime.GOOS + "_" + runtime.GOARCH + ".zip",
+		},
+		RepoURL: source,
+		Tag:     version.Tag,
 	})
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch release: %w", err)
