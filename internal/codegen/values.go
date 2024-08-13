@@ -107,8 +107,9 @@ func (m modulesSlice) ByName(name string) module {
 	return module{}
 }
 
-// Values is the top level container for variables being
-// passed to a stencil template.
+// Values is the top level container for variables being passed to a
+// stencil template. When updating this struct, ensure that the receiver
+// functions are updated to reflect the new fields.
 type Values struct {
 	// Git is information about the current git repository, if there is one
 	Git git
@@ -124,6 +125,11 @@ type Values struct {
 
 	// Template is the name of the template being rendered
 	Template stencilTemplate
+
+	// Data is only available when a template is being rendered through
+	// stencil.ApplyTemplate. It contains the data passed through said
+	// call.
+	Data any
 }
 
 // Copy returns a copy of the current values

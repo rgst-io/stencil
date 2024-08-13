@@ -23,8 +23,10 @@ func NewExtensionClient(ctx context.Context, extPath string, log slogext.Logger)
 	// create a connection to the extension
 	client := plugin.NewClient(&plugin.ClientConfig{
 		Logger: hclog.New(&hclog.LoggerOptions{
-			Level:       hclog.Trace,
-			Output:      &logger{fn: func(args ...interface{}) { log.Debugf("%s", args...) }},
+			Level: hclog.Trace,
+			Output: &logger{fn: func(args ...interface{}) {
+				log.Debug(fmt.Sprint(args...))
+			}},
 			DisableTime: true,
 		}),
 		HandshakeConfig: plugin.HandshakeConfig{

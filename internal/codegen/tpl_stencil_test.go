@@ -1,12 +1,14 @@
 package codegen
 
 import (
+	"context"
 	"os"
 	"reflect"
 	"testing"
 	"time"
 
 	"github.com/go-git/go-billy/v5"
+	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
@@ -243,4 +245,98 @@ func TestTplStencil_ReadFile(t *testing.T) {
 	// fails when file doesn't exist
 	_, err = s.ReadFile("file/that/doesnt/exist")
 	assert.Error(t, err, `file "file/that/doesnt/exist" does not exist`)
+}
+
+func TestTplStencil_ApplyTemplate(t *testing.T) {
+	type args struct {
+		name    string
+		dataSli []interface{}
+	}
+	tests := []struct {
+		name        string
+		args        args
+		subTemplate string
+		want        string
+		wantErr     bool
+	}{
+		{
+			name: "should error on non-existent template",
+			args: args{
+				name: "non-existent",
+			},
+			wantErr: true,
+		},
+		{
+			name: "should render a template",
+			args: args{
+				name: "hello-world",
+			},
+			subTemplate: `{{- define "hello-world" -}}{{ "Hello, world!" }}{{- end -}}`,
+			want:        "Hello, world!",
+		},
+		{
+			name: "should support data",
+			args: args{
+				name:    "hello-world",
+				dataSli: []any{"xyz"},
+			},
+			subTemplate: `{{- define "hello-world" -}}{{ .Data }}{{- end -}}`,
+			want:        "xyz",
+		},
+		{
+			name: "should pass through data from parent template",
+			args: args{
+				name:    "hello-world",
+				dataSli: []any{"xyz"},
+			},
+			subTemplate: `{{- define "hello-world" -}}{{ .Config.Name }}{{- end -}}`,
+			want:        "TestTplStencil_ApplyTemplate/should_pass_through_data_from_parent_template",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			log := slogext.NewTestLogger(t)
+
+			// create stencil
+			st := &Stencil{sharedData: &sharedData{globals: make(map[string]global)}}
+
+			// create module
+			module, err := modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{
+				Name: "test",
+			})
+			assert.NilError(t, err, "expected NewModuleFromTemplates to succeed")
+
+			// create template for module
+			tpl, err := NewTemplate(
+				module,
+				"not-a-real-template.tpl",
+				0o755,
+				time.Now(),
+				[]byte(tt.subTemplate),
+				log,
+			)
+			assert.NilError(t, err, "expected NewTemplate to succeed")
+
+			// render template to register it
+			tpl.Render(st,
+				NewValues(context.Background(), &configuration.Manifest{
+					Name: t.Name(),
+				}, []*modules.Module{module}),
+			)
+
+			s := &TplStencil{
+				t:   tpl,
+				s:   st,
+				log: log,
+			}
+			got, err := s.ApplyTemplate(tt.args.name, tt.args.dataSli...)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("TplStencil.ApplyTemplate() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("TplStencil.ApplyTemplate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
