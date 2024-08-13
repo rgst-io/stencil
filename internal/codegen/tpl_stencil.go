@@ -286,7 +286,9 @@ func (s *TplStencil) ApplyTemplate(name string, dataSli ...any) (string, error) 
 	// Create a copy of the current values so we can set the data on it
 	// without mutating the original values.
 	d := s.t.args.Copy()
-	d.Data = dataSli
+	if len(dataSli) > 0 {
+		d.Data = dataSli[0]
+	}
 
 	var buf bytes.Buffer
 	if err := s.t.Module.GetTemplate().ExecuteTemplate(&buf, name, d); err != nil {

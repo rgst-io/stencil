@@ -280,7 +280,7 @@ func TestTplStencil_ApplyTemplate(t *testing.T) {
 				name:    "hello-world",
 				dataSli: []any{"xyz"},
 			},
-			subTemplate: `{{- define "hello-world" -}}{{ . }}{{- end -}}`,
+			subTemplate: `{{- define "hello-world" -}}{{ .Data }}{{- end -}}`,
 			want:        "xyz",
 		},
 		{

@@ -1,5 +1,5 @@
 {{- define "command" }}
-{{- . }}
+{{- .Data }}
 {{- end }}
 
 # Generate a "<commandName>.go" file for each command in .arguments.commands
