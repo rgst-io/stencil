@@ -233,9 +233,18 @@ func (s *TplStencil) exists(name string) (billy.File, bool) {
 	return f, true
 }
 
-// ApplyTemplate executes a template inside of the current module
+// ApplyTemplate executes a named template (defined through the `define`
+// function) with the provided optional data.
 //
-// This function does not support rendering a template from another module.
+// The provided data can be accessed within the defined template under
+// the `.Data` key.
+//
+// `.` is a copy of [Values] for the calling template, meaning it is not
+// mutated to reflect that of the template being rendered.
+//
+// ## Examples
+//
+// ### Without Data
 //
 //	{{- define "command"}}
 //	package main
@@ -249,26 +258,40 @@ func (s *TplStencil) exists(name string) (billy.File, bool) {
 //	{{- end }}
 //
 //	{{- stencil.ApplyTemplate "command" | file.SetContents }}
-func (s *TplStencil) ApplyTemplate(name string, dataSli ...interface{}) (string, error) {
+//
+// ### With Data
+//
+//	{{- define "command"}}
+//	{{- $cliName := .Data }}
+//	package main
+//
+//	import "fmt"
+//
+//	func main() {
+//			fmt.Println("hello from {{ $cliName }}!")
+//	}
+//
+//	{{- end }}
+//
+//	{{- range $cliName := stencil.Arg "clis" }}
+//	{{- stencil.ApplyTemplate "command" $cliName | file.SetContents }}
+//	{{- end }}
+func (s *TplStencil) ApplyTemplate(name string, dataSli ...any) (string, error) {
 	// We check for dataSli here because we had to set it to a range of arguments
 	// to allow it to be not set.
 	if len(dataSli) > 1 {
 		return "", fmt.Errorf("ApplyTemplate() only takes max two arguments, name and data")
 	}
 
-	var data interface{}
-	if len(dataSli) == 1 {
-		data = dataSli[0]
-	} else {
-		// If no data was passed, pass through the values of the parent template
-		data = s.t.args
-	}
+	// Create a copy of the current values so we can set the data on it
+	// without mutating the original values.
+	d := s.t.args.Copy()
+	d.Data = dataSli
 
 	var buf bytes.Buffer
-	if err := s.t.Module.GetTemplate().ExecuteTemplate(&buf, name, data); err != nil {
+	if err := s.t.Module.GetTemplate().ExecuteTemplate(&buf, name, d); err != nil {
 		return "", err
 	}
-
 	return buf.String(), nil
 }
 

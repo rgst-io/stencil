@@ -6,9 +6,18 @@ order: 1012
 
 # stencil.ApplyTemplate
 
-ApplyTemplate executes a template inside of the current module
+ApplyTemplate executes a named template (defined through the `define`
+function) with the provided optional data.
 
-This function does not support rendering a template from another module.
+The provided data can be accessed within the defined template under the
+`.Data` key.
+
+`.` is a copy of [Values](#Values)for the calling template, meaning it is not mutated to reflect that of
+the template being rendered.
+
+## Examples
+
+### Without Data
 
 ```go
 {{- define "command"}}
@@ -23,4 +32,24 @@ func main() {
 {{- end }}
 
 {{- stencil.ApplyTemplate "command" | file.SetContents }}
+```
+
+### With Data
+
+```go
+{{- define "command"}}
+{{- $cliName := .Data }}
+package main
+
+import "fmt"
+
+func main() {
+		fmt.Println("hello from {{ $cliName }}!")
+}
+
+{{- end }}
+
+{{- range $cliName := stencil.Arg "clis" }}
+{{- stencil.ApplyTemplate "command" $cliName | file.SetContents }}
+{{- end }}
 ```

@@ -107,8 +107,9 @@ func (m modulesSlice) ByName(name string) module {
 	return module{}
 }
 
-// Values is the top level container for variables being
-// passed to a stencil template.
+// Values is the top level container for variables being passed to a
+// stencil template. When updating this struct, ensure that the receiver
+// functions are updated to reflect the new fields.
 type Values struct {
 	// Git is information about the current git repository, if there is one
 	Git git
@@ -124,12 +125,29 @@ type Values struct {
 
 	// Template is the name of the template being rendered
 	Template stencilTemplate
+
+	// Data is only available when a template is being rendered through
+	// stencil.ApplyTemplate. It contains the data passed through said
+	// call.
+	Data any
 }
 
 // Copy returns a copy of the current values
 func (v *Values) Copy() *Values {
 	nv := *v
 	return &nv
+}
+
+// CopyMap returns a copy of the current values as a map
+func (v *Values) CopyMap() map[string]interface{} {
+	c := v.Copy()
+	return map[string]any{
+		"Git":      c.Git,
+		"Runtime":  c.Runtime,
+		"Config":   c.Config,
+		"Module":   c.Module,
+		"Template": c.Template,
+	}
 }
 
 // WithModule returns a copy of the current values with the
