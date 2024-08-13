@@ -214,6 +214,7 @@ func (h *Host) downloadFromRemote(ctx context.Context, source, name string, vers
 	if err != nil {
 		return "", fmt.Errorf("failed to open archive: %w", err)
 	}
+	defer a.Close()
 
 	bin, err := archives.Pick(a, archives.PickFilterByName(filepath.Base(name)))
 	if err != nil {
