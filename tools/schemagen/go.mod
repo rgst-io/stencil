@@ -6,7 +6,7 @@ replace go.rgst.io/stencil => ../..
 
 require (
 	github.com/invopop/jsonschema v0.12.0
-	go.rgst.io/stencil v0.0.0-00010101000000-000000000000
+	go.rgst.io/stencil v0.9.0
 )
 
 require (
