@@ -32,6 +32,9 @@ func TestCanUpgradeModules(t *testing.T) {
 		Modules: []*configuration.TemplateRepository{{
 			Name: "github.com/rgst-io/stencil-golang",
 		}},
+		Arguments: map[string]any{
+			"org": "rgst-io",
+		},
 	}
 
 	lock := &stencil.Lockfile{
@@ -88,6 +91,9 @@ func TestUpgradeIncludesNewModules(t *testing.T) {
 		Modules: []*configuration.TemplateRepository{{
 			Name: "github.com/rgst-io/stencil-golang",
 		}},
+		Arguments: map[string]any{
+			"org": "rgst-io",
+		},
 	}
 
 	lock := &stencil.Lockfile{

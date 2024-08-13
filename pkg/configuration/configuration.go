@@ -79,7 +79,7 @@ type Manifest struct {
 	Versions map[string]string `yaml:"versions,omitempty"`
 
 	// Arguments is a map of arbitrary arguments to pass to the generator
-	Arguments map[string]interface{} `yaml:"arguments"`
+	Arguments map[string]any `yaml:"arguments"`
 
 	// Replacements is a list of module names to replace their URI.
 	//

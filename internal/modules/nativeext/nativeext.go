@@ -29,7 +29,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/getoutreach/gobox/pkg/cli/updater/archive"
+	"github.com/jaredallard/archives"
 	"github.com/jaredallard/vcs/releases"
 	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/internal/modules/nativeext/apiv1"
@@ -197,17 +197,28 @@ func (h *Host) downloadFromRemote(ctx context.Context, source, name string, vers
 
 	h.log.With("version", version).With("repo", source).Debug("Downloading native extension")
 	resp, fi, err := releases.Fetch(ctx, &releases.FetchOptions{
-		AssetName: filepath.Base(name) + "_*_" + runtime.GOOS + "_" + runtime.GOARCH + ".tar.gz",
-		RepoURL:   source,
-		Tag:       version.Tag,
+		AssetNames: []string{
+			filepath.Base(name) + "_*_" + runtime.GOOS + "_" + runtime.GOARCH + ".tar.*",
+			filepath.Base(name) + "_*_" + runtime.GOOS + "_" + runtime.GOARCH + ".zip",
+		},
+		RepoURL: source,
+		Tag:     version.Tag,
 	})
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch release: %w", err)
 	}
 
-	bin, _, err := archive.Extract(ctx, fi.Name(), resp, archive.WithFilePath(filepath.Base(name)))
+	a, err := archives.Open(resp, archives.OpenOptions{
+		Extension: archives.Ext(fi.Name()),
+	})
 	if err != nil {
-		return "", fmt.Errorf("failed to extract archive: %w", err)
+		return "", fmt.Errorf("failed to open archive: %w", err)
+	}
+	defer a.Close()
+
+	bin, err := archives.Pick(a, archives.PickFilterByName(filepath.Base(name)))
+	if err != nil {
+		return "", fmt.Errorf("failed to grab binary from archive: %w", err)
 	}
 
 	f, err := os.Create(dlPath)
