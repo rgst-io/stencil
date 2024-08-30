@@ -7,6 +7,9 @@ hero:
   name: stencil
   tagline: |
     A modern living-template engine for evolving repositories
+  image:
+    src: /logo.png
+    alt: stencil
   actions:
     - theme: brand
       text: About
@@ -19,8 +22,13 @@ hero:
       link: https://github.com/rgst-io/stencil
 
 features:
-  - title: <a href="/about">Development Lifecycle Management</a>
-    details: stencil goes further than other templating tools by defining extensibility "blocks" to explicitly separate what your consumers can and can't extend, encouraging a system of regularly re-running stencil to pull in living-and-progressing templates.
-  - title: <a href="/reference/native-extensions.html">Native Extensions</a>
-    details: Need to interface with an API or implement custom parsing/merging logic? Stencil supports native extensions in _any_ language to implement that logic.
+  - icon: 📝
+    title: <a href="/about">Development Lifecycle Management</a>
+    details: Treat your generated files as APIs by persisting changes in customizable "blocks" to allow rendering more than once
+  - icon: 🧱
+    title: <a href="/reference/modules.html">Modular</a>
+    details: Templates can be composed through importable modules allowing easy customization
+  - icon: 🛠️
+    title: <a href="/reference/native-extensions.html">Native Extensions</a>
+    details: Need to interface with an API or implement custom parsing/merging logic? Stencil supports native extensions in <i>any</i> language to implement that logic
 ---
