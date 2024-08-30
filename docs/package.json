@@ -8,7 +8,7 @@
 	},
 	"scripts": {
 		"docs:dev": "vitepress dev",
-		"docs:build": "vitepress build",
+		"docs:build": "vitepress build && cp logo.png .vitepress/dist && mkdir -p .vitepress/dist/static && cp ../schemas/* .vitepress/dist/static",
 		"docs:preview": "vitepress preview"
 	}
 }

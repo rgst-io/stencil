@@ -10,8 +10,8 @@ This section will walk you through building a nearly-empty stenciled project and
 
 This tutorial requires the following things installed on your machine:
 
-* Git - Used by the `stencil` CLI, this is always required.
-* [mise] - This is not required usually, but the module we'll look at does
+- Git - Used by the `stencil` CLI, this is always required.
+- [mise] - This is not required usually, but the module we'll look at does
   require it.
 
 ## Step 1: Install Stencil
@@ -186,7 +186,7 @@ Let's look at `.goreleaser.yaml`. This is a system for creating and
 releasing Go binaries. Opening the file, we can see something like this:
 
 ```yaml
-...
+---
 builds:
   - main: ./cmd/helloworld
     flags:
@@ -197,7 +197,6 @@ builds:
       ## <<Stencil::Block(helloworldLdflags)>>
 
       ## <</Stencil::Block>>
-...
 ```
 
 A normal customization that Go application do is add `ldflags`, which
@@ -207,7 +206,7 @@ something like a version string.
 Here, we could add our own version string injection inside of the block.
 
 ```yaml
-...
+---
 builds:
   - main: ./cmd/helloworld
     flags:
@@ -218,7 +217,6 @@ builds:
       ## <<Stencil::Block(helloworldLdflags)>>
       - -X main.Version="myVersion"
       ## <</Stencil::Block>>
-...
 ```
 
 Now, if you re-run `stencil`, you'll see that it updated the file, but

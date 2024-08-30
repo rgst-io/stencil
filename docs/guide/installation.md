@@ -60,11 +60,11 @@ curl https://alpine.fury.io/rgst-io/rgst-io@fury.io-946e9786.rsa.pub | sudo tee 
 Quickstart:
 
 ```yaml
-  - name: Install Stencil
-    uses: rgst-io/stencil-action@latest
-    with:
-      github-token: ${{ github.token }}
-      version: 'latest'
+- name: Install Stencil
+  uses: rgst-io/stencil-action@latest
+  with:
+    github-token: ${{ github.token }}
+    version: "latest"
 ```
 
 [Github Action Documentation](https://github.com/marketplace/actions/stencil-action)
