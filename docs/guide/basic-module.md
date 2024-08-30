@@ -20,15 +20,15 @@ stencil create module github.com/yourorg/helloworld
 ```
 
 You'll notice this created a `stencil.yaml` file and ran `stencil` on
-itself. This is to enable a future module we'll provide that helps
-quickstart module creation.
+itself. This isn't used now, but will be in the future.
 
 Not created for you is the `templates/` directory. This is where your
 templates will live.
 
 ## Step 2: Creating a Template
 
-Let's create a template that creates a simple hello world message in Go. We'll start by creating a `hello.go.tpl` in the `templates/` directory.
+Let's create a template that creates a simple hello world message in Go.
+We'll start by creating a `hello.go.tpl` in the `templates/` directory.
 
 ```go
 package main
@@ -134,10 +134,10 @@ arbitrary number of files with a single template. This is done with the
 `greeter.go.tpl` template in the `templates/` directory that'll create
 `<greeting>.go` based on the `greetings` argument.
 
-```yaml
-# This is important! We don't want to create a greeter.go file
-
+```go
+# This is important! We do not want to create a greeter.go file
 {{- $_ := file.Skip "Generates multiple files" }}
+
 {{- define "greeter" -}}
 {{- $greeting := .greeting }}
 package main
