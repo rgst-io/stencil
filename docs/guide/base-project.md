@@ -6,9 +6,13 @@ order: 2
 
 This section will walk you through building a nearly-empty stenciled project and teach you how blocks work. While the sample project here is very Golang-centric, stencil can be used for any language!
 
-> [!NOTE]
-> This quick start uses `macOS` in the examples. For instructions about how to install Stencil on other operating systems, see [install](installation.md).
-> It is required to have [Git installed](https://git-scm.com/downloads) to run this tutorial.
+## Step 0: Prerequisites
+
+This tutorial requires the following things installed on your machine:
+
+* Git - Used by the `stencil` CLI, this is always required.
+* [mise] - This is not required usually, but the module we'll look at does
+  require it.
 
 ## Step 1: Install Stencil
 
@@ -16,13 +20,17 @@ If you don't already have stencil installed, follow the [documentation to instal
 
 ## Step 2: Create a `stencil.yaml`
 
-First start by creating a new directory for your application, this should generally match whatever the name for your application is going to be. We'll go with `helloworld` here.
+First start by creating a new directory for your application, this
+should generally match whatever the name for your application is going
+to be. We'll go with `helloworld` here.
 
 ```bash
 mkdir helloworld
 ```
 
-A [stencil.yaml](/reference/stencil.yaml) is integral to running stencil. It defines the modules you're consuming and the arguments to pass to them.
+A [stencil.yaml](/reference/stencil.yaml) is integral to running
+stencil. It defines the modules you're consuming and the arguments to
+pass to them.
 
 Start with creating a basic `stencil.yaml`:
 
@@ -36,152 +44,196 @@ arguments: {}
 modules: []
 ```
 
-Now run `stencil`, you should have... nothing! That's expected because we didn't define any modules yet.
+Now run `stencil`, you should have... nothing! That's expected because
+we didn't define any modules yet.
 
 ```bash
 helloworld ❯ stencil
 
-INFO[0000] stencil v1.14.2
-INFO[0002] Fetching dependencies
-INFO[0002] Loading native extensions
-INFO[0002] Rendering templates
-INFO[0002] Writing template(s) to disk
-INFO[0002] Running post-run command(s)
+INFO stencil 0.9.0
+INFO Fetching dependencies
+INFO Loading native extensions
+INFO Rendering templates
+INFO Writing template(s) to disk
+INFO Running post-run command(s)
 
 helloworld ❯ ls -alh
-drwxr-xr-x 4 jaredallard wheel 128B May 4 20:16 .
-drwxr-xr-x 9 jaredallard wheel 288B May 4 20:16 ..
--rw-r--r-- 1 jaredallard wheel 213B May 4 20:16 stencil.yaml
--rw-r--r-- 1 jaredallard wheel 78B May 4 20:16 stencil.lock
+drwxr-xr-x 2 jaredallard jaredallard 4.0K Aug 29 19:51 .
+drwxr-xr-x 8 jaredallard jaredallard 4.0K Aug 29 19:49 ..
+-rw-r--r-- 1 jaredallard jaredallard   37 Aug 29 19:51 stencil.lock
+-rw-r--r-- 1 jaredallard jaredallard   43 Aug 29 19:50 stencil.yaml
 ```
 
 > [!NOTE]
 > You'll notice there's a `stencil.lock` file here.
 >
 > ```yaml
-> version: 0.8.0
+> version: 0.9.0
 > modules: []
 > files: []
 > ```
 >
-> This will keep track of what files were created by stencil and what created them, as well as the last ran version of your modules. This file is very important!
+> This will keep track of what files were created by stencil and what
+> created them, as well as the last ran version of your modules. This
+> file is very important!
 
 ## Step 3: Import a Module
 
-Now that we've created our first stencil application, you're going to want to import a module! Let's import the [`stencil-base`](https://github.com/getoutreach/stencil-base) module. stencil-base includes a bunch of scripts and other building blocks for a Golang project. Let's take a look at it's `manifest.yaml` to see what arguments are required.
+Now that we've created our first stencil application, you're going to
+want to import a module! Let's import the
+[`stencil-golang`](https://github.com/rgst-io/stencil-golang) module.
+This module is for creating a Go service or CLI, but don't worry, you
+don't need to know Go for this example!
+
+First, let's take a look at parameters exposed through `stencil-golang`.
+This can be done by looking at the `manifest.yaml` provided by it.
+
+> [!NOTE] The full manifest can be found
+> [here](https://github.com/rgst-io/stencil-golang/blob/e2ea9a1980f765f668d4a42d1f9108db777bf86d/manifest.yaml)
 
 ```yaml
-name: github.com/getoutreach/stencil-base
+name: github.com/rgst-io/stencil-golang
 ---
 arguments:
-  description:
+  org:
+    description: The Github organization to use for the project
     required: true
-    type: string
-    description: The purpose of this repository
+
+  library: <snip>
+  copyrightHolder: <snip>
+  license: <snip>
+  commands: <snip>
 ```
 
-We can see that `description` is a required argument, so let's add it! Modify the `stencil.yaml` to set `arguments.description` to `"My awesome service!"`
+We can see that the `org` argument is required and that it should be the
+Github organization that our repository will live under. For now, since
+we're not pushing this anywhere, it can be anything. So, let's go with
+`rgst-io`.
 
 ```yaml
 name: helloworld
-arguments: {}
-description: "My awesome service!"
+arguments:
+  org: rgst-io
 modules:
-  - name: github.com/getoutreach/stencil-base
+  - name: github.com/rgst-io/stencil-golang
 ```
 
 Now if we run stencil we'll see that we have some files!
 
 ```bash
 helloworld ❯ stencil
-INFO[0000] stencil v1.14.2
-INFO[0000] Fetching dependencies
-INFO[0001]  -> github.com/getoutreach/stencil-base v0.2.0
-INFO[0001] Loading native extensions
-INFO[0001] Rendering templates
-INFO[0001] Writing template(s) to disk
-INFO[0001]   -> Created .editorconfig
-INFO[0001]   -> Created .github/CODEOWNERS
-INFO[0001]   -> Created .github/pull_request_template.md
-INFO[0001]   -> Created .gitignore
-INFO[0001]   -> Created .releaserc.yaml
-INFO[0001]   -> Created CONTRIBUTING.md
-INFO[0001]   -> Skipped LICENSE
-INFO[0001]   -> Created README.md
-INFO[0001]   -> Skipped helpers
-INFO[0001]   -> Created package.json
-INFO[0001]   -> Created scripts/devbase.sh
-INFO[0001]   -> Created scripts/shell-wrapper.sh
-INFO[0001] Running post-run command(s)
+INFO stencil 0.9.0
+INFO Fetching dependencies
+INFO  -> github.com/rgst-io/stencil-golang v1.0.0 (b81af6111ff23879d56faa735c428dc2e8ff45b5)
+INFO Loading native extensions
+INFO Rendering templates
+INFO Writing template(s) to disk
+INFO   -> Created LICENSE
+INFO   -> Created .goreleaser.yaml
+INFO   -> Created cmd/helloworld/helloworld.go
+INFO   -> Created CONTRIBUTING.md
+INFO   -> Created .github/workflows/release.yaml
+INFO   -> Created .github/workflows/tests.yaml
+INFO   -> Created .vscode/settings.json
+INFO   -> Created .mise.toml
+INFO   -> Created .github/scripts/get-next-version.sh
+INFO   -> Created .github/settings.yml
+INFO   -> Created .cliff.toml
+INFO   -> Created .mise/tasks/changelog-release
+INFO   -> Created package.json
+INFO   -> Created .vscode/extensions.json
+INFO   -> Created go.mod
+INFO   -> Created .editorconfig
+INFO   -> Created .gitignore
+INFO   -> Created .vscode/common.code-snippets
+INFO Running post-run command(s)
 ...
 
+# Note: If you see an error about bun/prettier, simply run
+# 'bun install' and re-run stencil. Sorry about that!
+
 helloworld ❯ ls -alh
-drwxr-xr-x   4 jaredallard  wheel   128B May  4 20:16 .
-drwxr-xr-x   9 jaredallard  wheel   288B May  4 20:16 ..
--rw-r--r--   1 jaredallard  wheel   274B May  4 20:26 .editorconfig
-drwxr-xr-x   4 jaredallard  wheel   128B May  4 20:26 .github
--rw-r--r--   1 jaredallard  wheel   795B May  4 20:26 .gitignore
--rw-r--r--   1 jaredallard  wheel   857B May  4 20:26 .releaserc.yaml
--rw-r--r--   1 jaredallard  wheel   417B May  4 20:26 CONTRIBUTING.md
--rw-r--r--   1 jaredallard  wheel   703B May  4 20:26 README.md
--rw-r--r--   1 jaredallard  wheel   474B May  4 20:26 package.json
-drwxr-xr-x   4 jaredallard  wheel   128B May  4 20:26 scripts
--rw-r--r--   1 jaredallard  wheel   2.1K May  4 20:26 stencil.lock
--rw-r--r--   1 jaredallard  wheel   118B May  4 20:26 stencil.yaml
+drwxr-xr-x 6 jaredallard jaredallard 4.0K Aug 29 19:58 .
+drwxr-xr-x 8 jaredallard jaredallard 4.0K Aug 29 19:49 ..
+-rw-r--r-- 1 jaredallard jaredallard 4.3K Aug 29 19:58 .cliff.toml
+-rw-r--r-- 1 jaredallard jaredallard  185 Aug 29 19:58 .editorconfig
+drwxr-xr-x 4 jaredallard jaredallard 4.0K Aug 29 19:58 .github
+-rw-r--r-- 1 jaredallard jaredallard  583 Aug 29 19:58 .gitignore
+-rw-r--r-- 1 jaredallard jaredallard 1.1K Aug 29 19:58 .goreleaser.yaml
+drwxr-xr-x 3 jaredallard jaredallard 4.0K Aug 29 19:58 .mise
+-rw-r--r-- 1 jaredallard jaredallard 1.3K Aug 29 19:58 .mise.toml
+drwxr-xr-x 2 jaredallard jaredallard 4.0K Aug 29 19:58 .vscode
+-rw-r--r-- 1 jaredallard jaredallard  217 Aug 29 19:58 CONTRIBUTING.md
+-rw-r--r-- 1 jaredallard jaredallard  35K Aug 29 19:58 LICENSE
+drwxr-xr-x 3 jaredallard jaredallard 4.0K Aug 29 19:58 cmd
+-rw-r--r-- 1 jaredallard jaredallard   46 Aug 29 19:58 go.mod
+-rw-r--r-- 1 jaredallard jaredallard  130 Aug 29 19:58 package.json
+-rw-r--r-- 1 jaredallard jaredallard 2.4K Aug 29 19:58 stencil.lock
+-rw-r--r-- 1 jaredallard jaredallard   96 Aug 29 19:58 stencil.yaml
 ```
+
+Great, now we have all of these files! What stencil did was completely
+generate this application for us as well as integrate with [mise] to set
+up our toolchain.
 
 ## Step 4: Modifying a Block
 
-One of the key features in stencil is the notion of "blocks". Modules expose a block where they want developers to modify the code. Let's look at the `stencil-base` module to see what blocks are available.
+One of the key features in stencil is the notion of "blocks". Modules
+expose a block where they want developers to modify the code. Let's look
+at the `stencil-golang` module to see what blocks are available.
 
-In `README.md` we can see a basic block called "overview":
+Let's look at `.goreleaser.yaml`. This is a system for creating and
+releasing Go binaries. Opening the file, we can see something like this:
 
-```md
-# helloworld
-
+```yaml
 ...
+builds:
+  - main: ./cmd/helloworld
+    flags:
+      - -trimpath
+    ldflags:
+      - -s
+      - -w
+      ## <<Stencil::Block(helloworldLdflags)>>
 
-## High-level Overview
-
-<!--- <<Stencil::Block(overview)>> -->
-
-<!--- <</Stencil::Block>> -->
+      ## <</Stencil::Block>>
+...
 ```
 
-Let’s add some content in two places. One inside the block, one outside:
+A normal customization that Go application do is add `ldflags`, which
+are linker-time modifications to variables. This is normally done with
+something like a version string.
 
-```md
+Here, we could add our own version string injection inside of the block.
+
+```yaml
 ...
-
-## High-level Overview
-
-hello, world!
-
-<!--- <<Stencil::Block(overview)>> -->
-
-hello, world!
-
-<!--- <</Stencil::Block>> -->
+builds:
+  - main: ./cmd/helloworld
+    flags:
+      - -trimpath
+    ldflags:
+      - -s
+      - -w
+      ## <<Stencil::Block(helloworldLdflags)>>
+      - -X main.Version="myVersion"
+      ## <</Stencil::Block>>
+...
 ```
 
-If we re-run stencil, notice how the contents of `README.md` have changed:
-
-```md
-...
-
-## High-level Overview
-
-<!--- <<Stencil::Block(overview)>> -->
-
-hello, world!
-
-<!--- <</Stencil::Block>> -->
-```
-
-The contents of `README.md` have changed, but the contents within the block have not. This is the power of blocks, modules are able to change the content _around_ a user's content without affecting the user's content. This can be taken even further if a template decides to parse the code within a block at runtime, for example using the ast package to rewrite go code.
+Now, if you re-run `stencil`, you'll see that it updated the file, but
+did not change the contents. This is the "block" functionality that
+makes up the core of `stencil`. This allows you to generate your files,
+but most importantly _keep them updated_.
 
 ## Reflection
 
-In all, we've created a `stencil.yaml`, added a module to it, ran stencil, and then modified the contents within a block. That's it! We've imported a base module and created some files, all without doing much of anything on our side. Hopefully that shows you the power of stencil.
+In all, we've created a `stencil.yaml`, added a module to it, ran
+stencil, and then modified the contents within a block. That's it! We've
+imported a base module and created some files, all without doing much of
+anything on our side. Hopefully that shows you the power of stencil.
 
-For more resources be sure to dive into [how to create a module](basic-module.md) to get insight on how to create a module.
+For more resources be sure to dive into [how to create a module](basic-module.md)
+to get insight on how to create a module.
+
+[mise]: https://mise.jdx.dev

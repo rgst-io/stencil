@@ -55,6 +55,20 @@ echo "https://alpine.fury.io/rgst-io/" >> /etc/apk/repositories
 curl https://alpine.fury.io/rgst-io/rgst-io@fury.io-946e9786.rsa.pub | sudo tee /etc/apk/keys/'rgst-io@fury.io-946e9786.rsa.pub' >/dev/null
 ```
 
+### Github Action
+
+Quickstart:
+
+```yaml
+  - name: Install Stencil
+    uses: rgst-io/stencil-action@latest
+    with:
+      github-token: ${{ github.token }}
+      version: 'latest'
+```
+
+[Github Action Documentation](https://github.com/marketplace/actions/stencil-action)
+
 ### Binary (Cross-platform)
 
 Download the appropriate version for your platform from [Stencil Releases](https://github.com/rgst-io/stencil/releases). Once downloaded, the binary can be run from anywhere. You don't need to install it into a global location. This works well for shared hosts and other systems where you don't have a privileged account.

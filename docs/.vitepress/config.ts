@@ -21,6 +21,7 @@ export default defineConfig({
   },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
+		logo: 'logo.png',
     outline: 'deep',
     nav: [],
     sidebar: VitePressSidebar.generateSidebar(vitepressSidebarOptions),

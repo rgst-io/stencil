@@ -9,21 +9,26 @@ order: 4
 > usage already. If you aren't, be sure to go through the
 > [reference documentation](/reference/) or the other quick starts
 > here before proceeding. You've been warned!
+>
+> Also, if you get stuck, take a look at [stencil-golang's native
+> extension](https://github.com/rgst-io/stencil-golang/blob/main/internal/plugin/plugin.go).
+> It's a great example which only fetches license information from the
+> Github API!
 
-# What is a Native Extension?
+## What is a Native Extension?
 
 Native extensions are special module types that don't use go-templates
 to integrate with stencil. Instead they expose template functions
 written in another language that can be called by stencil templates.
 
-# How to create a Native Extension
+## How to create a Native Extension
 
 This quick start will focus on creating a Go native extension. While
 other languages may work as well, there currently is no official
 documentation or support for those languages (if you're interested in
 another language please contribute it back!).
 
-## Step 1: Create a Native Extension
+### Step 1: Create a Native Extension
 
 Much like a module we're going to use the [`stencil create module`]
 command to create a native extension.
@@ -37,7 +42,7 @@ However, instead of using the `templates/` directory we're going to
 create a `plugin/` directory.
 
 ```bash
-rm templates; mkdir plugin
+rm -f templates; mkdir plugin
 ```
 
 Now that we've created the `plugin/` directory we're going to created a
@@ -94,7 +99,7 @@ func main() {
 
 Next, we'll need to build the plugin: `go build -o bin/plugin .`
 
-## Step 2: Using in a Test Module
+### Step 2: Using in a Test Module
 
 Let's create a `testmodule` to consume the native extension.
 
@@ -117,7 +122,7 @@ modules:
   - name: github.com/yourorg/helloworld
 ```
 
-## Step 3: Running the Test Module
+### Step 3: Running the Test Module
 
 Now, in order to test the native extension and the module consuming it we'll need to create a test application.
 
@@ -139,7 +144,7 @@ Now, if we run `stencil` we should get a `hello.txt` file in our test applicatio
 
 ```bash
 testapp ❯ stencil
-INFO stencil v0.8.0
+INFO stencil v0.9.0
 INFO Fetching dependencies
 INFO  -> github.com/yourorg/helloworld local
 INFO Loading native extensions
@@ -153,7 +158,7 @@ helloWorld
 
 Success! :tada:
 
-# Reflection
+## Reflection
 
 To reflect, we've created a `hello.txt.tpl` file that calls the
 `helloWorld` function in the native extension we implemented.
