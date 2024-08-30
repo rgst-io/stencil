@@ -174,9 +174,10 @@ Now let's modify the `manifest.yaml` to accept the argument `greetings`:
 arguments:
   greetings:
     description: A list of greetings to use
-type: list
-require: true
-default: ["hello", "goodbye"]
+    required: true
+    default: ["hello", "goodbye"]
+    schema:
+      type: arrary
 ```
 
 If we now run stencil on the test application, we should see the following:
@@ -211,7 +212,7 @@ testapp ❯ cat goodbye.go
 package main
 
 func main() {
-	fmt.Println("goodbye, world!")
+  fmt.Println("goodbye, world!")
 }
 ```
 
