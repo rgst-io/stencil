@@ -114,12 +114,7 @@ func TestUpgradeIncludesNewModules(t *testing.T) {
 	assert.NilError(t, err, "failed to write lockfile")
 
 	// Run the upgrade
-	err = testRunCommand(t, cmd, tmpDir)
-	if err != nil {
-		// Right now it errors due to no go.mod, so allow that error to
-		// occur. It doesn't indicate the upgrade failure.
-		assert.ErrorContains(t, err, "failed to run post run command")
-	}
+	assert.NilError(t, testRunCommand(t, cmd, tmpDir), "expected upgrade to not error")
 
 	// Read the lockfile back in and ensure that the module was added.
 	lf, err := stencil.LoadLockfile(tmpDir)

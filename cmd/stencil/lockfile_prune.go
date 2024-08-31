@@ -28,18 +28,21 @@ import (
 // lockfile prune command.
 func NewLockfilePruneCommand(log slogext.Logger) *cli.Command {
 	return &cli.Command{
-		Name:        "prune",
-		Usage:       "Prunes non-existent files from the lockfile",
-		Description: "Prunes any non-existent files from the lockfile (will recreate any file.Once files on next run)",
+		Name:  "prune",
+		Usage: "Prunes non-existent files from the lockfile",
+		Description: "Prunes any non-existent files from the lockfile (will " +
+			"recreate any file.Once files on next run)",
 
 		Flags: []cli.Flag{
 			&cli.StringSliceFlag{
-				Name:  "file",
-				Usage: "If any file options are passed, prune only checks the passed filenames for pruning",
+				Name: "file",
+				Usage: "If any file options are passed, prune only checks the " +
+					"passed filenames for pruning",
 			},
 			&cli.StringSliceFlag{
-				Name:  "module",
-				Usage: "If any module options are passed, prune only checks the passed modulenames for pruning",
+				Name: "module",
+				Usage: "If any module options are passed, prune only checks the " +
+					"passed module names for pruning",
 			},
 		},
 		Action: func(c *cli.Context) error {

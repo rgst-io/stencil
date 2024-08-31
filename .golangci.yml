@@ -28,7 +28,7 @@ linters:
     - errcheck
     - errorlint
     - exhaustive # Checks exhaustiveness of enum switch statements.
-    - exportloopref # Checks for pointers to enclosing loop variables.
+    - copyloopvar
     - funlen
     - gochecknoinits
     - goconst

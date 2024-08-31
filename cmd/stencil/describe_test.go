@@ -14,6 +14,7 @@ import (
 	"go.rgst.io/stencil/pkg/stencil"
 	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
+	"gotest.tools/v3/env"
 )
 
 func Test_cleanPath(t *testing.T) {
@@ -83,7 +84,7 @@ func Test_cleanPath(t *testing.T) {
 func Test_describeFile_shouldFunction(t *testing.T) {
 	tmpDir := t.TempDir()
 
-	chdir(t, tmpDir)
+	env.ChangeWorkingDir(t, tmpDir)
 
 	lock := &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{

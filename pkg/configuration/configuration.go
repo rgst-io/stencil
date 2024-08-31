@@ -30,9 +30,21 @@ import (
 // ValidateNameRegexp is the regex used to validate the project's name
 const ValidateNameRegexp = `^[_a-z][_a-z0-9-]*$`
 
-// NewManifest reads a manifest from disk at the
-// specified path, parses it, and returns the output.
+// NewManifest reads a manifest from disk at the specified path, parses
+// it, and returns the output.
+//
+// Deprecated: Use LoadManifest instead.
 func NewManifest(path string) (*Manifest, error) {
+	return LoadManifest(path)
+}
+
+// LoadManifest reads a manifest from disk at the specified path, parses
+// it, and returns the output.
+//
+// In most cases, you should use LoadDefaultManifest instead as it
+// contains the standard locations for a manifest as well as
+// getoutreach/stencil interop.
+func LoadManifest(path string) (*Manifest, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -53,11 +65,19 @@ func NewManifest(path string) (*Manifest, error) {
 
 // NewDefaultManifest returns a parsed project manifest
 // from a set default path on disk.
+//
+// Deprecated: Use LoadDefaultManifest instead.
 func NewDefaultManifest() (*Manifest, error) {
+	return LoadDefaultManifest()
+}
+
+// LoadDefaultManifest returns a parsed project manifest from a set
+// default path on disk.
+func LoadDefaultManifest() (*Manifest, error) {
 	manifestFiles := []string{"stencil.yaml", "service.yaml"}
 	for _, file := range manifestFiles {
 		if _, err := os.Stat(file); err == nil {
-			return NewManifest(file)
+			return LoadManifest(file)
 		}
 	}
 
@@ -105,6 +125,39 @@ type TemplateRepository struct {
 	// will change as the module is resolved on subsequent runs.
 	// Eventually, this will be changed to use the lockfile by default.
 	Version string `yaml:"version,omitempty"`
+}
+
+// LoadTemplateRepositoryManifest reads a template repository manifest
+// from disk and returns it.
+//
+// In most cases, you should use LoadDefaultTemplateRepositoryManifest
+// instead as it contains the standard locations for a manifest.
+func LoadTemplateRepositoryManifest(path string) (*TemplateRepositoryManifest, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	var s TemplateRepositoryManifest
+	if err := yaml.NewDecoder(f).Decode(&s); err != nil {
+		return nil, err
+	}
+
+	return &s, nil
+}
+
+// LoadDefaultTemplateRepositoryManifest reads a template repository
+// manifest from disk and returns it, using a standard set of locations.
+func LoadDefaultTemplateRepositoryManifest() (*TemplateRepositoryManifest, error) {
+	manifestFiles := []string{"manifest.yaml"}
+	for _, file := range manifestFiles {
+		if _, err := os.Stat(file); err == nil {
+			return LoadTemplateRepositoryManifest(file)
+		}
+	}
+
+	return nil, fmt.Errorf("no manifest found (searched %v)", manifestFiles)
 }
 
 // TemplateRepositoryManifest is a manifest of a template repository

@@ -47,13 +47,13 @@ func encodeToFile(d any, outputFilePath string) error {
 
 // generateTemplateRepository generates a template repository manifest
 // (manifest.yaml) based on the provided input.
-func generateTemplateRepository(name string, hasPlugin bool) *configuration.TemplateRepositoryManifest {
+func generateTemplateRepository(name string, hasNativeExt bool) *configuration.TemplateRepositoryManifest {
 	tr := &configuration.TemplateRepositoryManifest{
 		Name: name,
 	}
 
 	tr.Type = configuration.TemplateRepositoryTypes{}
-	if hasPlugin {
+	if hasNativeExt {
 		tr.Type = append(tr.Type, configuration.TemplateRepositoryTypeTemplates, configuration.TemplateRepositoryTypeExt)
 	}
 
@@ -62,7 +62,7 @@ func generateTemplateRepository(name string, hasPlugin bool) *configuration.Temp
 
 // generateStencilYaml generates a stencil.yaml manifest based on the
 // provided input.
-func generateStencilYaml(name string, hasPlugin bool) *configuration.Manifest {
+func generateStencilYaml(name string, hasNativeExt bool) *configuration.Manifest {
 	mf := &configuration.Manifest{
 		Name: path.Base(name),
 		Modules: []*configuration.TemplateRepository{{
@@ -73,7 +73,7 @@ func generateStencilYaml(name string, hasPlugin bool) *configuration.Manifest {
 		},
 	}
 
-	if hasPlugin {
+	if hasNativeExt {
 		mf.Arguments["commands"] = []string{
 			"plugin",
 		}
@@ -92,10 +92,9 @@ func NewCreateModuleCommand(log slogext.Logger) *cli.Command {
 		Description: "Creates a module with the provided name in the current directory",
 		ArgsUsage:   "create module <name>",
 		Flags: []cli.Flag{
-			&cli.StringSliceFlag{
-				Name:  "type",
-				Usage: "The type of module to create",
-				Value: cli.NewStringSlice("templates"),
+			&cli.BoolFlag{
+				Name:  "native-extension",
+				Usage: "Generate a module with a native extension. ",
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -107,7 +106,7 @@ func NewCreateModuleCommand(log slogext.Logger) *cli.Command {
 			}
 
 			moduleName := c.Args().Get(0)
-			hasPlugin := false
+			hasNativeExt := c.Bool("native-extension")
 
 			// stencil-golang requires Github right now, so it doesn't make
 			// sense to generate broken templates on some other VCS provider.
@@ -134,11 +133,11 @@ func NewCreateModuleCommand(log slogext.Logger) *cli.Command {
 			}
 
 			// create stencil.yaml
-			if err := encodeToFile(generateStencilYaml(moduleName, hasPlugin), stencilManifestName); err != nil {
+			if err := encodeToFile(generateStencilYaml(moduleName, hasNativeExt), stencilManifestName); err != nil {
 				return fmt.Errorf("failed to serialize %s: %w", stencilManifestName, err)
 			}
 
-			if err := encodeToFile(generateTemplateRepository(moduleName, hasPlugin), "manifest.yaml"); err != nil {
+			if err := encodeToFile(generateTemplateRepository(moduleName, hasNativeExt), "manifest.yaml"); err != nil {
 				return fmt.Errorf("failed to serialize generated manifest.yaml: %w", err)
 			}
 
