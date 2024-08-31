@@ -18,6 +18,8 @@
 package configuration
 
 import (
+	"fmt"
+	"slices"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -44,53 +46,42 @@ const (
 // Use Contains to check for a type - it has special handling for the default case.
 // Even though it is a struct, it is marshalled and unmarshalled as a string with comma separated
 // values of TemplateRepositoryType.
-type TemplateRepositoryTypes struct {
-	types []TemplateRepositoryType
-}
-
-// MarshalYAML marshals TemplateRepositoryTypes as a string with comma-separated values.
-func (ts TemplateRepositoryTypes) MarshalYAML() (interface{}, error) {
-	var csv []string
-	for _, t := range ts.types {
-		csv = append(csv, string(t))
-	}
-	return strings.Join(csv, ","), nil
-}
+type TemplateRepositoryTypes []TemplateRepositoryType
 
 // UnmarshalYAML unmarshals TemplateRepositoryTypes from a string with comma-separated values.
 func (ts *TemplateRepositoryTypes) UnmarshalYAML(value *yaml.Node) error {
-	var csv string
-	if err := value.Decode(&csv); err != nil {
-		return err
+	//nolint:exhaustive // Why: default catches ones we care about here.
+	switch value.Kind {
+	case yaml.ScalarNode:
+		var csv string
+		if err := value.Decode(&csv); err != nil {
+			return fmt.Errorf("failed to parse as csv: %w", err)
+		}
+
+		for _, t := range strings.Split(csv, ",") {
+			*ts = append(*ts, TemplateRepositoryType(t))
+		}
+	case yaml.SequenceNode:
+		var types []TemplateRepositoryType
+		if err := value.Decode(&types); err != nil {
+			return fmt.Errorf("failed to parse as sequence: %w", err)
+		}
+
+		*ts = TemplateRepositoryTypes(types)
+	default:
+		return fmt.Errorf("unexpected yaml node kind: %v", value.Kind)
 	}
 
-	if csv == "" {
-		// empty type defaults to templates only (we do not support repos with no purpose)
-		// leave the slice empty for a consistent unmarshal/marshal roundtrip
-		ts.types = nil
-		return nil
-	}
-
-	items := strings.Split(csv, ",")
-	types := []TemplateRepositoryType{}
-	for _, i := range items {
-		types = append(types, TemplateRepositoryType(i))
-	}
-	ts.types = types
 	return nil
 }
 
 // Contains returns true if current repo needs to serve inpt type, with default assumed
 // to be a templates-only repo (we do not support repos with no purpose).
 func (ts TemplateRepositoryTypes) Contains(t TemplateRepositoryType) bool {
-	if len(ts.types) == 0 {
+	if len(ts) == 0 {
 		// empty types defaults to templates only (we do not support repos with no purpose)
 		return t == TemplateRepositoryTypeTemplates
 	}
-	for _, ti := range ts.types {
-		if ti == t {
-			return true
-		}
-	}
-	return false
+
+	return slices.Contains(ts, t)
 }

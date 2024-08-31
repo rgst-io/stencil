@@ -8,8 +8,10 @@ import (
 	"testing"
 
 	"github.com/urfave/cli/v2"
+	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
 	"gotest.tools/v3/assert"
+	"gotest.tools/v3/env"
 )
 
 // prepareTestRun sets up the environment for running a stencil command.
@@ -22,13 +24,14 @@ func prepareTestRun(t *testing.T, dir string) {
 	b, err := exec.Command("go", "env", "GOMOD").Output()
 	assert.NilError(t, err)
 	repoRoot := strings.TrimSuffix(strings.TrimSpace(string(b)), "/go.mod")
-	chdir(t, repoRoot)
+
+	env.ChangeWorkingDir(t, repoRoot)
 
 	// Use a temporary directory for the test if one is not provided.
 	if dir == "" {
 		dir = t.TempDir()
 	}
-	chdir(t, dir)
+	env.ChangeWorkingDir(t, dir)
 }
 
 // testRunApp runs the provided cli.App with the provided arguments.
@@ -48,27 +51,11 @@ func testRunCommand(t *testing.T, cmd *cli.Command, dir string, args ...string) 
 	return app.Run(append([]string{"test", cmd.Name}, args...))
 }
 
-// chdir changes the current working directory to the provided directory
-// and sets up a cleanup function to change it back to the original
-// directory when the test is done. If the cleanup function fails, the
-// test will panic.
-func chdir(t *testing.T, dir string) {
-	origDir, err := os.Getwd()
-	assert.NilError(t, err)
-	assert.NilError(t, os.Chdir(dir))
-	t.Cleanup(func() {
-		if err := os.Chdir(origDir); err != nil {
-			// Failed, not safe to run other tests.
-			panic(err)
-		}
-	})
-}
-
 func TestCanCreateModule(t *testing.T) {
 	log := slogext.NewTestLogger(t)
 	cmd := NewCreateModuleCommand(log)
 	assert.Assert(t, cmd != nil)
-	assert.NilError(t, testRunCommand(t, cmd, "", "test-module"))
+	assert.NilError(t, testRunCommand(t, cmd, "", "github.com/rgst-io/test-module"))
 
 	// Ensure it created the expected files.
 	_, err := os.Stat("stencil.yaml")
@@ -87,6 +74,32 @@ func TestCreateModuleFailsWhenFilesExist(t *testing.T) {
 	assert.NilError(t, err)
 	assert.NilError(t, f.Close())
 
-	err = testRunCommand(t, cmd, tmpDir, "test-module")
+	err = testRunCommand(t, cmd, tmpDir, "github.com/rgst-io/test-module")
 	assert.ErrorContains(t, err, "directory is not empty, found test-file")
+}
+
+// TestCanCreateNativeExtension ensures that we can render a native
+// extension through stencil-golang. This is technically more of a test
+// of stencil-golang than anything else.
+func TestCanCreateNativeExtension(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+	cmd := NewCreateModuleCommand(log)
+	assert.Assert(t, cmd != nil)
+
+	assert.NilError(t, testRunCommand(t, cmd, "", "--native-extension", "github.com/rgst-io/test-module"))
+
+	// Ensure it created the expected files.
+	expectedFiles := []string{
+		filepath.Join("cmd", "plugin", "plugin.go"),
+		"stencil.yaml",
+	}
+	for _, f := range expectedFiles {
+		_, err := os.Stat(f)
+		assert.NilError(t, err)
+	}
+
+	// Ensure that we have 'plugin' as one of our types.
+	tr, err := configuration.LoadDefaultTemplateRepositoryManifest()
+	assert.NilError(t, err)
+	assert.Assert(t, tr.Type.Contains(configuration.TemplateRepositoryTypeExt))
 }

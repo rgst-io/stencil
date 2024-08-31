@@ -16,19 +16,14 @@ import (
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
 	"gotest.tools/v3/assert"
+	"gotest.tools/v3/env"
 )
 
 func TestValues(t *testing.T) {
 	tmpDir, err := os.MkdirTemp(t.TempDir(), "stencil-values-test")
 	assert.NilError(t, err, "expected os.MkdirTemp() not to fail")
 
-	wd, err := os.Getwd()
-	assert.NilError(t, err, "expected os.Getwd() not to fail")
-
-	// Change directory to the temporary directory, and restore the original
-	// working directory when we're done.
-	os.Chdir(tmpDir)
-	defer func() { os.Chdir(wd) }()
+	env.ChangeWorkingDir(t, tmpDir)
 
 	r, err := gogit.PlainInit(tmpDir, false)
 	assert.NilError(t, err, "expected gogit.PlainInit() not to fail")
