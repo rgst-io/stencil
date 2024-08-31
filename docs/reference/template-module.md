@@ -95,19 +95,22 @@ items:
 
 #### Aliasing an argument with `from`
 
-Aliasing an argument allows you to reference another argument from within the module. For example, if you have an argument called `description` and you want to alias it to another argument called from the module `github.com/getoutreach/stencil-base`, you can do so like so:
+Aliasing an argument allows you to reference another argument from
+within the module. For example, if you have an argument called
+`description` and you want to alias it to another argument called from
+the module `github.com/rgst-io/stencil-golang`, you can do so like so
 
 ```yaml
 # your module
 arguments:
-	description:
-		from: github.com/getoutreach/stencil-base
+  description:
+    from: github.com/rgst-io/stencil-golang
 
-# github.com/getoutreach/stencil-base
+# github.com/rgst-io/stencil-golang
 arguments:
-	description:
-		schema:
-			type: string
+  description:
+    schema:
+      type: string
 ```
 
 There's a few limitations with aliasing arguments:
@@ -159,7 +162,7 @@ func TestGoMod(t \*testing.T) {
 	st := stenciltest.New(t, "go.mod.tpl")
 
 	// Define the arguments to pass to stencil
-	st.Args(map[string]interface{}{"org": "getoutreach"})
+	st.Args(map[string]interface{}{"org": "rgst-io"})
 
 	// Run the test, persisting the snapshot to disk if it changed.
 	// Default is set to false.
