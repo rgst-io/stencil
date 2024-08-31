@@ -2,11 +2,11 @@ package configuration_test
 
 import (
 	"fmt"
-	"os"
 	"testing"
 
 	"go.rgst.io/stencil/pkg/configuration"
 	"gotest.tools/v3/assert"
+	"gotest.tools/v3/env"
 )
 
 func ExampleValidateName() {
@@ -40,11 +40,7 @@ func ExampleNewManifest() {
 }
 
 func TestShouldSupportServiceYaml(t *testing.T) {
-	// Change into test directory
-	curDir, err := os.Getwd()
-	assert.NilError(t, err)
-	defer os.Chdir(curDir)
-	assert.NilError(t, os.Chdir("testdata/interop/service-if-not-found"))
+	env.ChangeWorkingDir(t, "testdata/interop/service-if-not-found")
 
 	sm, err := configuration.LoadDefaultManifest()
 	assert.NilError(t, err)
@@ -53,14 +49,19 @@ func TestShouldSupportServiceYaml(t *testing.T) {
 }
 
 func TestShouldUseStencilOverServiceYaml(t *testing.T) {
-	// Change into test directory
-	curDir, err := os.Getwd()
-	assert.NilError(t, err)
-	defer os.Chdir(curDir)
-	assert.NilError(t, os.Chdir("testdata/interop/stencil-over-service"))
+	env.ChangeWorkingDir(t, "testdata/interop/stencil-over-service")
 
 	sm, err := configuration.LoadDefaultManifest()
 	assert.NilError(t, err)
 
 	assert.Equal(t, sm.Name, "stencil")
+}
+
+func TestLoadDefaultTemplateRepositoryManifestShouldLoad(t *testing.T) {
+	env.ChangeWorkingDir(t, "testdata/tr-default")
+
+	sm, err := configuration.LoadDefaultTemplateRepositoryManifest()
+	assert.NilError(t, err)
+
+	assert.Equal(t, sm.Name, "github.com/rgst-io/test-module")
 }
