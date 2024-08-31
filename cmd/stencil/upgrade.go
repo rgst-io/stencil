@@ -39,7 +39,7 @@ func NewUpgradeCommand(log slogext.Logger) *cli.Command {
 				log.Debug("Debug logging enabled")
 			}
 
-			manifest, err := configuration.NewDefaultManifest()
+			manifest, err := configuration.LoadDefaultManifest()
 			if err != nil {
 				return fmt.Errorf("failed to parse stencil.yaml: %w", err)
 			}

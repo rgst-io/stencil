@@ -46,7 +46,7 @@ func TestShouldSupportServiceYaml(t *testing.T) {
 	defer os.Chdir(curDir)
 	assert.NilError(t, os.Chdir("testdata/interop/service-if-not-found"))
 
-	sm, err := configuration.NewDefaultManifest()
+	sm, err := configuration.LoadDefaultManifest()
 	assert.NilError(t, err)
 
 	assert.Equal(t, sm.Name, "service")
@@ -59,7 +59,7 @@ func TestShouldUseStencilOverServiceYaml(t *testing.T) {
 	defer os.Chdir(curDir)
 	assert.NilError(t, os.Chdir("testdata/interop/stencil-over-service"))
 
-	sm, err := configuration.NewDefaultManifest()
+	sm, err := configuration.LoadDefaultManifest()
 	assert.NilError(t, err)
 
 	assert.Equal(t, sm.Name, "stencil")

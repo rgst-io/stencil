@@ -51,7 +51,7 @@ func NewLockfilePruneCommand(log slogext.Logger) *cli.Command {
 				return errors.Wrap(err, "failed to load lockfile")
 			}
 
-			manifest, err := configuration.NewDefaultManifest()
+			manifest, err := configuration.LoadDefaultManifest()
 			if err != nil {
 				return fmt.Errorf("failed to parse stencil.yaml: %w", err)
 			}
