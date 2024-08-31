@@ -23,7 +23,7 @@ func newLogger(t *testing.T) slogext.Logger {
 func TestCanFetchModule(t *testing.T) {
 	ctx := context.Background()
 	m, err := modules.New(ctx, "", modules.NewModuleOpts{
-		ImportPath: "github.com/getoutreach/stencil-base", Version: &resolver.Version{Branch: "main"},
+		ImportPath: "github.com/rgst-io/stencil-module", Version: &resolver.Version{Branch: "main"},
 	})
 	assert.NilError(t, err, "failed to call New()")
 	assert.Assert(t, m.Manifest.Type.Contains(configuration.TemplateRepositoryTypeTemplates), "failed to validate returned manifest")
@@ -40,18 +40,18 @@ func TestReplacementLocalModule(t *testing.T) {
 		Name: "testing-project",
 		Modules: []*configuration.TemplateRepository{
 			{
-				Name: "github.com/getoutreach/stencil-base",
+				Name: "github.com/rgst-io/stencil-module",
 			},
 		},
 		Replacements: map[string]string{
-			"github.com/getoutreach/stencil-base": "file://testdata",
+			"github.com/rgst-io/stencil-module": "file://testdata",
 		},
 	}
 
 	mods, err := modules.FetchModules(context.Background(), &modules.ModuleResolveOptions{Manifest: sm, Log: newLogger(t)})
 	assert.NilError(t, err, "expected GetModulesForProject() to not error")
 	assert.Equal(t, len(mods), 1, "expected exactly one module to be returned")
-	assert.Equal(t, mods[0].URI, sm.Replacements["github.com/getoutreach/stencil-base"],
+	assert.Equal(t, mods[0].URI, sm.Replacements["github.com/rgst-io/stencil-module"],
 		"expected module to use replacement URI")
 }
 
@@ -62,7 +62,7 @@ func TestCanGetLatestVersion(t *testing.T) {
 			Name: "testing-project",
 			Modules: []*configuration.TemplateRepository{
 				{
-					Name: "github.com/getoutreach/stencil-base",
+					Name: "github.com/rgst-io/stencil-module",
 				},
 			},
 		},
@@ -104,8 +104,6 @@ func TestHandleMultipleConstraints(t *testing.T) {
 		}
 	}
 
-	// should resolve to v0.3.2 because testdata wants latest patch of 0.3.0, while we want =<0.5.0
-	// which is the latest patch of 0.3.0
 	assert.DeepEqual(t,
 		mods[index].Version,
 		&resolver.Version{Tag: "v0.3.2", Commit: "91797167d0e48ae4c9640c0acbd7447eb9e1e5e4"},
@@ -180,7 +178,7 @@ func TestCanUseBranch(t *testing.T) {
 			Name: "testing-project",
 			Modules: []*configuration.TemplateRepository{
 				{
-					Name:    "github.com/getoutreach/stencil-base",
+					Name:    "github.com/rgst-io/stencil-module",
 					Version: "main",
 				},
 			},
@@ -191,7 +189,7 @@ func TestCanUseBranch(t *testing.T) {
 
 	var mod *modules.Module
 	for _, m := range mods {
-		if m.Name == "github.com/getoutreach/stencil-base" {
+		if m.Name == "github.com/rgst-io/stencil-module" {
 			mod = m
 			break
 		}
@@ -211,7 +209,7 @@ func TestBranchAlwaysUsedOverDependency(t *testing.T) {
 		Name: "test",
 		Modules: []*configuration.TemplateRepository{
 			{
-				Name:    "github.com/getoutreach/stencil-base",
+				Name:    "github.com/rgst-io/stencil-module",
 				Version: ">=v0.0.0",
 			},
 		},
@@ -227,7 +225,7 @@ func TestBranchAlwaysUsedOverDependency(t *testing.T) {
 			Name: "testing-project",
 			Modules: []*configuration.TemplateRepository{
 				{
-					Name:    "github.com/getoutreach/stencil-base",
+					Name:    "github.com/rgst-io/stencil-module",
 					Version: "main",
 				},
 				{
@@ -241,7 +239,7 @@ func TestBranchAlwaysUsedOverDependency(t *testing.T) {
 
 	var mod *modules.Module
 	for _, m := range mods {
-		if m.Name == "github.com/getoutreach/stencil-base" {
+		if m.Name == "github.com/rgst-io/stencil-module" {
 			mod = m
 			break
 		}
@@ -304,28 +302,28 @@ func TestShouldResolveInMemoryModule(t *testing.T) {
 	assert.Equal(t, mod.Name, m.Name, "expected module to match")
 }
 
-func TestShouldErrorOnTwoDifferentChannels(t *testing.T) {
+func TestShouldErrorOnTwoDifferentBranches(t *testing.T) {
 	ctx := context.Background()
 	_, err := modules.FetchModules(ctx, &modules.ModuleResolveOptions{
 		Manifest: &configuration.Manifest{
 			Name: "testing-project",
 			Modules: []*configuration.TemplateRepository{
 				{
-					Name:    "github.com/getoutreach/stencil-base",
-					Version: "rc",
+					Name:    "github.com/rgst-io/stencil-module",
+					Version: "main",
 				},
 				{
-					Name:    "github.com/getoutreach/stencil-base",
-					Version: "unstable",
+					Name:    "github.com/rgst-io/stencil-module",
+					Version: "rc",
 				},
 			},
 		},
 		Log: newLogger(t),
 	})
 	assert.ErrorContains(t, err,
-		"failed to resolve module 'github.com/getoutreach/stencil-base' with constraints\n"+
-			"└─ testing-project (top-level) wants branch rc\n"+
-			"  └─ testing-project (top-level) wants branch unstable\n",
+		"failed to resolve module 'github.com/rgst-io/stencil-module' with constraints\n"+
+			"└─ testing-project (top-level) wants branch main\n"+
+			"  └─ testing-project (top-level) wants branch rc\n",
 		"expected GetModulesForProject() to error")
 }
 

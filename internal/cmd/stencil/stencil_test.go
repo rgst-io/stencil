@@ -87,7 +87,7 @@ func TestResolveShouldNotUpgradeOtherModulesWhenUpgradingOne(t *testing.T) {
 			},
 			{
 				// TODO(jaredallard): We need some more test live repos.
-				Name: "github.com/getoutreach/devbase",
+				Name: "github.com/rgst-io/stencil-module",
 			},
 		},
 	}, false)
@@ -99,10 +99,10 @@ func TestResolveShouldNotUpgradeOtherModulesWhenUpgradingOne(t *testing.T) {
 				Tag:    "v0.4.0",
 			},
 		}, {
-			Name: "github.com/getoutreach/devbase",
+			Name: "github.com/rgst-io/stencil-module",
 			Version: &resolver.Version{
-				Commit: "850cae0d50691772bd56267d2056b9dd1b246176",
-				Tag:    "v2.27.1",
+				Commit: "8a953c803b4762fbe90da806f39ad7af404aca0a",
+				Tag:    "v0.1.0",
 			},
 		}},
 	}
@@ -119,7 +119,7 @@ func TestResolveShouldNotUpgradeOtherModulesWhenUpgradingOne(t *testing.T) {
 	})
 
 	// other module shouldn't be changed
-	assert.DeepEqual(t, modsHM["github.com/getoutreach/devbase"].Version, s.lock.Modules[1].Version)
+	assert.DeepEqual(t, modsHM["github.com/rgst-io/stencil-module"].Version, s.lock.Modules[1].Version)
 }
 
 // TestResolveModulesShouldUpdateReplacements ensures that stencil will
@@ -162,17 +162,16 @@ func TestResolveModulesShouldAllowAdds(t *testing.T) {
 				Name:    "github.com/rgst-io/stencil-golang",
 				Version: "v0.5.0", // 3c3213721335c53fd78f4fede1b3704801616615
 			}, {
-				// TODO(jaredallard): We need some more test live repos.
-				Name: "github.com/getoutreach/devbase",
+				Name: "github.com/rgst-io/stencil-module",
 			},
 		},
 	}, false)
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
-			Name: "github.com/getoutreach/devbase",
+			Name: "github.com/rgst-io/stencil-module",
 			Version: &resolver.Version{
-				Commit: "850cae0d50691772bd56267d2056b9dd1b246176",
-				Tag:    "v2.27.1",
+				Commit: "8a953c803b4762fbe90da806f39ad7af404aca0a",
+				Tag:    "v0.1.0",
 			},
 		}},
 	}

@@ -14,6 +14,7 @@
 		"editor.defaultFormatter": "redhat.vscode-yaml"
 	},
 	"cSpell.words": ["codegen", "getoutreach", "gogit", "templating", "worktree"],
+	"cSpell.words": ["codegen", "gogit", "templating", "worktree"],
 
 	// Schema support OOTB.
 	"yaml.schemas": {
