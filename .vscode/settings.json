@@ -3,7 +3,6 @@
 	"go.lintTool": "golangci-lint",
 	"go.formatTool": "goimports",
 	"go.useLanguageServer": true,
-	"go.buildTags": "or_dev",
 	"go.testFlags": ["-v"],
 	"files.trimTrailingWhitespace": true,
 	"editor.formatOnSave": true,
@@ -13,9 +12,6 @@
 	},
 	"[yaml]": {
 		"editor.defaultFormatter": "redhat.vscode-yaml"
-	},
-	"gopls": {
-		"build.buildFlags": ["-tags=or_dev"]
 	},
 	"cSpell.words": ["codegen", "getoutreach", "gogit", "templating", "worktree"],
 

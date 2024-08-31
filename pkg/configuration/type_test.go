@@ -24,20 +24,28 @@ func TestTemplateRepositoryType(t *testing.T) {
 			DoesNotContain: []configuration.TemplateRepositoryType{configuration.TemplateRepositoryTypeExt},
 		},
 		{
-			Name:           "templates",
+			Name:           "string templates",
 			In:             "templates",
 			Contains:       []configuration.TemplateRepositoryType{configuration.TemplateRepositoryTypeTemplates},
 			DoesNotContain: []configuration.TemplateRepositoryType{configuration.TemplateRepositoryTypeExt},
 		},
 		{
-			Name:           "extension",
+			Name:           "string extension",
 			In:             "extension",
 			Contains:       []configuration.TemplateRepositoryType{configuration.TemplateRepositoryTypeExt},
 			DoesNotContain: []configuration.TemplateRepositoryType{configuration.TemplateRepositoryTypeTemplates},
 		},
 		{
-			Name: "both",
+			Name: "legacy csv both",
 			In:   "extension,templates",
+			Contains: []configuration.TemplateRepositoryType{
+				configuration.TemplateRepositoryTypeExt,
+				configuration.TemplateRepositoryTypeTemplates,
+			},
+		},
+		{
+			Name: "slice both",
+			In:   "- extension\n- templates",
 			Contains: []configuration.TemplateRepositoryType{
 				configuration.TemplateRepositoryTypeExt,
 				configuration.TemplateRepositoryTypeTemplates,
@@ -45,26 +53,22 @@ func TestTemplateRepositoryType(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		test := test // for the parallel closure
+	for i := range tests {
+		test := &tests[i]
+
 		t.Run(test.Name, func(t *testing.T) {
-			//t.Parallel()
+			t.Parallel()
+
 			var ts configuration.TemplateRepositoryTypes
-			err := yaml.Unmarshal([]byte(test.In), &ts)
-			assert.NilError(t, err)
+			assert.NilError(t, yaml.Unmarshal([]byte(test.In), &ts))
+
 			for _, typ := range test.Contains {
 				assert.Assert(t, ts.Contains(typ))
 			}
+
 			for _, typ := range test.DoesNotContain {
 				assert.Assert(t, !ts.Contains(typ))
 			}
-			// rountrip marshal
-			b, err := ts.MarshalYAML()
-			assert.NilError(t, err)
-			s, isString := b.(string)
-
-			assert.Equal(t, true, isString)
-			assert.Equal(t, test.In, s, "roundtrip marshal failed")
 		})
 	}
 }

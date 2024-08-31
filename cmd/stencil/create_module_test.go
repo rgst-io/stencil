@@ -68,7 +68,7 @@ func TestCanCreateModule(t *testing.T) {
 	log := slogext.NewTestLogger(t)
 	cmd := NewCreateModuleCommand(log)
 	assert.Assert(t, cmd != nil)
-	assert.NilError(t, testRunCommand(t, cmd, "", "test-module"))
+	assert.NilError(t, testRunCommand(t, cmd, "", "github.com/rgst-io/test-module"))
 
 	// Ensure it created the expected files.
 	_, err := os.Stat("stencil.yaml")
@@ -87,6 +87,6 @@ func TestCreateModuleFailsWhenFilesExist(t *testing.T) {
 	assert.NilError(t, err)
 	assert.NilError(t, f.Close())
 
-	err = testRunCommand(t, cmd, tmpDir, "test-module")
+	err = testRunCommand(t, cmd, tmpDir, "github.com/rgst-io/test-module")
 	assert.ErrorContains(t, err, "directory is not empty, found test-file")
 }
