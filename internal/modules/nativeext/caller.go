@@ -26,7 +26,7 @@ type ExtensionCaller struct {
 }
 
 // Call returns a function based on its path, e.g. test.callFunction
-func (ec *ExtensionCaller) Call(args ...interface{}) (interface{}, error) {
+func (ec *ExtensionCaller) Call(args ...interface{}) (any, error) {
 	if len(args) == 0 {
 		return nil, fmt.Errorf("expected at least 1 arg")
 	}
