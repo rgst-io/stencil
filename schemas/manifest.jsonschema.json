@@ -99,9 +99,8 @@
 			"description": "TemplateRepositoryManifest is a manifest of a template repository"
 		},
 		"TemplateRepositoryTypes": {
-			"properties": {},
-			"additionalProperties": false,
-			"type": "object",
+			"items": { "type": "string" },
+			"type": "array",
 			"description": "TemplateRepositoryTypes specifies what type of a stencil repository the current one is."
 		}
 	}
