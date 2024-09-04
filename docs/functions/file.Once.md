@@ -6,7 +6,8 @@ order: 1004
 
 # file.Once
 
-Once will only generate this file a single time, and store that fact
+Once will only generate this file a single time, if it doesn't already
+exist, and store that fact in the stencil.lock file.
 
 The first time a Once file is generated, it has its provenance stored in
 the stencil.lock file. Going forward, Once checks the lock file for

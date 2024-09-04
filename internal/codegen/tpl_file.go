@@ -10,6 +10,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/go-git/go-billy/v5/osfs"
 	"go.rgst.io/stencil/pkg/slogext"
 	"go.rgst.io/stencil/pkg/stencil"
 )
@@ -104,7 +105,7 @@ func (f *TplFile) Delete() (out string, err error) {
 //	{{- file.Static }}
 func (f *TplFile) Static() (out string, err error) {
 	// if the file already exists, skip it
-	if _, err := os.Stat(f.f.path); err == nil {
+	if _, err := osfs.Default.Stat(f.f.path); err == nil {
 		f.log.With("template", f.t.Path, "path", f.f.path).
 			Debug("Skipping static file because it already exists")
 		return f.Skip("Static file, output already exists")
@@ -113,7 +114,8 @@ func (f *TplFile) Static() (out string, err error) {
 	return "", nil
 }
 
-// Once will only generate this file a single time, and store that fact
+// Once will only generate this file a single time, if it doesn't already
+// exist, and store that fact in the stencil.lock file.
 //
 // The first time a Once file is generated, it has its provenance stored
 // in the stencil.lock file.  Going forward, Once checks the lock file
@@ -122,6 +124,13 @@ func (f *TplFile) Static() (out string, err error) {
 //
 //	{{- file.Once }}
 func (f *TplFile) Once() (out string, err error) {
+	// if the file exists at all, skip it
+	if _, err := osfs.Default.Stat(f.f.path); err == nil {
+		f.log.With("template", f.t.Path, "path", f.f.path).
+			Debug("Skipping once file because it already exists on FS")
+		return f.Skip("Once file, output already exists")
+	}
+
 	// if the file already exists in the lockfile, skip it
 	if f.lock != nil && slices.ContainsFunc(f.lock.Files, func(ff *stencil.LockfileFileEntry) bool { return ff.Name == f.f.path }) {
 		f.log.With("template", f.t.Path, "path", f.f.path).

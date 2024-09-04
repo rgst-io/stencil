@@ -53,7 +53,12 @@ run = "gotestsum"
 ## <<Stencil::Block(custom)>>
 [tasks.generate]
 description = "Generate code and documentation"
-run = ["go generate ./...", "mise run docgen", "mise run schemagen"]
+run = [
+	"go generate ./...",
+	"mise run docgen",
+	"mise run schemagen",
+	"mise run fmt",
+]
 
 [tasks.docgen]
 description = "Generate documentation based on Stencil template functions"
