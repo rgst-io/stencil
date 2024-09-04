@@ -1,6 +1,7 @@
 package codegen
 
 import (
+	"os"
 	"testing"
 
 	"go.rgst.io/stencil/pkg/slogext"
@@ -70,6 +71,25 @@ func TestTplFile_DeleteLockfileHistoryOfOther(t *testing.T) {
 	assert.Equal(t, "", fo)
 	assert.Equal(t, true, tplf.f.Deleted)
 	assert.Equal(t, 1, len(tplf.lock.Files))
+}
+
+// TestTplFile_OnceFileAlreadyExists tests the file.Once command when the target file already exists
+func TestTplFile_OnceFileAlreadyExists(t *testing.T) {
+	tplf := TplFile{
+		f:   &File{path: "test.go"},
+		t:   &Template{},
+		log: slogext.NewTestLogger(t),
+	}
+
+	assert.NilError(t, os.WriteFile("test.go", []byte("test"), 0o644))
+	defer func() {
+		os.Remove("test.go")
+	}()
+
+	fo, err := tplf.Once()
+	assert.NilError(t, err)
+	assert.Equal(t, "", fo)
+	assert.Equal(t, true, tplf.f.Skipped)
 }
 
 // TestTplFile_OnceNoLockfile tests the file.Once command when there's no lockfile history at all
