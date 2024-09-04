@@ -10,6 +10,7 @@ import (
 	"slices"
 	"time"
 
+	"github.com/go-git/go-billy/v5/osfs"
 	"go.rgst.io/stencil/pkg/slogext"
 	"go.rgst.io/stencil/pkg/stencil"
 )
@@ -104,7 +105,7 @@ func (f *TplFile) Delete() (out string, err error) {
 //	{{- file.Static }}
 func (f *TplFile) Static() (out string, err error) {
 	// if the file already exists, skip it
-	if _, err := os.Stat(f.f.path); err == nil {
+	if _, err := osfs.Default.Stat(f.f.path); err == nil {
 		f.log.With("template", f.t.Path, "path", f.f.path).
 			Debug("Skipping static file because it already exists")
 		return f.Skip("Static file, output already exists")
@@ -124,7 +125,7 @@ func (f *TplFile) Static() (out string, err error) {
 //	{{- file.Once }}
 func (f *TplFile) Once() (out string, err error) {
 	// if the file exists at all, skip it
-	if _, err := os.Stat(f.f.path); err == nil {
+	if _, err := osfs.Default.Stat(f.f.path); err == nil {
 		f.log.With("template", f.t.Path, "path", f.f.path).
 			Debug("Skipping once file because it already exists on FS")
 		return f.Skip("Once file, output already exists")
