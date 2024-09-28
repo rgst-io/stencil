@@ -88,6 +88,10 @@ func generateMarkdown(_ slogext.Logger) ([]file, error) {
 			continue
 		}
 
+		if typ.Name() == "TplError" {
+			continue
+		}
+
 		for _, f := range typ.Methods() {
 			txt, err := out.Func(f)
 			if err != nil {

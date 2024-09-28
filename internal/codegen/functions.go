@@ -17,6 +17,7 @@ package codegen
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -25,10 +26,27 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+// TplError is a wrapper for an [error] that can be returned by function
+// templates. This is due to [template] turning them into runtime panics
+// by default.
+type TplError struct {
+	err error
+}
+
+// Error returns the error message.
+func (e TplError) Error() string {
+	return e.err.Error()
+}
+
+// Unwrap returns the underlying error.
+func (e TplError) Unwrap() error {
+	return e.err
+}
+
 // dereference dereferences a pointer returning the
 // referenced data type. If the provided value is not
 // a pointer, it is returned.
-func dereference(i interface{}) interface{} {
+func dereference(i any) any {
 	infType := reflect.TypeOf(i)
 
 	// If not a pointer, noop
@@ -50,11 +68,11 @@ func quotejoinstrings(elems []string, sep string) string {
 }
 
 // toYAML is a clone of the helm toYaml function, which takes
-// an interface{} and turns it into yaml
+// an any and turns it into yaml
 //
 // Based on:
 // https://github.com/helm/helm/blob/a499b4b179307c267bdf3ec49b880e3dbd2a5591/pkg/engine/funcs.go#L83
-func toYAML(v interface{}) (string, error) {
+func toYAML(v any) (string, error) {
 	// If no data, return an empty string
 	if v == nil {
 		return "", nil
@@ -68,11 +86,11 @@ func toYAML(v interface{}) (string, error) {
 	return strings.TrimSuffix(string(data), "\n"), nil
 }
 
-// fromYAML converts a YAML document into a interface{}.
+// fromYAML converts a YAML document into [any].
 //
 // Based on: https://github.com/helm/helm/blob/a499b4b179307c267bdf3ec49b880e3dbd2a5591/pkg/engine/funcs.go#L98
-func fromYAML(str string) (interface{}, error) {
-	var m interface{}
+func fromYAML(str string) (any, error) {
+	var m any
 
 	if err := yaml.Unmarshal([]byte(str), &m); err != nil {
 		return nil, err
@@ -80,8 +98,8 @@ func fromYAML(str string) (interface{}, error) {
 	return m, nil
 }
 
-// toJSON converts a interface{} into a JSON document.
-func toJSON(v interface{}) (string, error) {
+// toJSON converts a any into a JSON document.
+func toJSON(v any) (string, error) {
 	// If no data, return an empty string
 	if v == nil {
 		return "", nil
@@ -95,14 +113,19 @@ func toJSON(v interface{}) (string, error) {
 	return strings.TrimSuffix(string(data), "\n"), nil
 }
 
-// fromJSON converts a JSON document into a interface{}.
-func fromJSON(str string) (interface{}, error) {
-	var m interface{}
+// fromJSON converts a JSON document into a any.
+func fromJSON(str string) (any, error) {
+	var m any
 
 	if err := json.Unmarshal([]byte(str), &m); err != nil {
 		return nil, err
 	}
 	return m, nil
+}
+
+// tplError creates a new [TplError] with the provided text
+func tplError(text string) TplError {
+	return TplError{errors.New(text)}
 }
 
 // Default are stock template functions that don't impact
@@ -115,4 +138,5 @@ var Default = template.FuncMap{
 	"fromYaml":         fromYAML,
 	"toJson":           toJSON,
 	"fromJson":         fromJSON,
+	"error":            tplError,
 }
