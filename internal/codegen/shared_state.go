@@ -15,6 +15,7 @@
 package codegen
 
 import (
+	"fmt"
 	"path"
 	"sort"
 
@@ -23,11 +24,12 @@ import (
 )
 
 // hashModuleHookValue hashes the module hook value using the
-// hashstructure library. If the hashing fails, it returns 0.
+// hashstructure library. This function panics if hashing fails because
+// there is currently no known case where this would fail.
 func hashModuleHookValue(m any) uint64 {
 	hash, err := hashstructure.Hash(m, hashstructure.FormatV2, nil)
 	if err != nil {
-		hash = 0
+		panic(fmt.Errorf("failed to hash module hook value: %w", err))
 	}
 	return hash
 }
