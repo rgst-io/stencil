@@ -25,7 +25,7 @@ func TestTplModule_Tpl(t *testing.T) {
 		{
 			name:            "should error on non-existent template",
 			callingTemplate: `{{- module.Call "caller.HelloWorld" }}`,
-			wantErrContains: `calling Call: module "caller" did not register any functions or was not imported`,
+			wantErrContains: `function "HelloWorld" in module "caller" was not registered`,
 		},
 		{
 			name:            "should error on invalid function name",
@@ -95,7 +95,7 @@ func TestTplModule_Tpl(t *testing.T) {
 			log := slogext.NewTestLogger(t)
 
 			// create stencil
-			st := &Stencil{sharedData: &sharedData{globals: make(map[string]global)}, moduleCaller: NewModuleCaller(), log: log}
+			st := &Stencil{sharedState: newSharedState(), log: log}
 
 			// create calling module
 			callerModule, err := modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{
@@ -137,12 +137,11 @@ func TestTplModule_Tpl(t *testing.T) {
 			vals := NewValues(context.Background(), &configuration.Manifest{Name: t.Name()}, mods)
 
 			// render template to register it
-			st.isFirstPass = true
 			assert.NilError(t, functionTpl.Render(st, vals), "expected Render to succeed")
 
 			// We already registered the function template, so we can render
 			// the caller template now.
-			st.isFirstPass = false
+			st.renderStage = renderStageFinal
 
 			err = callerTpl.Render(st, vals)
 			if err != nil {

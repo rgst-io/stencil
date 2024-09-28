@@ -127,14 +127,10 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 						log,
 					),
 				),
-				s: &Stencil{sharedData: &sharedData{
-					moduleHooks: make(map[string]*moduleHook),
-					globals:     make(map[string]global),
-				}},
+				s:   &Stencil{sharedState: newSharedState()},
 				log: log,
 			}
 
-			s.s.isFirstPass = true
 			for _, insert := range tt.inserts {
 				if _, err := s.AddToModuleHook(s.t.Module.Name, tt.args.name, insert); err != nil {
 					t.Errorf("TplStencil.GetModuleHook() error = %v", err)
@@ -142,16 +138,7 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 				}
 			}
 
-			// Ensure that GetModuleHook never returns anything other than
-			// `[]any` during the first pass.
-			if got := s.GetModuleHook(tt.args.name); !reflect.DeepEqual(got, []any{}) {
-				t.Errorf("TplStencil.GetModuleHook() = %v, want %v", got, []any{})
-			}
-			s.s.isFirstPass = false
-
-			// Sort the module hooks, which should be called by stencil before
-			// the second pass
-			s.s.sortModuleHooks()
+			s.s.sharedState.hash() // Sorts the module hooks
 
 			if got := s.GetModuleHook(tt.args.name); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("TplStencil.GetModuleHook() = %v, want %v", got, tt.want)
@@ -197,16 +184,11 @@ func TestGlobals(t *testing.T) {
 						log,
 					),
 				),
-				s:   &Stencil{sharedData: &sharedData{globals: make(map[string]global)}},
+				s:   &Stencil{sharedState: newSharedState()},
 				log: log,
 			}
 
-			s.s.isFirstPass = true
 			s.SetGlobal(tt.args.name, tt.args.data)
-
-			// Ensure we return nothing during the first pass.
-			assert.Equal(t, s.GetGlobal(tt.args.name), nil)
-			s.s.isFirstPass = false
 
 			// Ensure we return data after the first pass. SetGlobal should
 			// still take effect during the first pass.
@@ -230,7 +212,7 @@ func TestTplStencil_ReadFile(t *testing.T) {
 				log,
 			),
 		),
-		s:   &Stencil{sharedData: &sharedData{globals: make(map[string]global)}},
+		s:   &Stencil{sharedState: newSharedState()},
 		log: log,
 	}
 
@@ -298,7 +280,7 @@ func TestTplStencil_ApplyTemplate(t *testing.T) {
 			log := slogext.NewTestLogger(t)
 
 			// create stencil
-			st := &Stencil{sharedData: &sharedData{globals: make(map[string]global)}}
+			st := &Stencil{sharedState: newSharedState()}
 
 			// create module
 			module, err := modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{

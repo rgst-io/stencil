@@ -14,6 +14,7 @@ import (
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
 	"go.rgst.io/stencil/pkg/stencil"
+	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
 )
 
@@ -96,13 +97,7 @@ func TestModuleHookRender(t *testing.T) {
 	assert.Equal(t, len(tpls), 2, "expected Render() to return two templates")
 	// template return order is randomized to prevent order dependencies
 	slices.SortFunc(tpls, func(a, b *Template) int {
-		if a.Module.Name < b.Module.Name {
-			return -1
-		}
-		if a.Module.Name > b.Module.Name {
-			return 1
-		}
-		return 0
+		return strings.Compare(a.Module.Name, b.Module.Name)
 	})
 	assert.Equal(t, len(tpls[1].Files), 1, "expected Render() m2 template to return a single file")
 	assert.Equal(t, strings.TrimSpace(tpls[1].Files[0].String()), "a", "expected Render() m2 to return correct output")
@@ -142,4 +137,64 @@ func TestBadDirReplacement(t *testing.T) {
 	vals := NewValues(context.Background(), sm, nil)
 	_, err = st.renderDirReplacement("b/c", m, vals)
 	assert.ErrorContains(t, err, "contains path separator in output")
+}
+
+// TestIterations ensures that stencil properly handles iterations based
+// on state, in this case through global variables.
+func TestIterations(t *testing.T) {
+	fs := memfs.New()
+	ctx := context.Background()
+	log := slogext.NewTestLogger(t)
+
+	// create stub manifest
+	f, _ := fs.Create("manifest.yaml")
+	f.Write([]byte("name: testing"))
+	f.Close()
+
+	// create a stub template
+	f, err := fs.Create("templates/test-template.tpl")
+	assert.NilError(t, err, "failed to create stub template")
+	f.Write([]byte(`{{- stencil.SetGlobal "x" 1 }}
+{{- stencil.SetGlobal "z" (add (stencil.GetGlobal "y") 1) }}
+{{- stencil.SetGlobal "y" (add (stencil.GetGlobal "x") 1) }}
+
+x: {{ stencil.GetGlobal "x" }}
+y: {{ stencil.GetGlobal "y" }}
+z: {{ stencil.GetGlobal "z" }}`))
+	assert.NilError(t, f.Close(), "failed to close stub template")
+
+	tp, err := modulestest.NewWithFS(ctx, "testing", fs)
+	assert.NilError(t, err, "failed to NewWithFS")
+	st := NewStencil(&configuration.Manifest{
+		Name:      "test",
+		Arguments: map[string]any{},
+	}, nil, []*modules.Module{tp}, log)
+
+	tpls, err := st.Render(ctx, log)
+	assert.NilError(t, err, "expected Render() to not fail")
+	assert.Equal(t, len(tpls), 1, "expected Render() to return a single template")
+	assert.Equal(t, len(tpls[0].Files), 1, "expected Render() template to return a single file")
+
+	var resp map[string]int
+	assert.NilError(t, yaml.Unmarshal(tpls[0].Files[0].contents, &resp), "failed to unmarshal response")
+	assert.DeepEqual(t, resp, map[string]int{"x": 1, "y": 2, "z": 3})
+
+	lock := st.GenerateLockfile(tpls)
+	assert.DeepEqual(t, lock, &stencil.Lockfile{
+		Version: version.Version.GitVersion,
+		Modules: []*stencil.LockfileModuleEntry{
+			{
+				Name:    "testing",
+				URL:     "vfs://testing",
+				Version: &resolver.Version{Virtual: "vfs"},
+			},
+		},
+		Files: []*stencil.LockfileFileEntry{
+			{
+				Name:     "test-template",
+				Template: "test-template.tpl",
+				Module:   "testing",
+			},
+		},
+	})
 }

@@ -57,15 +57,8 @@ type TplStencil struct {
 //	  {{ . }}
 //	{{- end }}
 func (s *TplStencil) GetModuleHook(name string) []any {
-	// On the first pass, never return any data. If we did, the data would
-	// be unreliably set because we don't sort the templates in any way or
-	// guarantee that they will be rendered in specific any order.
-	if s.s.isFirstPass {
-		return []any{}
-	}
-
-	k := s.s.sharedData.key(s.t.Module.Name, name)
-	v := s.s.sharedData.moduleHooks[k]
+	k := s.s.sharedState.key(s.t.Module.Name, name)
+	v, _ := s.s.sharedState.ModuleHooks.Load(k)
 	if v == nil {
 		// No data, return nothing
 		return []any{}
@@ -74,7 +67,7 @@ func (s *TplStencil) GetModuleHook(name string) []any {
 	s.log.With("template", s.t.ImportPath(), "path", k, "data", spew.Sdump(v)).
 		Debug("getting module hook")
 
-	return v.values
+	return v
 }
 
 // SetGlobal sets a global to be used in the context of the current template module
@@ -91,19 +84,14 @@ func (s *TplStencil) GetModuleHook(name string) []any {
 //	{{- /* This writes a global into the current context of the template module repository */}}
 //	{{- stencil.SetGlobal "IsGeorgeCool" true -}}
 func (s *TplStencil) SetGlobal(name string, data any) string {
-	// Only modify on first pass
-	if !s.s.isFirstPass {
-		return ""
-	}
-
-	k := s.s.sharedData.key(s.t.Module.Name, name)
+	k := s.s.sharedState.key(s.t.Module.Name, name)
 	s.log.With("template", s.t.ImportPath(), "path", k, "data", spew.Sdump(data)).
 		Debug("adding to global store")
 
-	s.s.sharedData.globals[k] = global{
-		template: s.t.Path,
-		value:    data,
-	}
+	s.s.sharedState.Globals.Store(k, global{
+		Template: s.t.Path,
+		Value:    data,
+	})
 
 	return ""
 }
@@ -115,15 +103,8 @@ func (s *TplStencil) SetGlobal(name string, data any) string {
 //	{{- /* This retrieves a global from the current context of the template module repository */}}
 //	{{ $isGeorgeCool := stencil.GetGlobal "IsGeorgeCool" }}
 func (s *TplStencil) GetGlobal(name string) any {
-	// Never return any data during the first pass because that would be
-	// non-deterministic.
-	if s.s.isFirstPass {
-		return nil
-	}
-
-	k := s.s.sharedData.key(s.t.Module.Name, name)
-
-	v, ok := s.s.sharedData.globals[k]
+	k := s.s.sharedState.key(s.t.Module.Name, name)
+	v, ok := s.s.sharedState.Globals.Load(k)
 	if !ok {
 		s.log.With("template", s.t.ImportPath(), "path", k).
 			Warn("failed to retrieved data from global store")
@@ -134,9 +115,9 @@ func (s *TplStencil) GetGlobal(name string) any {
 		"template", s.t.ImportPath(),
 		"path", k,
 		"data", spew.Sdump(v),
-		"definingTemplate", v.template,
+		"definingTemplate", v.Template,
 	).Debug("retrieved data from global store")
-	return v.value
+	return v.Value
 }
 
 // AddToModuleHook adds to a hook in another module
@@ -150,12 +131,7 @@ func (s *TplStencil) GetGlobal(name string) any {
 //	{{- /* This writes to a module hook */}}
 //	{{- stencil.AddToModuleHook "github.com/myorg/repo" "myModuleHook" (list "myData") }}
 func (s *TplStencil) AddToModuleHook(module, name string, data interface{}) (out string, err error) {
-	// Only modify on first pass
-	if !s.s.isFirstPass {
-		return "", nil
-	}
-
-	k := s.s.sharedData.key(module, name)
+	k := s.s.sharedState.key(module, name)
 	s.log.With("template", s.t.ImportPath(), "path", k, "data", spew.Sdump(data)).
 		Debug("adding to module hook")
 
@@ -178,12 +154,8 @@ func (s *TplStencil) AddToModuleHook(module, name string, data interface{}) (out
 		interfaceSlice[i] = v.Index(i).Interface()
 	}
 
-	// if set, append, otherwise assign
-	if _, ok := s.s.sharedData.moduleHooks[k]; ok {
-		s.s.sharedData.moduleHooks[k].values = append(s.s.sharedData.moduleHooks[k].values, interfaceSlice...)
-	} else {
-		s.s.sharedData.moduleHooks[k] = &moduleHook{values: interfaceSlice}
-	}
+	orig, _ := s.s.sharedState.ModuleHooks.Load(k)
+	s.s.sharedState.ModuleHooks.Store(k, append(orig, interfaceSlice...))
 
 	return "", nil
 }
