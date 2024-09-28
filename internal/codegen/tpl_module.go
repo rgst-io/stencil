@@ -133,6 +133,9 @@ func (tm *TplModule) Call(name string, args ...any) (any, error) {
 	// Get the module name and function name by splitting the name by the
 	// last period.
 	lastPeriodIdx := strings.LastIndex(name, ".")
+	if lastPeriodIdx == -1 {
+		return nil, fmt.Errorf("expected format module.function, got %q", name)
+	}
 	moduleName, functionName := name[:lastPeriodIdx], name[lastPeriodIdx+1:]
 
 	if _, ok := tm.s.moduleCaller.functions[moduleName]; !ok {
