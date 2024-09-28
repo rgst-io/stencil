@@ -20,6 +20,7 @@ require (
 	github.com/mitchellh/hashstructure/v2 v2.0.2
 	github.com/pkg/errors v0.9.1
 	github.com/princjef/gomarkdoc v1.1.0
+	github.com/puzpuzpuz/xsync/v3 v3.4.0
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
 	github.com/urfave/cli/v2 v2.27.4
 	gopkg.in/yaml.v3 v3.0.1
@@ -72,7 +73,6 @@ require (
 	github.com/onsi/ginkgo v1.16.4 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/princjef/mageutil v1.0.0 // indirect
-	github.com/puzpuzpuz/xsync/v3 v3.4.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
