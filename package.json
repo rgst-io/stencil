@@ -1,7 +1,7 @@
 {
 	"name": "@rgst-io/stencil",
 	"devDependencies": {
-		"prettier": "^3.3.2"
+		"prettier": "^3.3.3"
 	},
 	"private": true
 }
