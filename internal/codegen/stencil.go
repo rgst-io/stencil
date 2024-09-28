@@ -41,16 +41,30 @@ import (
 // NewStencil creates a new, fully initialized Stencil renderer function
 func NewStencil(m *configuration.Manifest, lock *stencil.Lockfile, mods []*modules.Module, log slogext.Logger) *Stencil {
 	return &Stencil{
-		log:              log,
-		m:                m,
-		ext:              nativeext.NewHost(log),
-		lock:             lock,
-		modules:          mods,
-		isRenderStage:    true,
-		renderStageLimit: 20,
-		sharedState:      newSharedState(),
+		log:                 log,
+		m:                   m,
+		ext:                 nativeext.NewHost(log),
+		lock:                lock,
+		modules:             mods,
+		preRenderStageLimit: 20,
+		sharedState:         newSharedState(),
 	}
 }
+
+// renderStage denotes the stage that a [Stencil] struct is in. See the
+// comments on the const values for more information.
+type renderStage int
+
+const (
+	// renderStagePre is the initial render stage. This stage denotes that
+	// [sharedState] is still changing and more iterations may be needed.
+	renderStagePre renderStage = iota
+
+	// renderStageFinal is the final render stage. This stage denotes that
+	// [sharedState] is stable and we can move on to the final render
+	// stage. This is the stage where files are actually written.
+	renderStageFinal
+)
 
 // Stencil provides the basic functions for
 // stencil templates
@@ -66,15 +80,13 @@ type Stencil struct {
 	// modules is a list of modules used in this stencil render
 	modules []*modules.Module
 
-	// isRenderStage denotes if we're in the initial render stage. This is
-	// used to determine if our shared state is stable. Once it hasn't
-	// changed for a full iteration, we can move on to final render stage,
-	// which is when files are actually written.
-	isRenderStage bool
+	// renderStage is the current [renderStage] that the stencil is in.
+	renderStage renderStage
 
-	// renderStageLimit is the number of times we can repeat the render
-	// stage before we give up.
-	renderStageLimit int
+	// preRenderStageLimit is the number of iterations to allow the
+	// pre-render stage to run for. This is used to prevent infinite
+	// loops in templates.
+	preRenderStageLimit int
 
 	// sharedState is the shared state between all templates.
 	sharedState *sharedState
@@ -164,7 +176,7 @@ func (s *Stencil) Render(ctx context.Context, log slogext.Logger) ([]*Template, 
 	var lastHash uint64
 	var i int
 	for {
-		if i > (s.renderStageLimit - 1) {
+		if i > (s.preRenderStageLimit - 1) {
 			return nil, fmt.Errorf("failed to stabilize shared state within %d iterations", i)
 		}
 
@@ -182,7 +194,7 @@ func (s *Stencil) Render(ctx context.Context, log slogext.Logger) ([]*Template, 
 		// Calculate the hash of the shared state
 		hash, err := s.sharedState.hash()
 		if err != nil {
-			return nil, fmt.Errorf("failed to determine as stable hash for shared state: %w", err)
+			return nil, fmt.Errorf("failed to determine a stable hash for shared state: %w", err)
 		}
 		if hash == lastHash {
 			log.Debugf("First pass render stable after %d iterations", i)
@@ -193,8 +205,8 @@ func (s *Stencil) Render(ctx context.Context, log slogext.Logger) ([]*Template, 
 		i++
 	}
 
-	// Second pass render
-	s.isRenderStage = false
+	// We're at the final render stage now.
+	s.renderStage = renderStageFinal
 
 	if err := s.calcDirReplacements(vals); err != nil {
 		return nil, err

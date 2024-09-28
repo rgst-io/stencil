@@ -131,7 +131,6 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 				log: log,
 			}
 
-			s.s.isRenderStage = true
 			for _, insert := range tt.inserts {
 				if _, err := s.AddToModuleHook(s.t.Module.Name, tt.args.name, insert); err != nil {
 					t.Errorf("TplStencil.GetModuleHook() error = %v", err)
@@ -139,12 +138,6 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 				}
 			}
 
-			// Ensure that GetModuleHook never returns anything other than
-			// `[]any` during the first pass.
-			if got := s.GetModuleHook(tt.args.name); !reflect.DeepEqual(got, []any{}) {
-				t.Errorf("TplStencil.GetModuleHook() = %v, want %v", got, []any{})
-			}
-			s.s.isRenderStage = false
 			s.s.sharedState.hash() // Sorts the module hooks
 
 			if got := s.GetModuleHook(tt.args.name); !reflect.DeepEqual(got, tt.want) {
@@ -195,12 +188,7 @@ func TestGlobals(t *testing.T) {
 				log: log,
 			}
 
-			s.s.isRenderStage = true
 			s.SetGlobal(tt.args.name, tt.args.data)
-
-			// Ensure we return nothing during the first pass.
-			assert.Equal(t, s.GetGlobal(tt.args.name), nil)
-			s.s.isRenderStage = false
 
 			// Ensure we return data after the first pass. SetGlobal should
 			// still take effect during the first pass.

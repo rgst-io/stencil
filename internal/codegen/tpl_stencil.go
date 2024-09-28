@@ -57,13 +57,6 @@ type TplStencil struct {
 //	  {{ . }}
 //	{{- end }}
 func (s *TplStencil) GetModuleHook(name string) []any {
-	// On the first pass, never return any data. If we did, the data would
-	// be unreliably set because we don't sort the templates in any way or
-	// guarantee that they will be rendered in specific any order.
-	if s.s.isRenderStage {
-		return []any{}
-	}
-
 	k := s.s.sharedState.key(s.t.Module.Name, name)
 	v, _ := s.s.sharedState.ModuleHooks.Load(k)
 	if v == nil {
@@ -91,11 +84,6 @@ func (s *TplStencil) GetModuleHook(name string) []any {
 //	{{- /* This writes a global into the current context of the template module repository */}}
 //	{{- stencil.SetGlobal "IsGeorgeCool" true -}}
 func (s *TplStencil) SetGlobal(name string, data any) string {
-	// Only modify on first pass
-	if !s.s.isRenderStage {
-		return ""
-	}
-
 	k := s.s.sharedState.key(s.t.Module.Name, name)
 	s.log.With("template", s.t.ImportPath(), "path", k, "data", spew.Sdump(data)).
 		Debug("adding to global store")
@@ -115,12 +103,6 @@ func (s *TplStencil) SetGlobal(name string, data any) string {
 //	{{- /* This retrieves a global from the current context of the template module repository */}}
 //	{{ $isGeorgeCool := stencil.GetGlobal "IsGeorgeCool" }}
 func (s *TplStencil) GetGlobal(name string) any {
-	// Never return any data during the first pass because that would be
-	// non-deterministic.
-	if s.s.isRenderStage {
-		return nil
-	}
-
 	k := s.s.sharedState.key(s.t.Module.Name, name)
 	v, ok := s.s.sharedState.Globals.Load(k)
 	if !ok {
@@ -149,11 +131,6 @@ func (s *TplStencil) GetGlobal(name string) any {
 //	{{- /* This writes to a module hook */}}
 //	{{- stencil.AddToModuleHook "github.com/myorg/repo" "myModuleHook" (list "myData") }}
 func (s *TplStencil) AddToModuleHook(module, name string, data interface{}) (out string, err error) {
-	// Only modify on first pass
-	if !s.s.isRenderStage {
-		return "", nil
-	}
-
 	k := s.s.sharedState.key(module, name)
 	s.log.With("template", s.t.ImportPath(), "path", k, "data", spew.Sdump(data)).
 		Debug("adding to module hook")

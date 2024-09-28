@@ -137,12 +137,11 @@ func TestTplModule_Tpl(t *testing.T) {
 			vals := NewValues(context.Background(), &configuration.Manifest{Name: t.Name()}, mods)
 
 			// render template to register it
-			st.isRenderStage = true
 			assert.NilError(t, functionTpl.Render(st, vals), "expected Render to succeed")
 
 			// We already registered the function template, so we can render
 			// the caller template now.
-			st.isRenderStage = false
+			st.renderStage = renderStageFinal
 
 			err = callerTpl.Render(st, vals)
 			if err != nil {

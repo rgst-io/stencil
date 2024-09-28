@@ -56,7 +56,7 @@ type TplModule struct {
 //	{{ module.Export "HelloWorld" }}
 func (tm *TplModule) Export(name string) (string, error) {
 	// We only allow functions to be exported in the first pass.
-	if !tm.s.isRenderStage {
+	if tm.s.renderStage == renderStageFinal {
 		return "", nil
 	}
 
@@ -114,8 +114,9 @@ func (tm *TplModule) Call(name string, args ...any) (any, error) {
 		return nil, fmt.Errorf("Call() only takes max two arguments, name and data")
 	}
 
-	// Functions cannot be called in the first pass.
-	if tm.s.isRenderStage {
+	// We don't allow calling functions during the pre-render stage
+	// because we don't know what functions are available yet.
+	if tm.s.renderStage == renderStagePre {
 		return nil, nil
 	}
 
