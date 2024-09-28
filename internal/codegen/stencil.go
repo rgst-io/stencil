@@ -20,9 +20,8 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"math/rand"
+	"math/rand/v2"
 	"os"
-	"os/exec"
 	"path"
 	"path/filepath"
 	"sort"
@@ -30,6 +29,7 @@ import (
 	"time"
 
 	"github.com/go-git/go-billy/v5/util"
+	"github.com/jaredallard/cmdexec"
 	"github.com/mitchellh/hashstructure/v2"
 	"github.com/pkg/errors"
 	"go.rgst.io/stencil/internal/modules"
@@ -44,13 +44,14 @@ import (
 // NewStencil creates a new, fully initialized Stencil renderer function
 func NewStencil(m *configuration.Manifest, lock *stencil.Lockfile, mods []*modules.Module, log slogext.Logger) *Stencil {
 	return &Stencil{
-		log:         log,
-		m:           m,
-		ext:         nativeext.NewHost(log),
-		lock:        lock,
-		modules:     mods,
-		isFirstPass: true,
-		sharedData:  newSharedData(),
+		log:          log,
+		m:            m,
+		ext:          nativeext.NewHost(log),
+		lock:         lock,
+		modules:      mods,
+		moduleCaller: NewModuleCaller(),
+		isFirstPass:  true,
+		sharedData:   newSharedData(),
 	}
 }
 
@@ -66,7 +67,8 @@ type Stencil struct {
 	lock *stencil.Lockfile
 
 	// modules is a list of modules used in this stencil render
-	modules []*modules.Module
+	modules      []*modules.Module
+	moduleCaller *ModuleCaller
 
 	// isFirstPass denotes if the renderer is currently in first
 	// pass mode
@@ -299,11 +301,8 @@ func (s *Stencil) PostRun(ctx context.Context, log slogext.Logger) error {
 	for _, m := range s.modules {
 		for _, cmdStr := range m.Manifest.PostRunCommand {
 			log.Infof(" - %s", cmdStr.Name)
-			//nolint:gosec // Why: This is by design
-			cmd := exec.CommandContext(ctx, "/usr/bin/env", "bash", "-c", cmdStr.Command)
-			cmd.Stdin = os.Stdin
-			cmd.Stderr = os.Stderr
-			cmd.Stdout = os.Stdout
+			cmd := cmdexec.CommandContext(ctx, "/usr/bin/env", "bash", "-c", cmdStr.Command)
+			cmd.UseOSStreams(true)
 			if err := cmd.Run(); err != nil {
 				return errors.Wrapf(err, "failed to run post run command for module %q", m.Name)
 			}
@@ -379,7 +378,7 @@ func (s *Stencil) getTemplates(ctx context.Context, log slogext.Logger) ([]*Temp
 	// Shuffle the templates to prevent accidental file order guarantees
 	// from being relied upon.
 	//nolint:gosec // Why: We don't need that much entropy.
-	rand.New(rand.NewSource(time.Now().UnixNano())).Shuffle(len(tpls), func(i, j int) {
+	rand.Shuffle(len(tpls), func(i, j int) {
 		tpls[i], tpls[j] = tpls[j], tpls[i]
 	})
 

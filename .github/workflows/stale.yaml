@@ -1,7 +1,7 @@
-name: 'Close stale issues and PRs'
+name: "Close stale issues and PRs"
 on:
   schedule:
-    - cron: '30 1 * * *'
+    - cron: "30 1 * * *"
 
 permissions:
   issues: write
@@ -24,7 +24,7 @@ jobs:
           close-issue-message: >
             This issue has been automatically closed due to inactivity. If you're still interested in pursuing this, please reach out
             to the triage team (`@jaredallard`). Thanks!
-          stale-issue-label: 'lifecycle/stale'
-          exempt-issue-labels: 'lifecycle/frozen,status/backlog,status/in-progress,status/in-review'
+          stale-issue-label: "lifecycle/stale"
+          exempt-issue-labels: "lifecycle/frozen,status/backlog,status/in-progress,status/in-review"
           close-issue-reason: "not_planned"
           ascending: true

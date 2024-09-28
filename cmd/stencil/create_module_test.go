@@ -2,11 +2,11 @@ package main
 
 import (
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/jaredallard/cmdexec"
 	"github.com/urfave/cli/v2"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
@@ -21,7 +21,7 @@ import (
 func prepareTestRun(t *testing.T, dir string) {
 	// Change into the repo root.
 	// GOMOD: <module path>/go.mod
-	b, err := exec.Command("go", "env", "GOMOD").Output()
+	b, err := cmdexec.Command("go", "env", "GOMOD").Output()
 	assert.NilError(t, err)
 	repoRoot := strings.TrimSuffix(strings.TrimSpace(string(b)), "/go.mod")
 

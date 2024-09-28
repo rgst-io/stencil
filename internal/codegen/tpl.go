@@ -28,17 +28,20 @@ import (
 
 // NewFuncMap returns the standard func map for a template
 func NewFuncMap(st *Stencil, t *Template, log slogext.Logger) template.FuncMap {
-	// We allow tplst & tplf to be nil in the case of
-	// .Parse() of a template, where they need to be present
-	// but aren't actually executed by the template
-	// (execute is the one that renders it)
+	// At first look it might be confusing why we allow these to be nil,
+	// this is because when we call Parse() on a template, these values
+	// will be nil but not actually used until Execute() is called.
 	var tplst *TplStencil
 	var tplf *TplFile
+	var tplm *TplModule
 	if st != nil {
 		tplst = &TplStencil{st, t, log}
 	}
 	if t != nil && len(t.Files) > 0 {
 		tplf = &TplFile{t.Files[0], t, st.lock, log}
+	}
+	if t != nil && st != nil {
+		tplm = &TplModule{st, t, log}
 	}
 
 	// build the function map
@@ -48,9 +51,16 @@ func NewFuncMap(st *Stencil, t *Template, log slogext.Logger) template.FuncMap {
 		if tplf == nil {
 			panic(fmt.Errorf("attempted to use file in a template that doesn't support file rendering"))
 		}
-
 		return tplf
 	}
 	funcs["extensions"] = func() *nativeext.ExtensionCaller { return st.extCaller }
+	funcs["module"] = func() *TplModule { return tplm }
+
+	// Only valid in the "module" context. This is overwritten in the
+	// [TplModule.Call].
+	funcs["return"] = func() (string, error) {
+		return "", fmt.Errorf("'return' can only be called during a module.Call")
+	}
+
 	return funcs
 }
