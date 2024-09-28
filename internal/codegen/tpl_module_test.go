@@ -28,6 +28,11 @@ func TestTplModule_Tpl(t *testing.T) {
 			wantErrContains: `calling Call: module "caller" did not register any functions or was not imported`,
 		},
 		{
+			name:            "should error on invalid function name",
+			callingTemplate: `{{- module.Call "blah" }}`,
+			wantErrContains: `expected format module.function, got "blah"`,
+		},
+		{
 			name: "should support calling exported function",
 			functionTemplate: `{{- define "HelloWorld" -}}
 {{ return "Hello, world!" }}
