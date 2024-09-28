@@ -22,15 +22,12 @@ import (
 	"io"
 	"math/rand/v2"
 	"os"
-	"path"
 	"path/filepath"
-	"sort"
 	"strings"
 	"time"
 
 	"github.com/go-git/go-billy/v5/util"
 	"github.com/jaredallard/cmdexec"
-	"github.com/mitchellh/hashstructure/v2"
 	"github.com/pkg/errors"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/nativeext"
@@ -44,14 +41,14 @@ import (
 // NewStencil creates a new, fully initialized Stencil renderer function
 func NewStencil(m *configuration.Manifest, lock *stencil.Lockfile, mods []*modules.Module, log slogext.Logger) *Stencil {
 	return &Stencil{
-		log:          log,
-		m:            m,
-		ext:          nativeext.NewHost(log),
-		lock:         lock,
-		modules:      mods,
-		moduleCaller: NewModuleCaller(),
-		isFirstPass:  true,
-		sharedData:   newSharedData(),
+		log:              log,
+		m:                m,
+		ext:              nativeext.NewHost(log),
+		lock:             lock,
+		modules:          mods,
+		isRenderStage:    true,
+		renderStageLimit: 20,
+		sharedState:      newSharedState(),
 	}
 }
 
@@ -67,73 +64,20 @@ type Stencil struct {
 	lock *stencil.Lockfile
 
 	// modules is a list of modules used in this stencil render
-	modules      []*modules.Module
-	moduleCaller *ModuleCaller
+	modules []*modules.Module
 
-	// isFirstPass denotes if the renderer is currently in first
-	// pass mode
-	isFirstPass bool
+	// isRenderStage denotes if we're in the initial render stage. This is
+	// used to determine if our shared state is stable. Once it hasn't
+	// changed for a full iteration, we can move on to final render stage,
+	// which is when files are actually written.
+	isRenderStage bool
 
-	// sharedData is the store for module hook data and globals
-	sharedData *sharedData
-}
+	// renderStageLimit is the number of times we can repeat the render
+	// stage before we give up.
+	renderStageLimit int
 
-// hashModuleHookValue hashes the module hook value using the
-// hashstructure library. If the hashing fails, it returns 0.
-func hashModuleHookValue(m any) uint64 {
-	hash, err := hashstructure.Hash(m, hashstructure.FormatV2, nil)
-	if err != nil {
-		hash = 0
-	}
-	return hash
-}
-
-// moduleHook is a wrapper type for module hook values that
-// contains the values for module hooks
-type moduleHook struct {
-	// values are the values available for this module hook
-	values []any
-}
-
-// Sort sorts the module hook values by their hash
-func (m *moduleHook) Sort() {
-	sort.Slice(m.values, func(i, j int) bool {
-		return hashModuleHookValue(m.values[i]) < hashModuleHookValue(m.values[j])
-	})
-}
-
-// global is an explicit type used to define global variables in the sharedData
-// type (specifically the globals struct field) so that we can track not only the
-// value of the global but also the template it came from.
-type global struct {
-	// template is the template that defined this global (and is scoped too)
-	template string
-
-	// value is the underlying value
-	value any
-}
-
-// sharedData stores data that is injected by templates from modules
-// for both module hooks and template module globals.
-type sharedData struct {
-	moduleHooks map[string]*moduleHook
-	globals     map[string]global
-}
-
-// newSharedData returns an initialized (empty underlying maps) sharedData type.
-func newSharedData() *sharedData {
-	return &sharedData{
-		moduleHooks: make(map[string]*moduleHook),
-		globals:     make(map[string]global),
-	}
-}
-
-// key returns the key name for data stored in both modulesHooks and globals.
-//
-// The module parameter should just be the name of the module. Key is the actual
-// key passed as the identifier for either the module hook or the global.
-func (*sharedData) key(module, key string) string {
-	return path.Join(module, key)
+	// sharedState is the shared state between all templates.
+	sharedState *sharedState
 }
 
 // RegisterExtensions registers all extensions on the currently loaded
@@ -190,13 +134,6 @@ func (s *Stencil) GenerateLockfile(tpls []*Template) *stencil.Lockfile {
 	return l
 }
 
-// sortModuleHooks sorts the module hooks by their hash
-func (s *Stencil) sortModuleHooks() {
-	for _, m := range s.sharedData.moduleHooks {
-		m.Sort()
-	}
-}
-
 // Render renders all templates using the Manifest that was
 // provided to stencil at creation time, returned is the templates
 // that were produced and their associated files.
@@ -223,20 +160,41 @@ func (s *Stencil) Render(ctx context.Context, log slogext.Logger) ([]*Template, 
 		}
 	}
 
-	// Render the first pass, this is used to populate shared data
-	for _, t := range tplfiles {
-		log.Debugf("First pass render of template %s", t.ImportPath())
-		if err := t.Render(s, vals); err != nil {
-			return nil, errors.Wrapf(err, "failed to render template %q", t.ImportPath())
+	// Render until we limit or state is stable
+	var lastHash uint64
+	var i int
+	for {
+		if i > (s.renderStageLimit - 1) {
+			return nil, fmt.Errorf("failed to stabilize shared state within %d iterations", i)
 		}
 
-		// Remove the files, we're just using this to populate the shared data.
-		t.Files = nil
-	}
-	s.isFirstPass = false
+		log.Debugf("Render stage", "iteration", i)
+		for _, t := range tplfiles {
+			log.Debugf("Render template %s", t.ImportPath())
+			if err := t.Render(s, vals); err != nil {
+				return nil, errors.Wrapf(err, "failed to render template %q", t.ImportPath())
+			}
 
-	// Sort module hook data before the next pass
-	s.sortModuleHooks()
+			// Don't keep files, we only need the shared state modifications.
+			t.Files = nil
+		}
+
+		// Calculate the hash of the shared state
+		hash, err := s.sharedState.hash()
+		if err != nil {
+			return nil, fmt.Errorf("failed to determine as stable hash for shared state: %w", err)
+		}
+		if hash == lastHash {
+			log.Debugf("First pass render stable after %d iterations", i)
+			break
+		}
+
+		lastHash = hash
+		i++
+	}
+
+	// Second pass render
+	s.isRenderStage = false
 
 	if err := s.calcDirReplacements(vals); err != nil {
 		return nil, err
@@ -244,7 +202,7 @@ func (s *Stencil) Render(ctx context.Context, log slogext.Logger) ([]*Template, 
 
 	tpls := make([]*Template, 0)
 	for _, t := range tplfiles {
-		log.Debugf("Second pass render of template %s", t.ImportPath())
+		log.Debugf("Final render of template %s", t.ImportPath())
 		if err := t.Render(s, vals); err != nil {
 			return nil, errors.Wrapf(err, "failed to render template %q", t.ImportPath())
 		}

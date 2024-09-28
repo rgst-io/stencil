@@ -72,6 +72,7 @@ require (
 	github.com/onsi/ginkgo v1.16.4 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/princjef/mageutil v1.0.0 // indirect
+	github.com/puzpuzpuz/xsync/v3 v3.4.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect

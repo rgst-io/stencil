@@ -55,11 +55,8 @@ type TplModule struct {
 //
 //	{{ module.Export "HelloWorld" }}
 func (tm *TplModule) Export(name string) (string, error) {
-	tm.s.moduleCaller.mu.Lock()
-	defer tm.s.moduleCaller.mu.Unlock()
-
 	// We only allow functions to be exported in the first pass.
-	if !tm.s.isFirstPass {
+	if !tm.s.isRenderStage {
 		return "", nil
 	}
 
@@ -72,17 +69,12 @@ func (tm *TplModule) Export(name string) (string, error) {
 	}
 
 	moduleName := tm.t.Module.Name
-	if _, ok := tm.s.moduleCaller.functions[moduleName]; !ok {
-		tm.s.moduleCaller.functions[moduleName] = make(map[string]string)
-	}
-
-	if _, ok := tm.s.moduleCaller.functions[moduleName][name]; ok {
+	key := tm.s.sharedState.key(moduleName, name)
+	if _, ok := tm.s.sharedState.Functions.Load(key); ok {
 		return "", fmt.Errorf("function %s in module %s was already exported", name, moduleName)
 	}
 
-	// Right now the function name == template name. This may change in
-	// the future.
-	tm.s.moduleCaller.functions[moduleName][name] = name
+	tm.s.sharedState.Functions.Store(key, struct{}{})
 	tm.log.Debug("Exported function", "module.name", moduleName, "function.name", name)
 
 	return "", nil
@@ -123,12 +115,9 @@ func (tm *TplModule) Call(name string, args ...any) (any, error) {
 	}
 
 	// Functions cannot be called in the first pass.
-	if tm.s.isFirstPass {
+	if tm.s.isRenderStage {
 		return nil, nil
 	}
-
-	tm.s.moduleCaller.mu.RLock()
-	defer tm.s.moduleCaller.mu.RUnlock()
 
 	// Get the module name and function name by splitting the name by the
 	// last period.
@@ -138,12 +127,8 @@ func (tm *TplModule) Call(name string, args ...any) (any, error) {
 	}
 	moduleName, functionName := name[:lastPeriodIdx], name[lastPeriodIdx+1:]
 
-	if _, ok := tm.s.moduleCaller.functions[moduleName]; !ok {
-		return nil, fmt.Errorf("module %q did not register any functions or was not imported", moduleName)
-	}
-
-	templateName, ok := tm.s.moduleCaller.functions[moduleName][functionName]
-	if !ok {
+	key := tm.s.sharedState.key(moduleName, functionName)
+	if _, ok := tm.s.sharedState.Functions.Load(key); !ok {
 		return nil, fmt.Errorf("function %q in module %q was not registered", functionName, moduleName)
 	}
 
@@ -202,7 +187,7 @@ func (tm *TplModule) Call(name string, args ...any) (any, error) {
 		},
 	})
 
-	if err := tmpTpl.ExecuteTemplate(io.Discard, templateName, d); err != nil && !errors.Is(err, ErrStopProcessingTemplate) {
+	if err := tmpTpl.ExecuteTemplate(io.Discard, functionName, d); err != nil && !errors.Is(err, ErrStopProcessingTemplate) {
 		return nil, err
 	}
 
