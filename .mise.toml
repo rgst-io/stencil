@@ -2,7 +2,7 @@
 # Default versions of tools, to update these, set [tools.override]
 [tools]
 git-cliff = "latest"
-golang = "1.23.1"
+golang = "1.23.2"
 golangci-lint = "1.61.0"
 goreleaser = "latest"
 "go:gotest.tools/gotestsum" = "v1.12.0"
