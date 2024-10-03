@@ -27,9 +27,9 @@ This directory is used for storing all of the go-templates that a module owns. B
 
 For example, if a module had a template at `templates/helloWorld.tpl` it would by default be written to `./helloWorld`
 
-This can be changed with the [`file.SetPath`](/functions/file.SetPath) function as needed.
+This can be changed with the [`file.SetPath`](/functions/file_SetPath) function as needed.
 
-Templates can also call `file.Create` to create a new file within a loop. For more information see the [`file.Create` documentation](/functions/file.Create)
+Templates can also call `file.Create` to create a new file within a loop. For more information see the [`file.Create` documentation](/functions/file_Create)
 
 #### Library Templates
 
@@ -121,9 +121,9 @@ There's a few limitations with aliasing arguments:
 
 ## Module Hooks
 
-Module hooks enable other modules to write to a section of a file in your module. This can be done with the [`stencil.GetModuleHook "name"`](/functions/stencil.GetModuleHook) function. This returns a `[]interface{}`, or for non-gophers a list of any type. You can process this with a `range` or in any other method you'd like to generate whatever you need for your DSL.
+Module hooks enable other modules to write to a section of a file in your module. This can be done with the [`stencil.GetModuleHook "name"`](/functions/stencil_GetModuleHook) function. This returns a `[]interface{}`, or for non-gophers a list of any type. You can process this with a `range` or in any other method you'd like to generate whatever you need for your DSL.
 
-A module can write to a module hook with the [`stencil.AddToModuleHook "importPath" "hookName"`](/functions/stencil.AddToModuleHook) function.
+A module can write to a module hook with the [`stencil.AddToModuleHook "importPath" "hookName"`](/functions/stencil_AddToModuleHook) function.
 
 ## Updating a Module
 

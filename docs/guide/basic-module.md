@@ -130,7 +130,7 @@ across the run!
 
 One of the powerful parts of stencil is the ability to create an
 arbitrary number of files with a single template. This is done with the
-[`file.Create`](/functions/file.Create) function. Let's create a
+[`file.Create`](/functions/file_Create) function. Let's create a
 `greeter.go.tpl` template in the `templates/` directory that'll create
 `<greeting>.go` based on the `greetings` argument.
 
