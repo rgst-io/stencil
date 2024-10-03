@@ -99,7 +99,7 @@ func generateMarkdown(_ slogext.Logger) ([]file, error) {
 			}
 
 			files = append(files, file{
-				Name:     strings.ToLower(strings.TrimPrefix(typ.Name(), "Tpl")) + "." + f.Name(),
+				Name:     strings.ToLower(strings.TrimPrefix(typ.Name(), "Tpl")) + "_" + f.Name(),
 				Contents: txt,
 			})
 		}
