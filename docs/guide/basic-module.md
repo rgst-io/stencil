@@ -130,7 +130,7 @@ across the run!
 
 One of the powerful parts of stencil is the ability to create an
 arbitrary number of files with a single template. This is done with the
-[`file.Create`](/functions/file_Create) function. Let's create a
+[`file.Create`](/funcs/file.Create) function. Let's create a
 `greeter.go.tpl` template in the `templates/` directory that'll create
 `<greeting>.go` based on the `greetings` argument.
 
@@ -222,6 +222,6 @@ We've created a module, used it in a test application via the
 `replacements` map in the `stencil.yaml` and used a block. Optionally
 we've also created multiple files with a template. This is just the
 beginning of what you can do with modules. Modules have a rich amount of
-[functions](/functions/) available to them. Check out the
+[functions](/funcs/) available to them. Check out the
 [reference](/reference/) for more information about modules and how to
 use them.
