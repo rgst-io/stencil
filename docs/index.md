@@ -13,10 +13,10 @@ hero:
   actions:
     - theme: brand
       text: About
-      link: /about/problem-statement.html
+      link: /about/problem-statement
     - theme: alt
       text: Guide
-      link: /guide/installation.html
+      link: /guide/installation
     - theme: alt
       text: GitHub
       link: https://github.com/rgst-io/stencil
@@ -26,9 +26,9 @@ features:
     title: <a href="/about">Development Lifecycle Management</a>
     details: Treat your generated files as APIs by persisting changes in customizable "blocks" to allow rendering more than once
   - icon: 🧱
-    title: <a href="/reference/modules.html">Modular</a>
+    title: <a href="/reference/modules">Modular</a>
     details: Templates can be composed through importable modules allowing easy customization
   - icon: 🛠️
-    title: <a href="/reference/native-extensions.html">Native Extensions</a>
+    title: <a href="/reference/native-extensions">Native Extensions</a>
     details: Need to interface with an API or implement custom parsing/merging logic? Stencil supports native extensions in <i>any</i> language to implement that logic
 ---

@@ -112,7 +112,7 @@ func generateMarkdown(_ slogext.Logger) ([]file, error) {
 func saveMarkdown(log slogext.Logger, files []file) error {
 	for _, f := range files {
 		log.Infof(" -> Writing %s", f.Name)
-		if err := os.WriteFile(filepath.Join("docs", "functions", f.Name+".md"), []byte(f.Contents), 0o600); err != nil {
+		if err := os.WriteFile(filepath.Join("docs", "funcs", f.Name+".md"), []byte(f.Contents), 0o600); err != nil {
 			return err
 		}
 	}
