@@ -51,15 +51,24 @@ The important keys that a module has are listed below, but an exhaustive list ca
 - `modules` - a list of modules that this module depends on
   - `name` - import path of the module depended on
   - `version` - optional: A version to pin this module to.
+- `postRunCommand` - An array of commands to run after the module is rendered. This is useful for running commands like `go mod tidy` or other build steps. The array entries have `name` and `command` keys:
+  ```yaml
+  - name: Prettier fix
+    command: yarn run prettier:fix
+  ```
 - `dirReplacements` - a key:value mapping of template-able replacements for directory names, often used for languages like Java/Kotlin with directories named after the projects. These replacements can not rewrite directory structures, it only renames the leaf node directory name itself.
   - key: The directory name to replace
   - value: The template-able replacement name
   - example: This k:v pair will take the `com.projname` directory and replace it with the result of rendering the template (replacing it with the contents of the module's argument named "project-name"):
-
-```
+  ```yaml
   "src/main/kotlin/com.projname": '{{ stencil.Arg "project-name" }}'
-```
-
+  ```
+  - If you need to rename nested directories, you need to know that stencil renders from the deepest directory up, so you must structure your renames like this:
+  ```yaml
+  "src/outer/inner": "bar"
+  "src/outer": "foo"
+  ```
+  - This will result in the directory being named `src/foo/bar` after rendering -- the "outer" directory must match the actual pre-replace name in the filesystem.
 - `arguments` - a map of arguments that this module accepts. A module cannot access an argument via `stencil.Arg` without first declaring it here.
   - `name` - the name of the argument
   - `description` - a description of the argument
