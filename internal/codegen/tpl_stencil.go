@@ -106,8 +106,13 @@ func (s *TplStencil) GetGlobal(name string) any {
 	k := s.s.sharedState.key(s.t.Module.Name, name)
 	v, ok := s.s.sharedState.Globals.Load(k)
 	if !ok {
-		s.log.With("template", s.t.ImportPath(), "path", k).
-			Warn("failed to retrieved data from global store")
+		if s.s.renderStage == renderStageFinal {
+			s.log.With("template", s.t.ImportPath(), "path", k).
+				Warn("failed to retrieve data from global store")
+		} else {
+			s.log.With("template", s.t.ImportPath(), "path", k).
+				Debug("failed to retrieve data from global store on pre-final stage")
+		}
 		return nil
 	}
 
