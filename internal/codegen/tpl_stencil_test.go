@@ -4,10 +4,12 @@ import (
 	"context"
 	"os"
 	"reflect"
+	"slices"
 	"testing"
 	"time"
 
 	"github.com/go-git/go-billy/v5"
+	"github.com/pkg/errors"
 	"go.rgst.io/stencil/internal/modules"
 	"go.rgst.io/stencil/internal/modules/modulestest"
 	"go.rgst.io/stencil/pkg/configuration"
@@ -50,7 +52,7 @@ func TestTplStencil_ReadBlocks(t *testing.T) {
 			args: args{
 				fpath: "testdata/does-not-exist.txt",
 			},
-			want: map[string]string{},
+			wantErr: os.ErrNotExist,
 		},
 	}
 	for _, tt := range tests {
@@ -59,8 +61,11 @@ func TestTplStencil_ReadBlocks(t *testing.T) {
 			s := &TplStencil{log: log}
 			got, err := s.ReadBlocks(tt.args.fpath)
 
-			// String checking because errors.Is isn't working
-			if (tt.wantErr != nil) && err.Error() != tt.wantErr.Error() {
+			if (tt.wantErr != nil) && !errors.Is(err, tt.wantErr) {
+				t.Errorf("TplStencil.ReadBlocks() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if (tt.wantErr == nil) && err != nil {
 				t.Errorf("TplStencil.ReadBlocks() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -226,7 +231,7 @@ func TestTplStencil_ReadFile(t *testing.T) {
 
 	// fails when file doesn't exist
 	_, err = s.ReadFile("file/that/doesnt/exist")
-	assert.Error(t, err, `file "file/that/doesnt/exist" does not exist`)
+	assert.Equal(t, true, errors.Is(err, os.ErrNotExist))
 }
 
 func TestTplStencil_ApplyTemplate(t *testing.T) {
@@ -321,4 +326,42 @@ func TestTplStencil_ApplyTemplate(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTplStencil_ReadDir(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+	s := &TplStencil{
+		t: must(
+			NewTemplate(
+				must(modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{
+					Name: "test",
+				})),
+				"not-a-real-template.tpl",
+				0o755,
+				time.Now(),
+				[]byte{},
+				log,
+			),
+		),
+		s:   &Stencil{sharedState: newSharedState()},
+		log: log,
+	}
+
+	entries, err := s.ReadDir("../dsfdsfsd")
+	assert.Equal(t, true, errors.Is(err, billy.ErrCrossedBoundary))
+	assert.Equal(t, 0, len(entries))
+
+	entries, err = s.ReadDir("/root")
+	assert.Equal(t, true, errors.Is(err, os.ErrNotExist))
+	assert.Equal(t, 0, len(entries))
+
+	entries, err = s.ReadDir("testdata")
+	assert.NilError(t, err)
+	assert.Equal(t, true, len(entries) > 5)
+	assert.Equal(t, true, slices.ContainsFunc(entries, func(entry ReadDirEntry) bool {
+		return entry.Name == "blocks-test.txt" && !entry.IsDir
+	}))
+	assert.Equal(t, true, slices.ContainsFunc(entries, func(entry ReadDirEntry) bool {
+		return entry.Name == "args" && entry.IsDir
+	}))
 }
