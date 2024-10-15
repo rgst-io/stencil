@@ -22,7 +22,7 @@ require (
 	github.com/princjef/gomarkdoc v1.1.0
 	github.com/puzpuzpuz/xsync/v3 v3.4.0
 	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
-	github.com/urfave/cli/v2 v2.27.4
+	github.com/urfave/cli/v2 v2.27.5
 	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools/v3 v3.5.1
 	sigs.k8s.io/yaml v1.4.0
@@ -39,7 +39,7 @@ require (
 	github.com/charmbracelet/x/ansi v0.1.2 // indirect
 	github.com/cheggaaa/pb/v3 v3.1.5 // indirect
 	github.com/cloudflare/circl v1.3.8 // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.5 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.5 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fatih/color v1.17.0 // indirect
