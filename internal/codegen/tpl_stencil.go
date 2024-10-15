@@ -188,11 +188,11 @@ type ReadDirEntry struct {
 
 // ReadDir reads the contents of a directory and returns a list of files/directories
 //
-//		{{ range $entry := stencil.ReadDir "/tests" }}
-//		  {{ if $entry.IsDir }}
-//		    {{ $entry.Name }}
-//	      {{ end }}
-//	    {{ end }}
+//	{{ range $entry := stencil.ReadDir "/tests" }}
+//	  {{ if $entry.IsDir }}
+//	    {{ $entry.Name }}
+//	  {{ end }}
+//	{{ end }}
 func (s *TplStencil) ReadDir(name string) ([]ReadDirEntry, error) {
 	f, err := s.exists(name)
 	if err != nil {
