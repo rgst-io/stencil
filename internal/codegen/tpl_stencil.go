@@ -28,7 +28,6 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/osfs"
-	"github.com/pkg/errors"
 	"go.rgst.io/stencil/pkg/slogext"
 )
 
@@ -169,9 +168,9 @@ func (s *TplStencil) AddToModuleHook(module, name string, data interface{}) (out
 //
 //	{{ stencil.ReadFile "myfile.txt" }}
 func (s *TplStencil) ReadFile(name string) (string, error) {
-	f, ok := s.exists(name)
-	if !ok {
-		return "", errors.Errorf("file %q does not exist", name)
+	f, err := s.exists(name)
+	if err != nil {
+		return "", err
 	}
 
 	b, err := io.ReadAll(f)
@@ -182,32 +181,73 @@ func (s *TplStencil) ReadFile(name string) (string, error) {
 	return string(b), nil
 }
 
+type ReadDirEntry struct {
+	Name  string
+	IsDir bool
+}
+
+// ReadDir reads the contents of a directory and returns a list of files/directories
+//
+//	{{ range $entry := stencil.ReadDir "/tests" }}
+//	  {{ if $entry.IsDir }}
+//	    {{ $entry.Name }}
+//	  {{ end }}
+//	{{ end }}
+func (s *TplStencil) ReadDir(name string) ([]ReadDirEntry, error) {
+	f, err := s.exists(name)
+	if err != nil {
+		return nil, err
+	}
+	f.Close() // close the file handle, since we don't need it
+
+	entries, err := os.ReadDir(name)
+	if err != nil {
+		return nil, err
+	}
+
+	rv := make([]ReadDirEntry, 0, len(entries))
+	for _, entry := range entries {
+		rv = append(rv, ReadDirEntry{
+			Name:  entry.Name(),
+			IsDir: entry.IsDir(),
+		})
+	}
+
+	return rv, nil
+}
+
 // Exists returns true if the file exists in the current directory
 //
 //	{{- if stencil.Exists "myfile.txt" }}
 //	{{ stencil.ReadFile "myfile.txt" }}
 //	{{- end }}
 func (s *TplStencil) Exists(name string) bool {
-	f, ok := s.exists(name)
-	if ok {
-		f.Close() // close the file handle, since we don't need it
+	f, err := s.exists(name)
+	if err != nil {
+		return false
 	}
-	return ok
+	f.Close() // close the file handle, since we don't need it
+	return true
 }
 
-// exists returns a billy.File if the file exists, and true. If it doesn't,
-// nil is returned and false.
-func (s *TplStencil) exists(name string) (billy.File, bool) {
+// exists returns a billy.File if the file exists, and nil if it doesn't,
+// also returning an error if one is applicable.
+func (s *TplStencil) exists(name string) (billy.File, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
-		return nil, false
+		return nil, err
 	}
 
-	f, err := osfs.New(cwd).Open(name)
-	if err != nil {
-		return nil, false
+	bfs := osfs.New(cwd)
+	if _, err := bfs.Stat(name); err != nil {
+		return nil, err
 	}
-	return f, true
+
+	f, err := bfs.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
 }
 
 // ApplyTemplate executes a named template (defined through the `define`
@@ -289,20 +329,11 @@ func (s *TplStencil) ApplyTemplate(name string, dataSli ...any) (string, error) 
 //	  {{- $data }}
 //	{{- end }}
 func (s *TplStencil) ReadBlocks(fpath string) (map[string]string, error) {
-	cwd, err := os.Getwd()
+	f, err := s.exists(fpath)
 	if err != nil {
 		return nil, err
 	}
-
-	// ensure that the file is within the current directory
-	// and not attempting to escape it
-	if _, err := osfs.New(cwd).Stat(fpath); err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			return map[string]string{}, nil
-		}
-
-		return nil, err
-	}
+	f.Close() // close the file handle, since we don't need it
 
 	data, err := parseBlocks(fpath)
 	if err != nil {
