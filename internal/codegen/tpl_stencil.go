@@ -335,12 +335,16 @@ func (s *TplStencil) ReadBlocks(fpath string) (map[string]string, error) {
 	}
 	f.Close() // close the file handle, since we don't need it
 
-	data, err := parseBlocks(fpath)
+	data, err := parseBlocks(fpath, s.t)
 	if err != nil {
 		return nil, err
 	}
 
-	return data, nil
+	rv := make(map[string]string)
+	for k, v := range data {
+		rv[k] = v.Contents
+	}
+	return rv, nil
 }
 
 // Debug logs the provided arguments under the DEBUG log level (must run stencil with --debug).

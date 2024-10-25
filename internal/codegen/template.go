@@ -48,6 +48,10 @@ type Template struct {
 	// for the default file if not modified during render time
 	modTime time.Time
 
+	// adoptMode denotes if we should use heuristics to detect code that should go
+	// into blocks to assist with first-time adoption of templates
+	adoptMode bool
+
 	// Module is the underlying module that's creating this template
 	Module *modules.Module
 
@@ -69,20 +73,21 @@ type Template struct {
 // with the extension .tpl being removed. If the provided template has
 // the extension .library.tpl, then the Library field is set to true.
 func NewTemplate(m *modules.Module, fpath string, mode os.FileMode,
-	modTime time.Time, contents []byte, log slogext.Logger) (*Template, error) {
+	modTime time.Time, contents []byte, log slogext.Logger, adopt bool) (*Template, error) {
 	var library bool
 	if filepath.Ext(strings.TrimSuffix(fpath, ".tpl")) == ".library" {
 		library = true
 	}
 
 	return &Template{
-		log:      log,
-		mode:     mode,
-		modTime:  modTime,
-		Module:   m,
-		Path:     fpath,
-		Contents: contents,
-		Library:  library,
+		log:       log,
+		mode:      mode,
+		modTime:   modTime,
+		adoptMode: adopt,
+		Module:    m,
+		Path:      fpath,
+		Contents:  contents,
+		Library:   library,
 	}, nil
 }
 
@@ -114,7 +119,7 @@ func (t *Template) Render(st *Stencil, vals *Values) error {
 	if len(t.Files) == 0 && !t.Library {
 		p := strings.TrimSuffix(t.Path, ".tpl")
 		p = t.Module.ApplyDirReplacements(p)
-		f, err := NewFile(p, t.mode, t.modTime)
+		f, err := NewFile(p, t.mode, t.modTime, t)
 		if err != nil {
 			return err
 		}

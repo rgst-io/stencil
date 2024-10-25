@@ -120,6 +120,7 @@ func TestTplModule_Tpl(t *testing.T) {
 				time.Now(),
 				[]byte(tt.callingTemplate),
 				log,
+				false,
 			)
 			assert.NilError(t, err, "expected NewTemplate to succeed")
 
@@ -131,6 +132,7 @@ func TestTplModule_Tpl(t *testing.T) {
 				time.Now(),
 				[]byte(tt.functionTemplate),
 				log,
+				false,
 			)
 			assert.NilError(t, err, "expected NewTemplate to succeed")
 

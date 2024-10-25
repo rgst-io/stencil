@@ -1,0 +1,5 @@
+global:
+  deploymentEnvironment: prod
+  version: xyz
+somechart:
+  somestuff: 4

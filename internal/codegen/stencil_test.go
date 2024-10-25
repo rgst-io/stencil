@@ -39,7 +39,7 @@ func TestBasicE2ERender(t *testing.T) {
 	st := NewStencil(&configuration.Manifest{
 		Name:      "test",
 		Arguments: map[string]any{},
-	}, nil, []*modules.Module{tp}, log)
+	}, nil, []*modules.Module{tp}, log, false)
 
 	tpls, err := st.Render(ctx, log)
 	assert.NilError(t, err, "expected Render() to not fail")
@@ -90,7 +90,7 @@ func TestModuleHookRender(t *testing.T) {
 	st := NewStencil(&configuration.Manifest{
 		Name:      "test",
 		Arguments: map[string]interface{}{},
-	}, nil, []*modules.Module{m1, m2}, log)
+	}, nil, []*modules.Module{m1, m2}, log, false)
 
 	tpls, err := st.Render(ctx, log)
 	assert.NilError(t, err, "expected Render() to not fail")
@@ -117,7 +117,7 @@ func TestDirReplacementRendering(t *testing.T) {
 	m1, err := modulestest.NewModuleFromTemplates(m1man, "testdata/replacement/m1.tpl")
 	assert.NilError(t, err, "failed to NewWithFS")
 
-	st := NewStencil(sm, nil, []*modules.Module{m1}, log)
+	st := NewStencil(sm, nil, []*modules.Module{m1}, log, false)
 
 	tps, err := st.Render(context.Background(), log)
 	assert.NilError(t, err, "failed to render template")
@@ -133,7 +133,7 @@ func TestBadDirReplacement(t *testing.T) {
 	m, err := modulestest.NewModuleFromTemplates(m1man, "testdata/replacement/m1.tpl")
 	assert.NilError(t, err, "failed to NewModuleFromTemplates")
 
-	st := NewStencil(sm, nil, []*modules.Module{m}, log)
+	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
 	vals := NewValues(context.Background(), sm, nil)
 	_, err = st.renderDirReplacement("b/c", m, vals)
 	assert.ErrorContains(t, err, "contains path separator in output")
@@ -168,7 +168,7 @@ z: {{ stencil.GetGlobal "z" }}`))
 	st := NewStencil(&configuration.Manifest{
 		Name:      "test",
 		Arguments: map[string]any{},
-	}, nil, []*modules.Module{tp}, log)
+	}, nil, []*modules.Module{tp}, log, false)
 
 	tpls, err := st.Render(ctx, log)
 	assert.NilError(t, err, "expected Render() to not fail")

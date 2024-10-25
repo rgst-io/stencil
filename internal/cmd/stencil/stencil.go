@@ -53,6 +53,10 @@ type Command struct {
 
 	// dryRun denotes if we should write files to disk or not
 	dryRun bool
+
+	// adopt denotes if we should use heuristics to detect code that should go
+	// into blocks to assist with first-time adoption of templates
+	adopt bool
 }
 
 // printVersion is a command line friendly version of
@@ -69,7 +73,7 @@ func printVersion(v *resolver.Version) string {
 }
 
 // NewCommand creates a new stencil command
-func NewCommand(log slogext.Logger, s *configuration.Manifest, dryRun bool) *Command {
+func NewCommand(log slogext.Logger, s *configuration.Manifest, dryRun, adopt bool) *Command {
 	l, err := stencil.LoadLockfile("")
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		log.WithError(err).Warn("failed to load lockfile")
@@ -80,6 +84,7 @@ func NewCommand(log slogext.Logger, s *configuration.Manifest, dryRun bool) *Com
 		manifest: s,
 		log:      log,
 		dryRun:   dryRun,
+		adopt:    adopt,
 	}
 }
 
@@ -255,7 +260,7 @@ func (c *Command) Run(ctx context.Context) error {
 
 // runWithModules runs the stencil command with the given modules
 func (c *Command) runWithModules(ctx context.Context, mods []*modules.Module) error {
-	st := codegen.NewStencil(c.manifest, c.lock, mods, c.log)
+	st := codegen.NewStencil(c.manifest, c.lock, mods, c.log, c.adopt)
 	defer st.Close()
 
 	c.log.Info("Loading native extensions")

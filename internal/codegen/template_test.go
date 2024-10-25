@@ -39,12 +39,12 @@ func TestSingleFileRender(t *testing.T) {
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
-	tpl, err := NewTemplate(m, "virtual-file.tpl", 0o644, time.Now(), []byte("hello world!"), log)
+	tpl, err := NewTemplate(m, "virtual-file.tpl", 0o644, time.Now(), []byte("hello world!"), log, false)
 	assert.NilError(t, err, "failed to create basic template")
 
 	sm := &configuration.Manifest{Name: "testing"}
 
-	st := NewStencil(sm, nil, []*modules.Module{m}, log)
+	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
 	err = tpl.Render(st, NewValues(context.Background(), sm, nil))
 	assert.NilError(t, err, "expected Render() to not fail")
 	assert.Equal(t, tpl.Files[0].String(), "hello world!", "expected Render() to modify first created file")
@@ -58,14 +58,14 @@ func TestMultiFileRender(t *testing.T) {
 	assert.NilError(t, err, "failed to NewWithFS")
 
 	tpl, err := NewTemplate(m, "multi-file.tpl", 0o644,
-		time.Now(), []byte(multiFileTemplate), log)
+		time.Now(), []byte(multiFileTemplate), log, false)
 	assert.NilError(t, err, "failed to create template")
 
 	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{
 		"commands": []string{"hello", "world", "command"},
 	}}
 
-	st := NewStencil(sm, nil, []*modules.Module{m}, log)
+	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
 	err = tpl.Render(st, NewValues(context.Background(), sm, nil))
 	assert.NilError(t, err, "expected Render() to not fail")
 	assert.Equal(t, len(tpl.Files), 3, "expected Render() to create 3 files")
@@ -83,14 +83,14 @@ func TestMultiFileWithInputRender(t *testing.T) {
 	assert.NilError(t, err, "failed to NewWithFS")
 
 	tpl, err := NewTemplate(m, "multi-file-input.tpl", 0o644,
-		time.Now(), []byte(multiFileInputTemplate), log)
+		time.Now(), []byte(multiFileInputTemplate), log, false)
 	assert.NilError(t, err, "failed to create template")
 
 	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{
 		"commands": []string{"hello", "world", "command"},
 	}}
 
-	st := NewStencil(sm, nil, []*modules.Module{m}, log)
+	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
 	err = tpl.Render(st, NewValues(context.Background(), sm, nil))
 	assert.NilError(t, err, "expected Render() to not fail")
 	assert.Equal(t, len(tpl.Files), 3, "expected Render() to create 3 files")
@@ -108,14 +108,14 @@ func TestApplyTemplateArgumentPassthrough(t *testing.T) {
 	assert.NilError(t, err, "failed to NewWithFS")
 
 	tpl, err := NewTemplate(m, "apply-template-passthrough.tpl", 0o644,
-		time.Now(), []byte(applyTemplatePassthroughTemplate), log)
+		time.Now(), []byte(applyTemplatePassthroughTemplate), log, false)
 	assert.NilError(t, err, "failed to create template")
 
 	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{
 		"commands": []string{"hello", "world", "command"},
 	}}
 
-	st := NewStencil(sm, nil, []*modules.Module{m}, log)
+	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
 	err = tpl.Render(st, NewValues(context.Background(), sm, nil))
 	assert.NilError(t, err, "expected Render() to not fail")
 	assert.Equal(t, len(tpl.Files), 1, "expected Render() to create 1 files")
@@ -134,15 +134,15 @@ func TestGeneratedBlock(t *testing.T) {
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
-	st := NewStencil(sm, nil, []*modules.Module{m}, log)
+	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
 	assert.NilError(t, os.WriteFile(fakeFilePath, []byte(fakeGeneratedBlockFile), 0o644),
 		"failed to write generated file")
 
 	tpl, err := NewTemplate(m, "generated-block/template.tpl", 0o644,
-		time.Now(), []byte(generatedBlockTemplate), log)
+		time.Now(), []byte(generatedBlockTemplate), log, false)
 	assert.NilError(t, err, "failed to create template")
 
-	tplf, err := NewFile(fakeFilePath, 0o644, time.Now())
+	tplf, err := NewFile(fakeFilePath, 0o644, time.Now(), fakeBlocksTemplate())
 	assert.NilError(t, err, "failed to create file")
 
 	// Add the file (fake) to the template so that the template uses it for blocks
@@ -161,13 +161,13 @@ func TestLibraryTemplate(t *testing.T) {
 	log := slogext.NewTestLogger(t)
 	assert.NilError(t, err, "failed to NewWithFS")
 
-	tpl, err := NewTemplate(m, "hello.library.tpl", 0o644, time.Now(), []byte("hello world!"), log)
+	tpl, err := NewTemplate(m, "hello.library.tpl", 0o644, time.Now(), []byte("hello world!"), log, false)
 	assert.NilError(t, err, "failed to create basic template")
 	assert.Equal(t, tpl.Library, true, "expected library template to be marked as such")
 
 	assert.NilError(t, tpl.Render(
 		NewStencil(&configuration.Manifest{Name: "testing"}, nil, []*modules.Module{m},
-			log), NewValues(context.Background(), &configuration.Manifest{Name: "testing"}, nil)),
+			log, false), NewValues(context.Background(), &configuration.Manifest{Name: "testing"}, nil)),
 		"expected library template to not fail on render")
 
 	assert.Equal(t, len(tpl.Files), 0, "expected library template to not generate files")
@@ -182,12 +182,12 @@ func TestLibraryCantAccessFileFunctions(t *testing.T) {
 	log := slogext.NewTestLogger(t)
 	assert.NilError(t, err, "failed to NewWithFS")
 
-	tpl, err := NewTemplate(m, "hello.library.tpl", 0o644, time.Now(), []byte("{{ file.Create }}"), log)
+	tpl, err := NewTemplate(m, "hello.library.tpl", 0o644, time.Now(), []byte("{{ file.Create }}"), log, false)
 	assert.NilError(t, err, "failed to create basic template")
 	assert.Equal(t, tpl.Library, true, "expected library template to be marked as such")
 
-	err = tpl.Render(NewStencil(&configuration.Manifest{Name: "testing"}, nil, []*modules.Module{m}, log),
-		NewValues(context.Background(), &configuration.Manifest{Name: "testing"}, nil))
+	err = tpl.Render(NewStencil(&configuration.Manifest{Name: "testing"}, nil, []*modules.Module{m},
+		log, false), NewValues(context.Background(), &configuration.Manifest{Name: "testing"}, nil))
 	assert.ErrorContains(t, err,
 		"attempted to use file in a template that doesn't support file rendering",
 		"expected library template to fail on render",

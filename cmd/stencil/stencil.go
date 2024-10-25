@@ -65,7 +65,7 @@ func NewStencilAction(log slogext.Logger) cli.ActionFunc {
 			return fmt.Errorf("failed to parse stencil.yaml: %w", err)
 		}
 
-		return stencil.NewCommand(log, manifest, c.Bool("dry-run")).Run(c.Context)
+		return stencil.NewCommand(log, manifest, c.Bool("dry-run"), c.Bool("adopt")).Run(c.Context)
 	}
 }
 
@@ -87,6 +87,10 @@ func NewStencil(log slogext.Logger) *cli.App {
 				Name:    "debug",
 				Usage:   "Enables debug logging for version resolution, template renderer, and other useful information",
 				Aliases: []string{"d"},
+			},
+			&cli.BoolFlag{
+				Name:  "adopt",
+				Usage: "Uses heuristics to detect code that should go into blocks to assist with first-time adoption of templates",
 			},
 		},
 		Commands: []*cli.Command{
