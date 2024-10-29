@@ -95,6 +95,43 @@ func TestAdoptWithMultiplePresUseNext(t *testing.T) {
 	assert.Equal(t, *blocks["version"], expb, "expected parseBlocks() to parse version block")
 }
 
+func TestAdoptWithBlockAlreadyPresentDiffName(t *testing.T) {
+	blocks := adoptTestHelper(t, "testdata/adopt/adopt4.tpl", "testdata/adopt/adopt4.yaml")
+	exp1 := blockInfo{
+		Name:      "version1",
+		StartLine: 2,
+		EndLine:   4,
+		Contents:  "  version: xyz",
+	}
+	exp2 := blockInfo{
+		Name:      "version2",
+		StartLine: 8,
+		EndLine:   10,
+		Contents:  "  version: abc",
+	}
+	exp := blockInfo{
+		Name:      "version",
+		StartLine: 7,
+		EndLine:   11,
+		Contents:  "  ## <<Stencil::Block(version2)>>\n  version: abc\n  ## <</Stencil::Block>>",
+	}
+	assert.Equal(t, *blocks["version1"], exp1, "expected parseBlocks() to parse version1 block")
+	assert.Equal(t, *blocks["version2"], exp2, "expected parseBlocks() to parse version2 block")
+	assert.Equal(t, *blocks["version"], exp, "expected parseBlocks() to parse version block")
+}
+
+// This demonstrates that it's not a perfect system, so you might get semi unexpected results if your blocks are too similar
+func TestAdoptWithBadBlock(t *testing.T) {
+	blocks := adoptTestHelper(t, "testdata/adopt/adoptbad1.tpl", "testdata/adopt/adoptbad1.yaml")
+	exp := blockInfo{
+		Name:      "version",
+		StartLine: 1,
+		EndLine:   7,
+		Contents:  "  version: xyz\n  otherField: 1\nlocal:\n  deploymentEnvironmentx: prod\n  version: abc",
+	}
+	assert.Equal(t, *blocks["version"], exp, "expected parseBlocks() to parse wacky version block")
+}
+
 func adoptTestHelper(t *testing.T, templateFile, targetFile string) map[string]*blockInfo {
 	fs, err := testmemfs.WithManifest("name: testing\n")
 	assert.NilError(t, err, "failed to testmemfs.WithManifest")

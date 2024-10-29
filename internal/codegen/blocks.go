@@ -82,7 +82,7 @@ func parseBlocksInner(r io.ReadSeeker, filePath string, sourceTemplate *Template
 				cmd := v2Matches[3]
 				if v2Matches[2] == "/" {
 					if curBlock == nil {
-						return nil, fmt.Errorf("line %d: found closing <</Stencil::Block>> without an opening <</Stencil::Block>>", i+1)
+						return nil, fmt.Errorf("line %d: found closing <</Stencil::Block>> without an opening <<Stencil::Block>>", i+1)
 					}
 
 					if cmd == endStatement {

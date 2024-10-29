@@ -1,0 +1,14 @@
+global:
+  deploymentEnvironment: prod
+  ## <<Stencil::Block(version1)>>
+  version: xyz
+  ## <</Stencil::Block>>
+  otherField: 1
+local:
+  deploymentEnvironment: prod
+  ## <<Stencil::Block(version2)>>
+  version: abc
+  ## <</Stencil::Block>>
+  otherField: 1
+somechart:
+  somestuff: 4
