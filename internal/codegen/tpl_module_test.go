@@ -81,26 +81,26 @@ func TestTplModule_Tpl(t *testing.T) {
 			want:            "hello",
 		},
 		{
-			name: "should use data from caller",
-			functionTemplate: `{{- define "HelloWorld" -}}
-		{{ return (file.Path) }}
-		{{- end -}}
-		{{- module.Export "HelloWorld" -}}`,
-			callingTemplate: `{{ module.Call "function.HelloWorld" }}`,
-			// This is "caller" because the path should be from the template
-			// we are calling from. Otherwise, this would be "function".
-			want: "caller",
-		},
-		{
 			name:        "should break on duplicate export",
 			renderStage: renderStageFinal,
 			functionTemplate: `{{- define "HelloWorld" -}}
-{{ return (fromYaml "hello: world") }}
-{{- end -}}
-{{- module.Export "HelloWorld" -}}
-{{- module.Export "HelloWorld" -}}`,
+		{{ return (fromYaml "hello: world") }}
+		{{- end -}}
+		{{- module.Export "HelloWorld" -}}
+		{{- module.Export "HelloWorld" -}}`,
 			callingTemplate:     ``,
 			wantFuncErrContains: "already exported",
+		},
+		{
+			name: "use context from module being called",
+			functionTemplate: `{{- stencil.SetGlobal "a" "func" -}}
+		{{- define "HelloWorld" -}}
+		{{ return (stencil.GetGlobal "a") }}
+		{{- end -}}
+		{{- module.Export "HelloWorld" -}}`,
+			callingTemplate: `{{- stencil.SetGlobal "a" "caller" -}}
+		{{ module.Call "function.HelloWorld" }}`,
+			want: "func",
 		},
 	}
 	for _, tt := range tests {
