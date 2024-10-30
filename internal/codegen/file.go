@@ -29,7 +29,7 @@ type File struct {
 	// comments that encompass data that is persisted across runs of stencil. These
 	// are then exposed via the Block method to be re-injected at template runtime.
 	// This enables users to persist their changes in certain areas.
-	blocks map[string]string
+	blocks map[string]*blockInfo
 
 	// contents is the contents of the file rendered for this template
 	contents []byte
@@ -43,6 +43,9 @@ type File struct {
 	// modTime is the modification time of this file (when it was last modified)
 	// Note: This is not always reliable currently.
 	modTime time.Time
+
+	// sourceTemplate is the template that is currently acting on this file
+	sourceTemplate *Template
 
 	// Below are public fields that are useful for determining
 	// how to process this file.
@@ -66,18 +69,22 @@ type File struct {
 // NewFile creates a new file, an existing file at the given path is
 // parsed to read blocks from, if it exists. An error is returned if
 // the file is unable to be read for a reason other than not existing.
-func NewFile(path string, mode os.FileMode, modTime time.Time) (*File, error) {
-	blocks, err := parseBlocks(path)
+func NewFile(path string, mode os.FileMode, modTime time.Time, sourceTemplate *Template) (*File, error) {
+	blocks, err := parseBlocks(path, sourceTemplate)
 	if err != nil {
 		return nil, err
 	}
 
-	return &File{path: path, mode: mode, modTime: modTime, blocks: blocks}, nil
+	return &File{path: path, mode: mode, modTime: modTime, blocks: blocks, sourceTemplate: sourceTemplate}, nil
 }
 
 // Block returns the contents of a given block.
 func (f *File) Block(name string) string {
-	return f.blocks[name]
+	bi, ok := f.blocks[name]
+	if !ok {
+		return ""
+	}
+	return bi.Contents
 }
 
 // AddDeprecationNotice adds a deprecation notice to a file
@@ -93,7 +100,7 @@ func (f *File) AddDeprecationNotice(msg string) {
 // SetPath updates the path of this file. This causes
 // the blocks to be parsed again.
 func (f *File) SetPath(path string) error {
-	blocks, err := parseBlocks(path)
+	blocks, err := parseBlocks(path, f.sourceTemplate)
 	if err != nil {
 		return err
 	}

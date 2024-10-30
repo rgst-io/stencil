@@ -136,7 +136,7 @@ arbitrary number of files with a single template. This is done with the
 
 ```go
 # This is important! We do not want to create a greeter.go file
-{{- $_ := file.Skip "Generates multiple files" }}
+{{- file.Skip "Generates multiple files" }}
 
 {{- define "greeter" -}}
 {{- $greeting := .greeting }}

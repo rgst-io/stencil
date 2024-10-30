@@ -1,0 +1,10 @@
+global:
+  deploymentEnvironment: prod
+  version: xyz
+  otherField: 1
+local:
+  deploymentEnvironmentx: prod
+  version: abc
+  otherField: 2
+somechart:
+  somestuff: 4

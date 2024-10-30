@@ -130,6 +130,7 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 						time.Now(),
 						[]byte(""),
 						log,
+						false,
 					),
 				),
 				s:   &Stencil{sharedState: newSharedState()},
@@ -187,6 +188,7 @@ func TestGlobals(t *testing.T) {
 						time.Now(),
 						[]byte{},
 						log,
+						false,
 					),
 				),
 				s:   &Stencil{sharedState: newSharedState()},
@@ -215,6 +217,7 @@ func TestTplStencil_ReadFile(t *testing.T) {
 				time.Now(),
 				[]byte{},
 				log,
+				false,
 			),
 		),
 		s:   &Stencil{sharedState: newSharedState()},
@@ -301,6 +304,7 @@ func TestTplStencil_ApplyTemplate(t *testing.T) {
 				time.Now(),
 				[]byte(tt.subTemplate),
 				log,
+				false,
 			)
 			assert.NilError(t, err, "expected NewTemplate to succeed")
 
@@ -341,6 +345,7 @@ func TestTplStencil_ReadDir(t *testing.T) {
 				time.Now(),
 				[]byte{},
 				log,
+				false,
 			),
 		),
 		s:   &Stencil{sharedState: newSharedState()},

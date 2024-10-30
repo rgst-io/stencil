@@ -44,7 +44,7 @@ func NewUpgradeCommand(log slogext.Logger) *cli.Command {
 				return fmt.Errorf("failed to parse stencil.yaml: %w", err)
 			}
 
-			return stencil.NewCommand(log, manifest, c.Bool("dry-run")).Upgrade(c.Context)
+			return stencil.NewCommand(log, manifest, c.Bool("dry-run"), c.Bool("adopt")).Upgrade(c.Context)
 		},
 	}
 }

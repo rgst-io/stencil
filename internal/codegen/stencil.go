@@ -39,7 +39,7 @@ import (
 )
 
 // NewStencil creates a new, fully initialized Stencil renderer function
-func NewStencil(m *configuration.Manifest, lock *stencil.Lockfile, mods []*modules.Module, log slogext.Logger) *Stencil {
+func NewStencil(m *configuration.Manifest, lock *stencil.Lockfile, mods []*modules.Module, log slogext.Logger, adopt bool) *Stencil {
 	return &Stencil{
 		log:                 log,
 		m:                   m,
@@ -48,6 +48,7 @@ func NewStencil(m *configuration.Manifest, lock *stencil.Lockfile, mods []*modul
 		modules:             mods,
 		preRenderStageLimit: 20,
 		sharedState:         newSharedState(),
+		adoptMode:           adopt,
 	}
 }
 
@@ -90,6 +91,10 @@ type Stencil struct {
 
 	// sharedState is the shared state between all templates.
 	sharedState *sharedState
+
+	// adoptMode denotes if we should use heuristics to detect code that should go
+	// into blocks to assist with first-time adoption of templates
+	adoptMode bool
 }
 
 // RegisterExtensions registers all extensions on the currently loaded
@@ -247,7 +252,7 @@ func (s *Stencil) calcDirReplacements(vals *Values) error {
 
 // renderDirReplacement breaks out the actual rendering for calcDirReplacements to make it unit testable
 func (s *Stencil) renderDirReplacement(template string, m *modules.Module, vals *Values) (string, error) {
-	rt, err := NewTemplate(m, "dirReplace", 0o000, time.Time{}, []byte(template), s.log)
+	rt, err := NewTemplate(m, "dirReplace", 0o000, time.Time{}, []byte(template), s.log, s.adoptMode)
 	if err != nil {
 		return "", err
 	}
@@ -330,7 +335,7 @@ func (s *Stencil) getTemplates(ctx context.Context, log slogext.Logger) ([]*Temp
 			}
 
 			log.Debugf("Discovered template %q", path)
-			tpl, err := NewTemplate(m, path, inf.Mode(), inf.ModTime(), tplContents, log)
+			tpl, err := NewTemplate(m, path, inf.Mode(), inf.ModTime(), tplContents, log, s.adoptMode)
 			if err != nil {
 				return errors.Wrapf(err, "failed to create template %q from module %q", path, m.Name)
 			}

@@ -28,6 +28,9 @@ features:
   - icon: 🧱
     title: <a href="/reference/modules">Modular</a>
     details: Templates can be composed through importable modules allowing easy customization
+  - icon: 📈
+    title: <a href="/reference/adopt">Adopt Existing Projects</a>
+    details: Templatize existing patterns and automatically adopt code blocks into Stencil template modules
   - icon: 🛠️
     title: <a href="/reference/native-extensions">Native Extensions</a>
     details: Need to interface with an API or implement custom parsing/merging logic? Stencil supports native extensions in <i>any</i> language to implement that logic

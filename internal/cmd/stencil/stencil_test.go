@@ -27,7 +27,7 @@ func TestResolveModulesShouldUseModulesFromLockfile(t *testing.T) {
 		Modules: []*configuration.TemplateRepository{{
 			Name: "github.com/rgst-io/stencil-golang",
 		}},
-	}, false)
+	}, false, false)
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -54,7 +54,7 @@ func TestResolveModulesShouldUpgradeWhenExplicitlyAsked(t *testing.T) {
 			Name:    "github.com/rgst-io/stencil-golang",
 			Version: "v0.5.0", // 3c3213721335c53fd78f4fede1b3704801616615
 		}},
-	}, false)
+	}, false, false)
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -90,7 +90,7 @@ func TestResolveShouldNotUpgradeOtherModulesWhenUpgradingOne(t *testing.T) {
 				Name: "github.com/rgst-io/stencil-module",
 			},
 		},
-	}, false)
+	}, false, false)
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -134,7 +134,7 @@ func TestResolveModulesShouldUpdateReplacements(t *testing.T) {
 		Replacements: map[string]string{
 			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stub-module"),
 		},
-	}, false)
+	}, false, false)
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -165,7 +165,7 @@ func TestResolveModulesShouldAllowAdds(t *testing.T) {
 				Name: "github.com/rgst-io/stencil-module",
 			},
 		},
-	}, false)
+	}, false, false)
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-module",
