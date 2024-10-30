@@ -39,6 +39,10 @@ type TplModule struct {
 	log slogext.Logger
 }
 
+// exportChecks is a map of already exported functions to prevent
+// duplicate exports.
+var exportChecks = make(map[string]struct{})
+
 // Export registers a function to allow it to be called by other
 // templates.
 //
@@ -55,8 +59,15 @@ type TplModule struct {
 //
 //	{{ module.Export "HelloWorld" }}
 func (tm *TplModule) Export(name string) (string, error) {
-	// We only allow functions to be exported in the first pass.
+	// We only allow functions to be exported before the final pass.
 	if tm.s.renderStage == renderStageFinal {
+		// In the final pass, though, check to make sure there's not dupes
+		checkName := fmt.Sprintf("%s.%s", tm.t.Module.Name, name)
+		if _, ok := exportChecks[checkName]; ok {
+			return "", fmt.Errorf("function %q in module %q was already exported", name, tm.t.Module.Name)
+		}
+		exportChecks[checkName] = struct{}{}
+
 		return "", nil
 	}
 
@@ -70,10 +81,6 @@ func (tm *TplModule) Export(name string) (string, error) {
 
 	moduleName := tm.t.Module.Name
 	key := tm.s.sharedState.key(moduleName, name)
-	if _, ok := tm.s.sharedState.Functions.Load(key); ok {
-		return "", fmt.Errorf("function %s in module %s was already exported", name, moduleName)
-	}
-
 	tm.s.sharedState.Functions.Store(key, struct{}{})
 	tm.log.Debug("Exported function", "module.name", moduleName, "function.name", name)
 
@@ -106,7 +113,7 @@ func (tm *TplModule) Export(name string) (string, error) {
 //	{{ module.Export "HelloWorld" }}
 //
 //	// module-b
-//	{{ module.Call "module-b.HelloWorld" "Jared" }}
+//	{{ module.Call "github.com/rgst-io/module-a.HelloWorld" "Jared" }}
 //	// Output: Hello, Jared
 func (tm *TplModule) Call(name string, args ...any) (any, error) {
 	// Allows args to not be set.
