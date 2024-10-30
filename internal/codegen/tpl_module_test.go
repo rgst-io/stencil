@@ -89,6 +89,16 @@ func TestTplModule_Tpl(t *testing.T) {
 			// we are calling from. Otherwise, this would be "function".
 			want: "caller",
 		},
+		{
+			name: "should break on duplicate export",
+			functionTemplate: `{{- define "HelloWorld" -}}
+{{ return (fromYaml "hello: world") }}
+{{- end -}}
+{{- module.Export "HelloWorld" -}}
+{{- module.Export "HelloWorld" -}}`,
+			callingTemplate: ``,
+			wantErrContains: "already exported",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
