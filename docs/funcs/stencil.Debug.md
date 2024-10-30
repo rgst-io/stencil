@@ -10,5 +10,5 @@ Debug logs the provided arguments under the DEBUG log level (must run
 stencil with --debug).
 
 ```go
-{{- $_ := stencil.Debug "I'm a log!" }}
+{{- stencil.Debug "I'm a log!" }}
 ```
