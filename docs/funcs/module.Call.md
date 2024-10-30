@@ -31,6 +31,6 @@ Example:
 {{ module.Export "HelloWorld" }}
 
 // module-b
-{{ module.Call "module-b.HelloWorld" "Jared" }}
+{{ module.Call "github.com/rgst-io/module-a.HelloWorld" "Jared" }}
 // Output: Hello, Jared
 ```
