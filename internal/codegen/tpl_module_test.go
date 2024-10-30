@@ -16,11 +16,13 @@ import (
 // TestTplModule_Tpl tests [TplModule] in a template context.
 func TestTplModule_Tpl(t *testing.T) {
 	tests := []struct {
-		name             string
-		functionTemplate string
-		callingTemplate  string
-		want             string
-		wantErrContains  string
+		name                string
+		functionTemplate    string
+		callingTemplate     string
+		want                string
+		renderStage         renderStage
+		wantFuncErrContains string
+		wantErrContains     string
 	}{
 		{
 			name:            "should error on non-existent template",
@@ -35,69 +37,70 @@ func TestTplModule_Tpl(t *testing.T) {
 		{
 			name: "should support calling exported function",
 			functionTemplate: `{{- define "HelloWorld" -}}
-{{ return "Hello, world!" }}
-{{- end -}}
-{{- module.Export "HelloWorld" -}}`,
+		{{ return "Hello, world!" }}
+		{{- end -}}
+		{{- module.Export "HelloWorld" -}}`,
 			callingTemplate: `{{ module.Call "function.HelloWorld" }}`,
 			want:            "Hello, world!",
 		},
 		{
 			name: "should support returning errors",
 			functionTemplate: `{{- define "HelloWorld" -}}
-{{ return "" (error "Failed!") }}
-{{- end -}}
-{{- module.Export "HelloWorld" -}}`,
+		{{ return "" (error "Failed!") }}
+		{{- end -}}
+		{{- module.Export "HelloWorld" -}}`,
 			callingTemplate: `{{ module.Call "function.HelloWorld" }}`,
 			wantErrContains: "Failed!",
 		},
 		{
 			name: "should not continue processing after error",
 			functionTemplate: `{{- define "HelloWorld" -}}
-{{ return "" (error "Failed!") }}
-{{ fail "should not continue processing" }}
-{{- end -}}
-{{- module.Export "HelloWorld" -}}`,
+		{{ return "" (error "Failed!") }}
+		{{ fail "should not continue processing" }}
+		{{- end -}}
+		{{- module.Export "HelloWorld" -}}`,
 			callingTemplate: `{{ module.Call "function.HelloWorld" }}`,
 			wantErrContains: "Failed!",
 		},
 		{
 			name: "should support passing concrete types",
 			functionTemplate: `{{- define "HelloWorld" -}}
-{{ return (fromYaml "hello: world") }}
-{{- end -}}
-{{- module.Export "HelloWorld" -}}`,
+		{{ return (fromYaml "hello: world") }}
+		{{- end -}}
+		{{- module.Export "HelloWorld" -}}`,
 			callingTemplate: `{{ (module.Call "function.HelloWorld").hello }}`,
 			want:            "world",
 		},
 		{
 			name: "should pass data between calls",
 			functionTemplate: `{{- define "HelloWorld" -}}
-{{ return .Data }}
-{{- end -}}
-{{- module.Export "HelloWorld" -}}`,
+		{{ return .Data }}
+		{{- end -}}
+		{{- module.Export "HelloWorld" -}}`,
 			callingTemplate: `{{ module.Call "function.HelloWorld" "hello" }}`,
 			want:            "hello",
 		},
 		{
 			name: "should use data from caller",
 			functionTemplate: `{{- define "HelloWorld" -}}
-{{ return (file.Path) }}
-{{- end -}}
-{{- module.Export "HelloWorld" -}}`,
+		{{ return (file.Path) }}
+		{{- end -}}
+		{{- module.Export "HelloWorld" -}}`,
 			callingTemplate: `{{ module.Call "function.HelloWorld" }}`,
 			// This is "caller" because the path should be from the template
 			// we are calling from. Otherwise, this would be "function".
 			want: "caller",
 		},
 		{
-			name: "should break on duplicate export",
+			name:        "should break on duplicate export",
+			renderStage: renderStageFinal,
 			functionTemplate: `{{- define "HelloWorld" -}}
 {{ return (fromYaml "hello: world") }}
 {{- end -}}
 {{- module.Export "HelloWorld" -}}
 {{- module.Export "HelloWorld" -}}`,
-			callingTemplate: ``,
-			wantErrContains: "already exported",
+			callingTemplate:     ``,
+			wantFuncErrContains: "already exported",
 		},
 	}
 	for _, tt := range tests {
@@ -149,7 +152,19 @@ func TestTplModule_Tpl(t *testing.T) {
 			vals := NewValues(context.Background(), &configuration.Manifest{Name: t.Name()}, mods)
 
 			// render template to register it
-			assert.NilError(t, functionTpl.Render(st, vals), "expected Render to succeed")
+			st.renderStage = tt.renderStage
+			err = functionTpl.Render(st, vals)
+			if err != nil {
+				if tt.wantFuncErrContains == "" {
+					t.Errorf("unexpected function error: %v", err)
+					return
+				}
+
+				assert.ErrorContains(t, err, tt.wantFuncErrContains, "expected function error to match")
+				return
+			} else if tt.wantFuncErrContains != "" {
+				t.Errorf("expected function error to contain %q, got nil", tt.wantFuncErrContains)
+			}
 
 			// We already registered the function template, so we can render
 			// the caller template now.
@@ -164,6 +179,8 @@ func TestTplModule_Tpl(t *testing.T) {
 
 				assert.ErrorContains(t, err, tt.wantErrContains, "expected error to match")
 				return
+			} else if tt.wantErrContains != "" {
+				t.Errorf("expected error to contain %q, got nil", tt.wantErrContains)
 			}
 
 			got := string(callerTpl.Files[0].contents)
