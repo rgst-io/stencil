@@ -81,7 +81,10 @@ func (tm *TplModule) Export(name string) (string, error) {
 
 	moduleName := tm.t.Module.Name
 	key := tm.s.sharedState.key(moduleName, name)
-	tm.s.sharedState.Functions.Store(key, struct{}{})
+	ef := exportedFunction{
+		Template: tm.t,
+	}
+	tm.s.sharedState.Functions.Store(key, ef)
 	tm.log.Debug("Exported function", "module.name", moduleName, "function.name", name)
 
 	return "", nil
@@ -98,7 +101,7 @@ func (tm *TplModule) Export(name string) (string, error) {
 // template function, which is only available in this context.
 //
 // In addition, all of the file, stencil and other functions are in the
-// context of the parent template, not the template being called.
+// context of the owning template, not the template calling the function.
 //
 // `.` in a template function acts the same way as it does for
 // [TplStencil.ApplyTemplate] (`stencil.ApplyTemplate`). Meaning, it
@@ -136,7 +139,8 @@ func (tm *TplModule) Call(name string, args ...any) (any, error) {
 	moduleName, functionName := name[:lastPeriodIdx], name[lastPeriodIdx+1:]
 
 	key := tm.s.sharedState.key(moduleName, functionName)
-	if _, ok := tm.s.sharedState.Functions.Load(key); !ok {
+	ef, ok := tm.s.sharedState.Functions.Load(key)
+	if !ok {
 		return nil, fmt.Errorf("function %q in module %q was not registered", functionName, moduleName)
 	}
 
@@ -170,7 +174,7 @@ func (tm *TplModule) Call(name string, args ...any) (any, error) {
 		return nil, err
 	}
 
-	tmpTpl.Funcs(NewFuncMap(tm.s, tm.t, tm.log))
+	tmpTpl.Funcs(NewFuncMap(tm.s, ef.Template, tm.log))
 	tmpTpl.Funcs(map[string]any{
 		// return captures a value from the executed function template and
 		// returns it to the calling template.

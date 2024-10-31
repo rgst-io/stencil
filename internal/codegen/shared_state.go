@@ -56,6 +56,12 @@ type global struct {
 	Value any
 }
 
+// exportedFunction stores data about a function that has been exported with
+// module.Export for later retrieval/usage at module.Call-time.
+type exportedFunction struct {
+	Template *Template
+}
+
 // sharedState stores data that is injected by templates and shared
 // between them.
 //
@@ -64,7 +70,7 @@ type global struct {
 type sharedState struct {
 	// functions is a map of modules to templates that have been exported
 	// through [TplModule].
-	Functions   *xsync.MapOf[string, struct{}]
+	Functions   *xsync.MapOf[string, exportedFunction]
 	Globals     *xsync.MapOf[string, global]
 	ModuleHooks *xsync.MapOf[string, moduleHook]
 }
@@ -73,7 +79,7 @@ type sharedState struct {
 // sharedData type.
 func newSharedState() *sharedState {
 	return &sharedState{
-		Functions:   xsync.NewMapOf[string, struct{}](),
+		Functions:   xsync.NewMapOf[string, exportedFunction](),
 		ModuleHooks: xsync.NewMapOf[string, moduleHook](),
 		Globals:     xsync.NewMapOf[string, global](),
 	}
