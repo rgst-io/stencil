@@ -169,6 +169,10 @@ type TemplateRepositoryManifest struct {
 	// Modules are template repositories that this manifest requires
 	Modules []*TemplateRepository `yaml:"modules,omitempty"`
 
+	// MinStencilVersion is the minimum version of stencil that is required to
+	// render this module.
+	MinStencilVersion string `yaml:"minStencilVersion,omitempty"`
+
 	// Type stores a comma-separated list of template repository types served by the current module.
 	// Use the TemplateRepositoryTypes.Contains method to check.
 	Type TemplateRepositoryTypes `yaml:"type,omitempty"`
