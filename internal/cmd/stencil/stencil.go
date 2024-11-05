@@ -31,9 +31,11 @@ import (
 	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/internal/codegen"
 	"go.rgst.io/stencil/internal/modules"
+	"go.rgst.io/stencil/internal/version"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
 	"go.rgst.io/stencil/pkg/stencil"
+	"golang.org/x/mod/semver"
 )
 
 // Command is a thin wrapper around the codegen package that implements
@@ -253,6 +255,14 @@ func (c *Command) Run(ctx context.Context) error {
 
 	for _, m := range mods {
 		c.log.Infof(" -> %s %s", m.Name, printVersion(m.Version))
+
+		if m.Manifest.MinStencilVersion != "" {
+			// semver.Compare expects the version to be prefixed with "v"
+			if semver.Compare("v"+version.Version.GitVersion, "v"+m.Manifest.MinStencilVersion) < 0 {
+				return fmt.Errorf("stencil version %s is less than the required version %s for %s",
+					version.Version.GitVersion, m.Manifest.MinStencilVersion, m.Name)
+			}
+		}
 	}
 
 	return c.runWithModules(ctx, mods)
