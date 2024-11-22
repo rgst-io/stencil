@@ -46,7 +46,7 @@ jobs:
       - name: Run Go tests
         run: mise run coverage
       - name: Upload test coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ${{ env.COVERFILE }}
