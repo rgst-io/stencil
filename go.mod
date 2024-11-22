@@ -3,7 +3,7 @@ module go.rgst.io/stencil
 go 1.23
 
 require (
-	github.com/Masterminds/semver/v3 v3.3.0
+	github.com/Masterminds/semver/v3 v3.3.1
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/caarlos0/go-version v0.1.1
 	github.com/chainguard-dev/git-urls v1.0.2
