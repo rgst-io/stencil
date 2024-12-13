@@ -39,7 +39,7 @@ func TestSingleFileRender(t *testing.T) {
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
-	tpl, err := NewTemplate(m, "virtual-file.tpl", 0o644, time.Now(), []byte("hello world!"), log, false)
+	tpl, err := NewTemplate(m, "virtual-file.tpl", 0o644, time.Now(), []byte("hello world!"), log, nil)
 	assert.NilError(t, err, "failed to create basic template")
 
 	sm := &configuration.Manifest{Name: "testing"}
@@ -58,7 +58,7 @@ func TestMultiFileRender(t *testing.T) {
 	assert.NilError(t, err, "failed to NewWithFS")
 
 	tpl, err := NewTemplate(m, "multi-file.tpl", 0o644,
-		time.Now(), []byte(multiFileTemplate), log, false)
+		time.Now(), []byte(multiFileTemplate), log, nil)
 	assert.NilError(t, err, "failed to create template")
 
 	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{
@@ -83,7 +83,7 @@ func TestMultiFileWithInputRender(t *testing.T) {
 	assert.NilError(t, err, "failed to NewWithFS")
 
 	tpl, err := NewTemplate(m, "multi-file-input.tpl", 0o644,
-		time.Now(), []byte(multiFileInputTemplate), log, false)
+		time.Now(), []byte(multiFileInputTemplate), log, nil)
 	assert.NilError(t, err, "failed to create template")
 
 	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{
@@ -108,7 +108,7 @@ func TestApplyTemplateArgumentPassthrough(t *testing.T) {
 	assert.NilError(t, err, "failed to NewWithFS")
 
 	tpl, err := NewTemplate(m, "apply-template-passthrough.tpl", 0o644,
-		time.Now(), []byte(applyTemplatePassthroughTemplate), log, false)
+		time.Now(), []byte(applyTemplatePassthroughTemplate), log, nil)
 	assert.NilError(t, err, "failed to create template")
 
 	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{
@@ -139,7 +139,7 @@ func TestGeneratedBlock(t *testing.T) {
 		"failed to write generated file")
 
 	tpl, err := NewTemplate(m, "generated-block/template.tpl", 0o644,
-		time.Now(), []byte(generatedBlockTemplate), log, false)
+		time.Now(), []byte(generatedBlockTemplate), log, nil)
 	assert.NilError(t, err, "failed to create template")
 
 	tplf, err := NewFile(fakeFilePath, 0o644, time.Now(), fakeBlocksTemplate())
@@ -161,7 +161,7 @@ func TestLibraryTemplate(t *testing.T) {
 	log := slogext.NewTestLogger(t)
 	assert.NilError(t, err, "failed to NewWithFS")
 
-	tpl, err := NewTemplate(m, "hello.library.tpl", 0o644, time.Now(), []byte("hello world!"), log, false)
+	tpl, err := NewTemplate(m, "hello.library.tpl", 0o644, time.Now(), []byte("hello world!"), log, nil)
 	assert.NilError(t, err, "failed to create basic template")
 	assert.Equal(t, tpl.Library, true, "expected library template to be marked as such")
 
@@ -182,7 +182,7 @@ func TestLibraryCantAccessFileFunctions(t *testing.T) {
 	log := slogext.NewTestLogger(t)
 	assert.NilError(t, err, "failed to NewWithFS")
 
-	tpl, err := NewTemplate(m, "hello.library.tpl", 0o644, time.Now(), []byte("{{ file.Create }}"), log, false)
+	tpl, err := NewTemplate(m, "hello.library.tpl", 0o644, time.Now(), []byte("{{ file.Create }}"), log, nil)
 	assert.NilError(t, err, "failed to create basic template")
 	assert.Equal(t, tpl.Library, true, "expected library template to be marked as such")
 

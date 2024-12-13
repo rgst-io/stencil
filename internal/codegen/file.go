@@ -16,8 +16,12 @@
 package codegen
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"time"
+
+	"go.rgst.io/stencil/pkg/slogext"
 )
 
 // _ ensures that we implement the os.FileInfo interface
@@ -162,5 +166,46 @@ func (f *File) Size() int64 {
 // Sys implements the os.FileInfo.Sys method. This does
 // not do anything.
 func (f *File) Sys() interface{} {
+	return nil
+}
+
+// Write writes a [codegen.File] to disk based on its current state, logging appropriately
+func (f *File) Write(log slogext.Logger, dryRun bool) error {
+	action := "Created"
+	if f.Deleted {
+		action = "Deleted"
+
+		if !dryRun {
+			os.Remove(f.Name())
+		}
+	} else if f.Skipped {
+		action = "Skipped"
+	} else if _, err := os.Stat(f.Name()); err == nil {
+		action = "Updated"
+	}
+
+	if action == "Created" || action == "Updated" {
+		if !dryRun {
+			if err := os.MkdirAll(filepath.Dir(f.Name()), 0o755); err != nil {
+				return fmt.Errorf("failed to create directory %q: %w", filepath.Dir(f.Name()), err)
+			}
+
+			if err := os.WriteFile(f.Name(), f.Bytes(), f.Mode()); err != nil {
+				return fmt.Errorf("failed to write file %q: %w", f.Name(), err)
+			}
+		}
+	}
+
+	msg := fmt.Sprintf("  -> %s %s", action, f.Name())
+	if dryRun {
+		msg += " (dry-run)"
+	}
+
+	if !f.Skipped {
+		log.Info(msg)
+	} else {
+		// For skipped files, we only log at debug level
+		log.Debug(msg, "reason", f.SkippedReason)
+	}
 	return nil
 }

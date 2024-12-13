@@ -141,7 +141,9 @@ func adoptTestHelper(t *testing.T, templateFile, targetFile string) map[string]*
 
 	conts, err := os.ReadFile(templateFile)
 	assert.NilError(t, err, "failed to read templateFile")
-	tpl, err := NewTemplate(m, templateFile, 0o644, time.Now(), conts, log, true)
+	tpl, err := NewTemplate(m, templateFile, 0o644, time.Now(), conts, log, &NewTemplateOpts{
+		Adopt: true,
+	})
 	assert.NilError(t, err, "failed to NewTemplate")
 
 	blocks, err := parseBlocks(targetFile, tpl)

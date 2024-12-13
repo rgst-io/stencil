@@ -23,7 +23,10 @@ A module structure typically looks like so:
 
 ### `templates/`
 
-This directory is used for storing all of the go-templates that a module owns. By default a file that doesn't have a `.tpl` extension will be ignored by stencil. When a `.tpl` file is found, this file is written to the base of the execution directory of stencil, minus the `templates` directory and `.tpl` extension.
+This directory is used for storing all of the go-templates that a module owns. By default a file that doesn't have a `.tpl` or `.nontpl` extension will be ignored by stencil.
+
+- When a `.tpl` file is found, this file is written to the base of the execution directory of stencil, minus the `templates` directory and `.tpl` extension.
+- Files with a `.nontpl` extension are treated as raw binary files and are written verbatim (not treated as templates) to the base of the execution directory of stencil, minus the `templates` directory and `.nontpl` extension.
 
 For example, if a module had a template at `templates/helloWorld.tpl` it would by default be written to `./helloWorld`
 
