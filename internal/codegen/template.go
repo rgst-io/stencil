@@ -64,8 +64,10 @@ type Template struct {
 	// Contents is the content of this template
 	Contents []byte
 
-	// Binary denotes if a template is a binary "template" or not.  Binary
-	// templates only generate the single binary file for output.
+	// Binary denotes if a template is a binary "template" (not actually a
+	// template) or not.  Binary "templates" are just copied verbatim to the
+	// target path, used for embedding binary files into tempalte repos for
+	// uses like gradle-wrapper.jar.
 	Binary bool
 
 	// Library denotes if a template is a library template or not. Library
@@ -74,12 +76,10 @@ type Template struct {
 }
 
 type NewTemplateOpts struct {
-	// Adopt denotes if we should use heuristics to detect code that should go
-	// into blocks to assist with first-time adoption of templates
+	// Enable the adoptMode option for the Template file (see [codegen.Template.adoptMode])
 	Adopt bool
 
-	// Binary denotes if a template is a binary "template" or not.  Binary
-	// templates only generate the single binary file for output.
+	// Enable the binary option for the Template file (see [codegen.Template.Binary])
 	Binary bool
 }
 

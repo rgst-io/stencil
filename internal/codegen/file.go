@@ -169,7 +169,7 @@ func (f *File) Sys() interface{} {
 	return nil
 }
 
-// Write writes a codegen.File to disk based on its current state, logging appropriately
+// Write writes a [codegen.File] to disk based on its current state, logging appropriately
 func (f *File) Write(log slogext.Logger, dryRun bool) error {
 	action := "Created"
 	if f.Deleted {
