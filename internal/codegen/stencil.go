@@ -322,7 +322,7 @@ func (s *Stencil) getTemplates(ctx context.Context, log slogext.Logger) ([]*Temp
 
 			// Skip files without a .tpl extension
 			isTemplate := filepath.Ext(path) == ".tpl"
-			isBinary := filepath.Ext(path) == ".tplb"
+			isBinary := filepath.Ext(path) == ".nontpl"
 			if !isTemplate && !isBinary {
 				return nil
 			}

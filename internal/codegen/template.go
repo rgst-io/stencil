@@ -141,7 +141,7 @@ func (t *Template) Render(st *Stencil, vals *Values) error {
 	if len(t.Files) == 0 && !t.Library {
 		var p string
 		if t.Binary {
-			p = strings.TrimSuffix(t.Path, ".tplb")
+			p = strings.TrimSuffix(t.Path, ".nontpl")
 		} else {
 			p = strings.TrimSuffix(t.Path, ".tpl")
 		}

@@ -134,7 +134,7 @@ func TestBinaryRender(t *testing.T) {
 	m1man := &configuration.TemplateRepositoryManifest{
 		Name: "testing1",
 	}
-	m1, err := modulestest.NewModuleFromTemplates(m1man, "testdata/binary.tplb")
+	m1, err := modulestest.NewModuleFromTemplates(m1man, "testdata/binary.nontpl")
 	assert.NilError(t, err, "failed to NewWithFS")
 
 	st := NewStencil(sm, nil, []*modules.Module{m1}, log, false)
@@ -155,7 +155,7 @@ func TestBinaryRender(t *testing.T) {
 	assert.NilError(t, err, "failed to file out")
 
 	// read entire binary file
-	cont, err := os.ReadFile(path.Join(wd, "testdata/binary.tplb"))
+	cont, err := os.ReadFile(path.Join(wd, "testdata/binary.nontpl"))
 	assert.NilError(t, err, "failed to load binary file")
 	cont2, err := os.ReadFile(tpls[0].Files[0].path)
 	assert.NilError(t, err, "failed to load output binary file")
