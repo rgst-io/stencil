@@ -66,7 +66,7 @@ type Template struct {
 
 	// Binary denotes if a template is a binary "template" (not actually a
 	// template) or not.  Binary "templates" are just copied verbatim to the
-	// target path, used for embedding binary files into tempalte repos for
+	// target path, used for embedding binary files into template repos for
 	// uses like gradle-wrapper.jar.
 	Binary bool
 
