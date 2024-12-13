@@ -2,6 +2,8 @@ package codegen
 
 import (
 	"context"
+	"os"
+	"path"
 	"slices"
 	"strings"
 	"testing"
@@ -124,6 +126,40 @@ func TestDirReplacementRendering(t *testing.T) {
 	assert.Equal(t, len(tps), 1)
 	assert.Equal(t, len(tps[0].Files), 1)
 	assert.Equal(t, tps[0].Files[0].path, "bob/d/m1")
+}
+
+func TestBinaryRender(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]any{"x": "d"}}
+	m1man := &configuration.TemplateRepositoryManifest{
+		Name: "testing1",
+	}
+	m1, err := modulestest.NewModuleFromTemplates(m1man, "testdata/binary.tplb")
+	assert.NilError(t, err, "failed to NewWithFS")
+
+	st := NewStencil(sm, nil, []*modules.Module{m1}, log, false)
+
+	tpls, err := st.Render(context.Background(), log)
+	assert.NilError(t, err, "failed to render template")
+	assert.Equal(t, len(tpls), 1)
+	assert.Equal(t, len(tpls[0].Files), 1)
+
+	wd, err := os.Getwd()
+	assert.NilError(t, err, "failed to get working directory")
+	td := os.TempDir()
+	err = os.Chdir(td)
+	assert.NilError(t, err, "failed to change working directory")
+	defer os.Chdir(wd)
+
+	err = tpls[0].Files[0].Write(log, false)
+	assert.NilError(t, err, "failed to file out")
+
+	// read entire binary file
+	cont, err := os.ReadFile(path.Join(wd, "testdata/binary.tplb"))
+	assert.NilError(t, err, "failed to load binary file")
+	cont2, err := os.ReadFile(tpls[0].Files[0].path)
+	assert.NilError(t, err, "failed to load output binary file")
+	assert.DeepEqual(t, cont, cont2)
 }
 
 func TestBadDirReplacement(t *testing.T) {

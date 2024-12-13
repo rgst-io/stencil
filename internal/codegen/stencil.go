@@ -252,7 +252,7 @@ func (s *Stencil) calcDirReplacements(vals *Values) error {
 
 // renderDirReplacement breaks out the actual rendering for calcDirReplacements to make it unit testable
 func (s *Stencil) renderDirReplacement(template string, m *modules.Module, vals *Values) (string, error) {
-	rt, err := NewTemplate(m, "dirReplace", 0o000, time.Time{}, []byte(template), s.log, s.adoptMode)
+	rt, err := NewTemplate(m, "dirReplace", 0o000, time.Time{}, []byte(template), s.log, nil)
 	if err != nil {
 		return "", err
 	}
@@ -318,8 +318,12 @@ func (s *Stencil) getTemplates(ctx context.Context, log slogext.Logger) ([]*Temp
 				return err
 			}
 
+			// add binary check here
+
 			// Skip files without a .tpl extension
-			if filepath.Ext(path) != ".tpl" {
+			isTemplate := filepath.Ext(path) == ".tpl"
+			isBinary := filepath.Ext(path) == ".tplb"
+			if !isTemplate && !isBinary {
 				return nil
 			}
 
@@ -335,7 +339,10 @@ func (s *Stencil) getTemplates(ctx context.Context, log slogext.Logger) ([]*Temp
 			}
 
 			log.Debugf("Discovered template %q", path)
-			tpl, err := NewTemplate(m, path, inf.Mode(), inf.ModTime(), tplContents, log, s.adoptMode)
+			tpl, err := NewTemplate(m, path, inf.Mode(), inf.ModTime(), tplContents, log, &NewTemplateOpts{
+				Adopt:  s.adoptMode,
+				Binary: isBinary,
+			})
 			if err != nil {
 				return errors.Wrapf(err, "failed to create template %q from module %q", path, m.Name)
 			}

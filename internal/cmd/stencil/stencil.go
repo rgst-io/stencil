@@ -25,7 +25,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"path/filepath"
 	"slices"
 
 	"github.com/jaredallard/vcs/resolver"
@@ -297,53 +296,12 @@ func (c *Command) runWithModules(ctx context.Context, mods []*modules.Module) er
 	return st.PostRun(ctx, c.log)
 }
 
-// writeFile writes a codegen.File to disk based on its current state
-func (c *Command) writeFile(f *codegen.File) error {
-	action := "Created"
-	if f.Deleted {
-		action = "Deleted"
-
-		if !c.dryRun {
-			os.Remove(f.Name())
-		}
-	} else if f.Skipped {
-		action = "Skipped"
-	} else if _, err := os.Stat(f.Name()); err == nil {
-		action = "Updated"
-	}
-
-	if action == "Created" || action == "Updated" {
-		if !c.dryRun {
-			if err := os.MkdirAll(filepath.Dir(f.Name()), 0o755); err != nil {
-				return fmt.Errorf("failed to create directory %q: %w", filepath.Dir(f.Name()), err)
-			}
-
-			if err := os.WriteFile(f.Name(), f.Bytes(), f.Mode()); err != nil {
-				return fmt.Errorf("failed to write file %q: %w", f.Name(), err)
-			}
-		}
-	}
-
-	msg := fmt.Sprintf("  -> %s %s", action, f.Name())
-	if c.dryRun {
-		msg += " (dry-run)"
-	}
-
-	if !f.Skipped {
-		c.log.Info(msg)
-	} else {
-		// For skipped files, we only log at debug level
-		c.log.Debug(msg, "reason", f.SkippedReason)
-	}
-	return nil
-}
-
 // writeFiles writes the files to disk
 func (c *Command) writeFiles(st *codegen.Stencil, tpls []*codegen.Template) error {
 	c.log.Infof("Writing template(s) to disk")
 	for _, tpl := range tpls {
 		for i := range tpl.Files {
-			if err := c.writeFile(tpl.Files[i]); err != nil {
+			if err := tpl.Files[i].Write(c.log, c.dryRun); err != nil {
 				return err
 			}
 		}

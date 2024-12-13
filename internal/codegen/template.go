@@ -64,31 +64,51 @@ type Template struct {
 	// Contents is the content of this template
 	Contents []byte
 
+	// Binary denotes if a template is a binary "template" or not.  Binary
+	// templates only generate the single binary file for output.
+	Binary bool
+
 	// Library denotes if a template is a library template or not. Library
 	// templates cannot generate files.
 	Library bool
+}
+
+type NewTemplateOpts struct {
+	// Adopt denotes if we should use heuristics to detect code that should go
+	// into blocks to assist with first-time adoption of templates
+	Adopt bool
+
+	// Binary denotes if a template is a binary "template" or not.  Binary
+	// templates only generate the single binary file for output.
+	Binary bool
 }
 
 // NewTemplate creates a new Template with the current file being the same name
 // with the extension .tpl being removed. If the provided template has
 // the extension .library.tpl, then the Library field is set to true.
 func NewTemplate(m *modules.Module, fpath string, mode os.FileMode,
-	modTime time.Time, contents []byte, log slogext.Logger, adopt bool) (*Template, error) {
+	modTime time.Time, contents []byte, log slogext.Logger, opts *NewTemplateOpts) (*Template, error) {
 	var library bool
 	if filepath.Ext(strings.TrimSuffix(fpath, ".tpl")) == ".library" {
 		library = true
 	}
 
-	return &Template{
-		log:       log,
-		mode:      mode,
-		modTime:   modTime,
-		adoptMode: adopt,
-		Module:    m,
-		Path:      fpath,
-		Contents:  contents,
-		Library:   library,
-	}, nil
+	t := &Template{
+		log:      log,
+		mode:     mode,
+		modTime:  modTime,
+		Module:   m,
+		Path:     fpath,
+		Contents: contents,
+		Library:  library,
+	}
+
+	if opts != nil {
+		t.adoptMode = opts.Adopt
+		t.Binary = opts.Binary
+	}
+
+	return t, nil
 }
 
 // ImportPath returns the path to this template, this is meant to denote
@@ -100,12 +120,14 @@ func (t *Template) ImportPath() string {
 // Parse parses the provided template and makes it available to be Rendered
 // in the context of the current module.
 func (t *Template) Parse(_ *Stencil) error {
-	// Add the current template to the template object on the module that we're
-	// attached to. This enables us to call functions in other templates within our
-	// 'module context'.
-	if _, err := t.Module.GetTemplate().New(t.ImportPath()).Funcs(NewFuncMap(nil, nil, t.log)).
-		Parse(string(t.Contents)); err != nil {
-		return err
+	if !t.Binary {
+		// Add the current template to the template object on the module that we're
+		// attached to. This enables us to call functions in other templates within our
+		// 'module context'.
+		if _, err := t.Module.GetTemplate().New(t.ImportPath()).Funcs(NewFuncMap(nil, nil, t.log)).
+			Parse(string(t.Contents)); err != nil {
+			return err
+		}
 	}
 
 	t.parsed = true
@@ -117,7 +139,12 @@ func (t *Template) Parse(_ *Stencil) error {
 // are rendered onto the Files field of the template struct.
 func (t *Template) Render(st *Stencil, vals *Values) error {
 	if len(t.Files) == 0 && !t.Library {
-		p := strings.TrimSuffix(t.Path, ".tpl")
+		var p string
+		if t.Binary {
+			p = strings.TrimSuffix(t.Path, ".tplb")
+		} else {
+			p = strings.TrimSuffix(t.Path, ".tpl")
+		}
 		p = t.Module.ApplyDirReplacements(p)
 		f, err := NewFile(p, t.mode, t.modTime, t)
 		if err != nil {
@@ -131,6 +158,11 @@ func (t *Template) Render(st *Stencil, vals *Values) error {
 		if err := t.Parse(st); err != nil {
 			return err
 		}
+	}
+
+	if t.Binary {
+		t.Files[0].SetContents(string(t.Contents))
+		return nil
 	}
 
 	// Update the module values
