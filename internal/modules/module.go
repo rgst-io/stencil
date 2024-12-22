@@ -204,7 +204,7 @@ func (m *Module) GetFS(ctx context.Context) (billy.Filesystem, error) {
 		storageDir = strings.TrimPrefix(m.URI, "file://")
 	} else {
 		var err error
-		storageDir, err = git.Clone(ctx, m.Version.GitRef(), m.URI)
+		storageDir, err = git.Clone(ctx, m.Version.GitRef(), m.URI, &git.CloneOptions{UseArchive: true})
 		if err != nil {
 			return nil, fmt.Errorf("failed to clone module: %w", err)
 		}
