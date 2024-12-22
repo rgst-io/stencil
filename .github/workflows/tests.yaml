@@ -44,6 +44,8 @@ jobs:
       - name: Download dependencies
         run: go mod download
       - name: Run Go tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: mise run coverage
       - name: Upload test coverage
         uses: codecov/codecov-action@v5

@@ -186,7 +186,7 @@ func (s *Stencil) Render(ctx context.Context, log slogext.Logger) ([]*Template, 
 			return nil, fmt.Errorf("failed to stabilize shared state within %d iterations", i)
 		}
 
-		log.Debugf("Render stage", "iteration", i)
+		log.Debug("Render stage", "iteration", i)
 		for _, t := range tplfiles {
 			log.Debugf("Render template %s", t.ImportPath())
 			if err := t.Render(s, vals); err != nil {
