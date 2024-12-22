@@ -172,7 +172,7 @@ func (lf *Lockfile) PruneFiles(onlyFiles []string) []string {
 	return missingFilenames
 }
 
-func (lf *Lockfile) PruneModules(newModuleNames []string, onlyModules []string) []string {
+func (lf *Lockfile) PruneModules(newModuleNames, onlyModules []string) []string {
 	missingModulesList := []*LockfileModuleEntry{}
 	for _, lf := range lf.Modules {
 		if len(onlyModules) > 0 && !slices.Contains(onlyModules, lf.Name) {

@@ -3,8 +3,8 @@ modules:
     - name: github.com/rgst-io/stencil-golang
       url: https://github.com/rgst-io/stencil-golang
       version:
-        commit: 553b465e2e6fb0f3ce71a6e2b9add52e8513eb62
-        branch: main
+        commit: 2caa391c628957e7477ffd9fcd1c52a3029b254d
+        tag: v1.2.0
 files:
     - name: .cliff.toml
       template: .cliff.toml.tpl
@@ -24,6 +24,12 @@ files:
     - name: .github/workflows/tests.yaml
       template: .github/workflows/tests.yaml.tpl
       module: github.com/rgst-io/stencil-golang
+    - name: .gitignore
+      template: .gitignore.tpl
+      module: github.com/rgst-io/stencil-golang
+    - name: .golangci.yml
+      template: .golangci.yml.tpl
+      module: github.com/rgst-io/stencil-golang
     - name: .goreleaser.yaml
       template: .goreleaser.yaml.tpl
       module: github.com/rgst-io/stencil-golang
@@ -32,6 +38,9 @@ files:
       module: github.com/rgst-io/stencil-golang
     - name: .mise/tasks/changelog-release
       template: .mise/tasks/changelog-release.tpl
+      module: github.com/rgst-io/stencil-golang
+    - name: .vscode/common.code-snippets
+      template: .vscode/common.code-snippets.tpl
       module: github.com/rgst-io/stencil-golang
     - name: .vscode/extensions.json
       template: .vscode/extensions.json.tpl
@@ -43,5 +52,8 @@ files:
       template: CONTRIBUTING.md.tpl
       module: github.com/rgst-io/stencil-golang
     - name: LICENSE
-      template: LICENSE_Apache-2.0.tpl
+      template: LICENSE.tpl
+      module: github.com/rgst-io/stencil-golang
+    - name: package.json
+      template: package.json.tpl
       module: github.com/rgst-io/stencil-golang

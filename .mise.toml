@@ -1,6 +1,7 @@
 
 # Default versions of tools, to update these, set [tools.override]
 [tools]
+bun = "latest"
 git-cliff = "latest"
 golang = "1.23.4"
 golangci-lint = "1.62.2"
@@ -8,15 +9,11 @@ goreleaser = "latest"
 "go:gotest.tools/gotestsum" = "v1.12.0"
 "go:golang.org/x/tools/cmd/goimports" = "latest"
 "go:mvdan.cc/sh/v3/cmd/shfmt" = "latest"
-# TODO(jaredallard): Deviated from stencil-golang.
-bun = "latest"
 "go:github.com/thenativeweb/get-next-version" = "latest"
 "go:sigs.k8s.io/mdtoc" = "latest"
 
 [tasks.build]
 description = "Build a binary for the current platform/architecture"
-outputs = ["bin/stencil"]
-sources = ["cmd/**/*.go", "internal/**/*.go", "pkg/**/*.go", "go.mod", "go.sum"]
 run = "go build -trimpath -o ./bin/ -v ./cmd/..."
 
 [tasks.changelog]
@@ -32,7 +29,6 @@ run = [
 	"gofmt -s -w .",
 	"goimports -w .",
 	"shfmt -w .",
-	# TODO(jaredallard): Deviated from stencil-golang.
 	"bun node_modules/.bin/prettier --write '**/*.{json,yaml,yml,md,jsonschema.json}'",
 ]
 

@@ -30,7 +30,7 @@ import (
 
 // Set the version printer to do nothing but print the version.
 //
-//nolint:gochecknoinits
+//nolint:gochecknoinits // Why: This is acceptable.
 func init() {
 	cli.VersionPrinter = func(_ *cli.Context) {
 		fmt.Println(version.Version.String())

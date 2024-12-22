@@ -82,9 +82,7 @@ func TestTplFile_OnceFileAlreadyExists(t *testing.T) {
 	}
 
 	assert.NilError(t, os.WriteFile("test.go", []byte("test"), 0o644))
-	defer func() {
-		os.Remove("test.go")
-	}()
+	defer os.Remove("test.go")
 
 	fo, err := tplf.Once()
 	assert.NilError(t, err)

@@ -45,7 +45,7 @@ func TestBlockInsideBlock(t *testing.T) {
 func TestWrongEndBlock(t *testing.T) {
 	_, err := parseBlocks("testdata/wrongendblock-test.txt", fakeBlocksTemplate())
 	assert.Error(t, err,
-		"invalid EndBlock, found EndBlock with name \"wrongend\" while inside of block with name \"helloWorld\", at testdata/wrongendblock-test.txt:3", //nolint:lll
+		"invalid EndBlock, found EndBlock with name \"wrongend\" while inside of block with name \"helloWorld\", at testdata/wrongendblock-test.txt:3", //nolint:lll // Why: test
 		"expected parseBlocks() to fail")
 }
 

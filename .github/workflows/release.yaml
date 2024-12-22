@@ -19,7 +19,7 @@ permissions:
   contents: write
   packages: write
   issues: write
-  # Below are required for attestations
+  # Used by attestations in the release workflow.
   id-token: write
   attestations: write
 
@@ -58,11 +58,11 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ${{ steps.go.outputs.cache_dir }}
-          key: ${{ runner.os }}-go-build-cache-rel-${{ hashFiles('**/go.sum') }}
+          key: ${{ github.workflow }}-${{ runner.os }}-go-build-cache-${{ hashFiles('**/go.sum') }}
       - uses: actions/cache@v4
         with:
           path: ${{ steps.go.outputs.mod_cache_dir }}
-          key: ${{ runner.os }}-go-mod-cache-${{ hashFiles('go.sum') }}
+          key: ${{ github.workflow }}-${{ runner.os }}-go-mod-cache-${{ hashFiles('go.sum') }}
       - name: Retrieve goreleaser version
         run: |-
           echo "version=$(mise current goreleaser)" >> "$GITHUB_OUTPUT"

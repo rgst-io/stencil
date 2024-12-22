@@ -4,4 +4,3 @@ arguments:
   license: Apache-2.0
 modules:
   - name: github.com/rgst-io/stencil-golang
-    version: main

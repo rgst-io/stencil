@@ -1,20 +1,17 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 version: 2
 project_name: stencil
-before:
-  hooks:
-    - go mod tidy
 report_sizes: true
 metadata:
   mod_timestamp: "{{ .CommitTimestamp }}"
 builds:
-  - main: ./cmd/{{ .ProjectName }}
+  - main: ./cmd/stencil
     flags:
       - -trimpath
     ldflags:
       - -s
       - -w
-      ## <<Stencil::Block(ldflags)>>
+      ## <<Stencil::Block(stencilLdflags)>>
       - -X go.rgst.io/stencil/internal/version.version={{.Version}}
       - -X go.rgst.io/stencil/internal/version.commit={{.Commit}}
       - -X go.rgst.io/stencil/internal/version.date={{ .CommitDate }}
@@ -26,7 +23,7 @@ builds:
     goarch:
       - amd64
       - arm64
-      ## <<Stencil::Block(extraArch)>>
+      ## <<Stencil::Block(stencilExtraArch)>>
       - "386"
       - arm
       - ppc64
@@ -34,8 +31,9 @@ builds:
     goos:
       - linux
       - darwin
-      ## <<Stencil::Block(extraOS)>>
       - windows
+      ## <<Stencil::Block(stencilExtraOS)>>
+
       ## <</Stencil::Block>>
     ignore:
       - goos: windows
@@ -44,7 +42,7 @@ builds:
 checksum:
   name_template: "checksums.txt"
 snapshot:
-  name_template: "{{ incpatch .Version }}-next"
+  version_template: "{{ incpatch .Version }}-next"
 changelog:
   use: git
 release:

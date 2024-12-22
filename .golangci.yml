@@ -1,42 +1,38 @@
 # yaml-language-server: $schema=https://json.schemastore.org/golangci-lint
-lintroller:
-  tier: "platinum"
 
 # Linter settings
 linters-settings:
-  dupl:
-    threshold: 100
   errcheck:
     check-blank: true
-  funlen:
-    lines: 500
-    statements: 50
   gocyclo:
     min-complexity: 25
-  goconst:
-    min-len: 3
-    min-occurrences: 3
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
   lll:
     line-length: 140
 
 linters:
-  # Inverted configuration with enable-all and disable is not scalable during updates of golangci-lint.
+  # Inverted configuration with enable-all and disable is not scalable
+  # during updates of golangci-lint.
   disable-all: true
   enable:
     - bodyclose
     - dogsled
     - errcheck
     - errorlint
-    - exhaustive # Checks exhaustiveness of enum switch statements.
+    - exhaustive
     - copyloopvar
-    - funlen
     - gochecknoinits
-    - goconst
     - gocritic
     - gocyclo
     - gofmt
+    - goheader
     - goimports
-    - revive
     - gosec
     - gosimple
     - govet
@@ -45,6 +41,7 @@ linters:
     - misspell
     - nakedret
     - staticcheck
+    - revive
     - typecheck
     - unconvert
     - unparam
@@ -61,24 +58,12 @@ issues:
     # Exclude some linters from running on tests files.
     - path: _test\.go
       linters:
-        - gocyclo
         - errcheck
-        - gosec
         - funlen
         - gochecknoglobals # Globals in test files are tolerated.
-        - goconst # Repeated consts in test files are tolerated.
-    # This rule is buggy and breaks on our `///Block` lines.  Disable for now.
-    - linters:
-        - gocritic
-      text: "commentFormatting: put a space"
-    # This rule incorrectly flags nil references after assert.Assert(t, x != nil)
-    - path: _test\.go
-      text: "SA5011"
-      linters:
-        - staticcheck
-    - linters:
-        - lll
-      source: "^//go:generate "
+        - gocyclo
+        - goheader # Don't require license headers in test files.
+        - gosec
 
 output:
   sort-results: true

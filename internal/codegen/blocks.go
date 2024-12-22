@@ -63,7 +63,7 @@ func parseBlocks(filePath string, sourceTemplate *Template) (map[string]*blockIn
 
 // parseBlocksInner is the inner implementation of parseBlocks, reusable from inside adoptBlocks to parse blocks
 // from the source template contents
-// nolint: funlen
+// nolint:funlen // Why: Will refactor in the future.
 func parseBlocksInner(r io.ReadSeeker, filePath string, sourceTemplate *Template) (map[string]*blockInfo, error) {
 	blocks := make(map[string]*blockInfo)
 	var curBlock *blockInfo
