@@ -22,6 +22,7 @@ import (
 	"io"
 	"math/rand/v2"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"time"
@@ -273,14 +274,51 @@ func (s *Stencil) renderDirReplacement(template string, m *modules.Module, vals 
 // this project depends on
 func (s *Stencil) PostRun(ctx context.Context, log slogext.Logger) error {
 	log.Info("Running post-run command(s)")
+
+	type postRunCommand struct {
+		Module string
+		Spec   *configuration.PostRunCommandSpec
+	}
+
+	postRunCommands := []*postRunCommand{}
+
+	// Check if the project has a '.mise.toml' and that 'mise' is
+	// installed. If so, automatically trust the config.
+	//
+	// Note: This is to fix a special case with mise being used across
+	// various language's modules. If anything else needs to be added
+	// here, consider adding it to the post run commands array for a
+	// specific module first. Otherwise, consider changing this system to
+	// prevent more cases from being added to the code.
+	if _, err := os.Stat(".mise.toml"); err == nil {
+		// Check if 'mise' is in path to ensure this is less likely to fail.
+		if misePath, _ := exec.LookPath("mise"); misePath != "" {
+			postRunCommands = append(postRunCommands, &postRunCommand{
+				Module: "stencil",
+				Spec: &configuration.PostRunCommandSpec{
+					Name:    "mise: trust config",
+					Command: "mise trust",
+				},
+			})
+		}
+	}
+
+	// Get all post run commands from all modules
 	for _, m := range s.modules {
-		for _, cmdStr := range m.Manifest.PostRunCommand {
-			log.Infof(" - %s", cmdStr.Name)
-			cmd := cmdexec.CommandContext(ctx, "/usr/bin/env", "bash", "-c", cmdStr.Command)
-			cmd.UseOSStreams(true)
-			if err := cmd.Run(); err != nil {
-				return errors.Wrapf(err, "failed to run post run command for module %q", m.Name)
-			}
+		for _, prc := range m.Manifest.PostRunCommand {
+			postRunCommands = append(postRunCommands, &postRunCommand{
+				Module: m.Name,
+				Spec:   prc,
+			})
+		}
+	}
+
+	for _, prc := range postRunCommands {
+		log.Infof(" - %s", prc.Spec.Name)
+		cmd := cmdexec.CommandContext(ctx, "/usr/bin/env", "bash", "-c", prc.Spec.Command)
+		cmd.UseOSStreams(true)
+		if err := cmd.Run(); err != nil {
+			return errors.Wrapf(err, "failed to run post run command for module %q", prc.Module)
 		}
 	}
 
