@@ -292,12 +292,14 @@ func (s *Stencil) PostRun(ctx context.Context, log slogext.Logger) error {
 	// prevent more cases from being added to the code.
 	if _, err := os.Stat(".mise.toml"); err == nil {
 		// Check if 'mise' is in path to ensure this is less likely to fail.
+		//
+		//nolint:errcheck // Why: Checking path only
 		if misePath, _ := exec.LookPath("mise"); misePath != "" {
 			postRunCommands = append(postRunCommands, &postRunCommand{
 				Module: "stencil",
 				Spec: &configuration.PostRunCommandSpec{
 					Name:    "mise: trust config",
-					Command: "mise trust",
+					Command: "mise trust --quiet",
 				},
 			})
 		}
@@ -314,7 +316,7 @@ func (s *Stencil) PostRun(ctx context.Context, log slogext.Logger) error {
 	}
 
 	for _, prc := range postRunCommands {
-		log.Infof(" - %s", prc.Spec.Name)
+		log.Infof(" - %s (source: %s)", prc.Spec.Name, prc.Module)
 		cmd := cmdexec.CommandContext(ctx, "/usr/bin/env", "bash", "-c", prc.Spec.Command)
 		cmd.UseOSStreams(true)
 		if err := cmd.Run(); err != nil {
