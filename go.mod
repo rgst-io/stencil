@@ -16,7 +16,7 @@ require (
 	github.com/hashicorp/go-plugin v1.6.2
 	github.com/jaredallard/archives v1.0.0
 	github.com/jaredallard/cmdexec v1.2.1
-	github.com/jaredallard/vcs v0.3.1
+	github.com/jaredallard/vcs v0.4.0
 	github.com/mitchellh/hashstructure/v2 v2.0.2
 	github.com/pkg/errors v0.9.1
 	github.com/princjef/gomarkdoc v1.1.0
