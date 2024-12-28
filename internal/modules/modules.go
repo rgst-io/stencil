@@ -23,6 +23,7 @@ package modules
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -116,24 +117,36 @@ func criteriaForVersionString(version string) *resolver.Criteria {
 // resolutionError returns an error for a failed module resolution
 // with a given import path and history of constraints that were used
 // to resolve the module.
-func resolutionError(importPath string, history []history) error {
-	errorString := ""
-	for i := range history {
-		h := &history[i]
-		errorString += strings.Repeat(" ", i*2) + "└─ "
+func resolutionError(err error, importPath string, history []history) error {
+	resolverHistory := ""
 
-		wants := "*"
-		switch {
-		case h.criteria.Branch != "":
-			wants = "branch " + h.criteria.Branch
-		case h.criteria.Constraint != "":
-			wants = h.criteria.Constraint
+	// Only include the resolution history/criteria if the error was
+	// related to that.
+	//
+	// TODO(jaredallard): We should consider updating the vcs library to
+	// also expose the branch error, possibly in the same error type.
+	if errors.Is(err, resolver.ErrUnableToSatisfy) || strings.Contains(err.Error(), "unable to satisfy multiple branch constraints") {
+		for i := range history {
+			h := &history[i]
+			resolverHistory += strings.Repeat(" ", i*2) + "└─ "
+
+			wants := "*"
+			switch {
+			case h.criteria.Branch != "":
+				wants = "branch " + h.criteria.Branch
+			case h.criteria.Constraint != "":
+				wants = h.criteria.Constraint
+			}
+
+			resolverHistory += fmt.Sprintln(history[i].parent, "wants", wants)
 		}
-
-		errorString += fmt.Sprintln(history[i].parent, "wants", wants)
 	}
 
-	return fmt.Errorf("failed to resolve module '%s' with constraints\n%s", importPath, errorString)
+	err = fmt.Errorf("failed to resolve module '%s': %w", importPath, err)
+	if resolverHistory != "" {
+		err = fmt.Errorf("%w\n\nConstraints:\n%s", err, resolverHistory)
+	}
+	return err
 }
 
 // FetchModules fetches modules for a given Manifest. See
@@ -228,7 +241,7 @@ func FetchModules(ctx context.Context, opts *ModuleResolveOptions) ([]*Module, e
 			var err error
 			version, err = r.Resolve(ctx, uri, criteria...)
 			if err != nil {
-				return nil, resolutionError(importPath, modules[importPath].history)
+				return nil, resolutionError(err, importPath, modules[importPath].history)
 			}
 
 			// Track that we got this version for this module

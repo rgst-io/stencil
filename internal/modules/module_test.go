@@ -165,7 +165,9 @@ func TestFailOnIncompatibleConstraints(t *testing.T) {
 		Log: newLogger(t),
 	})
 	assert.Error(t, err,
-		"failed to resolve module 'github.com/getoutreach/stencil-base' with constraints\n"+
+		"failed to resolve module 'github.com/getoutreach/stencil-base': no versions found that satisfy criteria\n"+
+			"\n"+
+			"Constraints:\n"+
 			"└─ testing-project (top-level) wants >=0.5.0\n"+
 			"  └─ nested_constraint@virtual (source: local) wants ~0.3.0\n",
 		"expected GetModulesForProject() to error")
@@ -321,7 +323,9 @@ func TestShouldErrorOnTwoDifferentBranches(t *testing.T) {
 		Log: newLogger(t),
 	})
 	assert.ErrorContains(t, err,
-		"failed to resolve module 'github.com/rgst-io/stencil-module' with constraints\n"+
+		"failed to resolve module 'github.com/rgst-io/stencil-module': unable to satisfy multiple branch constraints (rc, main)\n"+
+			"\n"+
+			"Constraints:\n"+
 			"└─ testing-project (top-level) wants branch main\n"+
 			"  └─ testing-project (top-level) wants branch rc\n",
 		"expected GetModulesForProject() to error")
@@ -336,4 +340,22 @@ func TestSimpleDirReplacement(t *testing.T) {
 	m.StoreDirReplacements(map[string]string{"a": "b"})
 
 	assert.Equal(t, m.ApplyDirReplacements("a/base"), "b/base")
+}
+
+func TestShouldErrorOnNonExistentRepo(t *testing.T) {
+	ctx := context.Background()
+	_, err := modules.FetchModules(ctx, &modules.ModuleResolveOptions{
+		Manifest: &configuration.Manifest{
+			Name: "testing-project",
+			Modules: []*configuration.TemplateRepository{
+				{
+					Name:    "github.com/rgst-io/i-am-not-a-real-repo",
+					Version: "main",
+				},
+			},
+		},
+		Log: newLogger(t),
+	})
+	//nolint:lll // Why: Error message is long.
+	assert.ErrorContains(t, err, "failed to resolve module 'github.com/rgst-io/i-am-not-a-real-repo': failed to get remote branches: exec failed (exit status 128): remote: Repository not found.\nfatal: repository 'https://github.com/rgst-io/i-am-not-a-real-repo/' not found\n", "expected GetModulesForProject() to error")
 }
