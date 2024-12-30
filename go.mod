@@ -21,7 +21,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/princjef/gomarkdoc v1.1.0
 	github.com/puzpuzpuz/xsync/v3 v3.4.0
-	github.com/santhosh-tekuri/jsonschema/v5 v5.3.1
+	github.com/santhosh-tekuri/jsonschema/v6 v6.0.1
 	github.com/urfave/cli/v2 v2.27.5
 	golang.org/x/mod v0.22.0
 	gopkg.in/yaml.v3 v3.0.1
