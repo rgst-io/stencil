@@ -146,6 +146,23 @@ func resolutionError(err error, importPath string, history []history) error {
 	if resolverHistory != "" {
 		err = fmt.Errorf("%w\n\nConstraints:\n%s", err, resolverHistory)
 	}
+
+	// If we failed to get the remote branches, this is probably due to
+	// credentials than the more common message (not found) would suggest.
+	// So, attempt to be helpful by suggesting they check their git
+	// configuration.
+	//
+	// Note that "git" is hardcoded here because this module resolver
+	// still uses git for credentials as opposed to the
+	// [github.com/jaredallard/vcs/token] library used elsewhere. This
+	// will be adjusted in the future.
+	if strings.Contains(err.Error(), "failed to get remote branches") {
+		helpMessage := []string{
+			"This error could be due to invalid credentials.",
+			"Ensure your git configuration is correct.",
+		}
+		err = fmt.Errorf("%w\n\n%s", err, strings.Join(helpMessage, " "))
+	}
 	return err
 }
 

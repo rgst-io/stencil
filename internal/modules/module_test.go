@@ -357,5 +357,5 @@ func TestShouldErrorOnNonExistentRepo(t *testing.T) {
 		Log: newLogger(t),
 	})
 	//nolint:lll // Why: Error message is long.
-	assert.ErrorContains(t, err, "failed to resolve module 'github.com/rgst-io/i-am-not-a-real-repo': failed to get remote branches: exec failed (exit status 128): remote: Repository not found.\nfatal: repository 'https://github.com/rgst-io/i-am-not-a-real-repo/' not found\n", "expected GetModulesForProject() to error")
+	assert.Error(t, err, "failed to resolve module 'github.com/rgst-io/i-am-not-a-real-repo': failed to get remote branches: exec failed (exit status 128): remote: Repository not found.\nfatal: repository 'https://github.com/rgst-io/i-am-not-a-real-repo/' not found\n\n\nThis error could be due to invalid credentials. Ensure your git configuration is correct.", "expected GetModulesForProject() to error")
 }
