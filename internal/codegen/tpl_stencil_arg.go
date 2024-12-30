@@ -173,20 +173,24 @@ func (s *TplStencil) resolveFrom(_ context.Context, pth string, arg *configurati
 func (s *TplStencil) validateArg(pth string, arg *configuration.Argument, v interface{}) error {
 	schemaBuf := new(bytes.Buffer)
 	if err := json.NewEncoder(schemaBuf).Encode(arg.Schema); err != nil {
-		return errors.Wrap(err, "failed to encode schema into JSON")
+		return fmt.Errorf("failed to encode schema into JSON: %w", err)
 	}
 
 	jsc := jsonschema.NewCompiler()
 	jsc.DefaultDraft(jsonschema.Draft7)
 
 	schemaURL := "manifest.yaml/arguments/" + pth
-	if err := jsc.AddResource(schemaURL, schemaBuf); err != nil {
-		return errors.Wrapf(err, "failed to add argument '%s' json schema to compiler", pth)
+	doc, err := jsonschema.UnmarshalJSON(schemaBuf)
+	if err != nil {
+		return fmt.Errorf("failed to decode (re)encoded JSON schema: %w", err)
+	}
+	if err := jsc.AddResource(schemaURL, doc); err != nil {
+		return fmt.Errorf("failed to add argument %q json schema to compiler: %w", pth, err)
 	}
 
 	schema, err := jsc.Compile(schemaURL)
 	if err != nil {
-		return errors.Wrapf(err, "failed to compile argument '%s' schema", pth)
+		return fmt.Errorf("failed to compile argument %q schema: %w", pth, err)
 	}
 
 	if err := schema.Validate(v); err != nil {
@@ -203,7 +207,7 @@ func (s *TplStencil) validateArg(pth string, arg *configuration.Argument, v inte
 			return fmt.Errorf("module %q validation failed", s.t.Module.Name)
 		}
 
-		return errors.Wrapf(err, "module %q argument %q validation failed", s.t.Module.Name, pth)
+		return fmt.Errorf("module %q argument %q validation failed: %w", s.t.Module.Name, pth, err)
 	}
 
 	return nil
