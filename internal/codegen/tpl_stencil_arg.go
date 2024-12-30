@@ -27,7 +27,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/santhosh-tekuri/jsonschema/v5"
+	"github.com/santhosh-tekuri/jsonschema/v6"
 	"go.rgst.io/stencil/internal/dotnotation"
 	"go.rgst.io/stencil/pkg/configuration"
 )
@@ -177,7 +177,7 @@ func (s *TplStencil) validateArg(pth string, arg *configuration.Argument, v inte
 	}
 
 	jsc := jsonschema.NewCompiler()
-	jsc.Draft = jsonschema.Draft7
+	jsc.DefaultDraft(jsonschema.Draft7)
 
 	schemaURL := "manifest.yaml/arguments/" + pth
 	if err := jsc.AddResource(schemaURL, schemaBuf); err != nil {
