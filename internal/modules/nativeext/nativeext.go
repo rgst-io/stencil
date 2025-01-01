@@ -231,7 +231,7 @@ func (h *Host) downloadFromRemote(ctx context.Context, source, name string, vers
 	syscall.ForkLock.RLock()
 	defer syscall.ForkLock.RUnlock()
 
-	f, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o755)
+	f, err := os.OpenFile(dlPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o755)
 	if err != nil {
 		return "", fmt.Errorf("failed to create file: %w", err)
 	}
