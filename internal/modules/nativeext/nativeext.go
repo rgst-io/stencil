@@ -28,6 +28,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
 
 	"github.com/jaredallard/archives"
 	"github.com/jaredallard/vcs/releases"
@@ -207,6 +208,7 @@ func (h *Host) downloadFromRemote(ctx context.Context, source, name string, vers
 	if err != nil {
 		return "", fmt.Errorf("failed to fetch release: %w", err)
 	}
+	defer resp.Close()
 
 	a, err := archives.Open(resp, archives.OpenOptions{
 		Extension: archives.Ext(fi.Name()),
@@ -221,7 +223,15 @@ func (h *Host) downloadFromRemote(ctx context.Context, source, name string, vers
 		return "", fmt.Errorf("failed to grab binary from archive: %w", err)
 	}
 
-	f, err := os.Create(dlPath)
+	// Lock ForkLock whenever we are writing to a file that will execute
+	// shortly after, to prevent its FD from leaking into a forked process
+	// and thus making exec fail with ETXBSY.
+	//
+	// See: https://github.com/golang/go/issues/22315
+	syscall.ForkLock.RLock()
+	defer syscall.ForkLock.RUnlock()
+
+	f, err := os.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o755)
 	if err != nil {
 		return "", fmt.Errorf("failed to create file: %w", err)
 	}
@@ -229,12 +239,6 @@ func (h *Host) downloadFromRemote(ctx context.Context, source, name string, vers
 
 	if _, err := io.Copy(f, bin); err != nil {
 		return "", fmt.Errorf("failed to download binary: %w", err)
-	}
-	f.Close()
-
-	// Ensure the file is executable.
-	if err := os.Chmod(dlPath, 0o755); err != nil {
-		return "", fmt.Errorf("failed to ensure plugin is executable: %w", err)
 	}
 
 	return dlPath, nil
