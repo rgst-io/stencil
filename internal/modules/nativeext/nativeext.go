@@ -82,9 +82,8 @@ func NewHost(log slogext.Logger) (*Host, error) {
 		return nil, err
 	}
 
-	mu := &lockedfile.Mutex{Path: filepath.Join(cacheDir, "cache.lock")}
 	return &Host{
-		mu:         mu,
+		mu:         lockedfile.MutexAt(filepath.Join(cacheDir, "cache.lock")),
 		r:          resolver.NewResolver(),
 		log:        log,
 		extensions: make(map[string]extension),
