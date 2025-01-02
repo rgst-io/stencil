@@ -43,10 +43,14 @@ body = """
     {%- for commit in commits %}
         {%- if not commit.scope -%}
             {{ self::print_commit(commit=commit) }}\
-            {% if commit.github.username %} by @{{ commit.github.username }}{%- endif -%}\
+            {% if commit.remote.username %} by @{{ commit.remote.username }}{%- endif -%}\
+            {% if commit.remote.pr_number %} in \
+						  [#{{ commit.remote.pr_number }}]({{ self::remote_url() }}/pull/{{ commit.remote.pr_number }}) \
+            {%- endif %}\
             {% raw %}\n{% endraw -%}
         {% endif -%}
     {% endfor -%}
+		{% raw %}\n{% endraw %}\
 {% endfor %}\n
 
 {%- if github -%}
