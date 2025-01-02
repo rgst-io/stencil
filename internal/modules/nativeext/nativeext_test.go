@@ -16,8 +16,6 @@ import (
 // extension host, and then finally execute a template function provided
 // by the extension.
 func TestCanImportNativeExtension(t *testing.T) {
-	t.Skip("currently flaky")
-
 	if os.Getenv("CI") == "true" {
 		originalGITHUB := os.Getenv("GITHUB_TOKEN")
 		originalGH := os.Getenv("GH_TOKEN")
