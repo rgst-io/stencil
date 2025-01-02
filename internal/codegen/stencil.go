@@ -41,10 +41,16 @@ import (
 
 // NewStencil creates a new, fully initialized Stencil renderer function
 func NewStencil(m *configuration.Manifest, lock *stencil.Lockfile, mods []*modules.Module, log slogext.Logger, adopt bool) *Stencil {
+	ext, err := nativeext.NewHost(log)
+	if err != nil {
+		// TODO(jaredallard): We need to change the signature of this
+		// function to support returning an error.
+		log.WithError(err).Warn("failed to initialize extension host, native extensions may not work")
+	}
 	return &Stencil{
 		log:                 log,
 		m:                   m,
-		ext:                 nativeext.NewHost(log),
+		ext:                 ext,
 		lock:                lock,
 		modules:             mods,
 		preRenderStageLimit: 20,
