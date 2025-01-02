@@ -35,7 +35,8 @@ func TestCanImportNativeExtension(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	ext := nativeext.NewHost(slogext.NewTestLogger(t))
+	ext, err := nativeext.NewHost(slogext.NewTestLogger(t))
+	assert.NilError(t, err, "expected NewHost to not fail")
 	defer ext.Close()
 
 	ver, err := resolver.NewResolver().Resolve(ctx, "https://github.com/rgst-io/stencil-golang", &resolver.Criteria{

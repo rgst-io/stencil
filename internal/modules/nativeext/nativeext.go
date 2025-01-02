@@ -33,6 +33,7 @@ import (
 	"github.com/jaredallard/archives"
 	"github.com/jaredallard/vcs/releases"
 	"github.com/jaredallard/vcs/resolver"
+	"github.com/rogpeppe/go-internal/lockedfile"
 	"go.rgst.io/stencil/internal/modules/nativeext/apiv1"
 	"go.rgst.io/stencil/pkg/slogext"
 )
@@ -45,6 +46,11 @@ type generatedTemplateFunc func(...interface{}) (interface{}, error)
 // Host implements an extension host that handles
 // registering extensions and executing them.
 type Host struct {
+	// mu guards the [Host] against all possible instances of stencil
+	// being ran on the current host under the current user. It is
+	// important to ensure it is locked whenever storing extensions in the
+	// global cache.
+	mu         *lockedfile.Mutex
 	r          *resolver.Resolver
 	log        slogext.Logger
 	extensions map[string]extension
@@ -56,13 +62,33 @@ type extension struct {
 	closer func() error
 }
 
+// getCacheDir returns the directory where extensions are cached in
+func getCacheDir() (string, error) {
+	cacheDir := os.Getenv("XDG_CACHE_HOME")
+	if cacheDir == "" { // default to $HOME/.cache as per XDG spec
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			return "", fmt.Errorf("failed to get home directory: %w", err)
+		}
+		cacheDir = filepath.Join(homeDir, ".cache")
+	}
+	return filepath.Join(cacheDir, "stencil"), nil
+}
+
 // NewHost creates a new extension host
-func NewHost(log slogext.Logger) *Host {
+func NewHost(log slogext.Logger) (*Host, error) {
+	cacheDir, err := getCacheDir()
+	if err != nil {
+		return nil, err
+	}
+
+	mu := &lockedfile.Mutex{Path: filepath.Join(cacheDir, "cache.lock")}
 	return &Host{
+		mu:         mu,
 		r:          resolver.NewResolver(),
 		log:        log,
 		extensions: make(map[string]extension),
-	}
+	}, nil
 }
 
 // createFunctionFromTemplateFunction takes a given
@@ -160,20 +186,16 @@ func (h *Host) RegisterInprocExtension(name string, ext apiv1.Implementation) {
 
 // getExtensionPath returns the path to an extension binary
 func (h *Host) getExtensionPath(version *resolver.Version, name string) (string, error) {
-	cacheDir := os.Getenv("XDG_CACHE_HOME")
-	if cacheDir == "" { // default to $HOME/.cache as per XDG spec
-		homeDir, err := os.UserHomeDir()
-		if err != nil {
-			return "", fmt.Errorf("failed to get home directory: %w", err)
-		}
-		cacheDir = filepath.Join(homeDir, ".cache")
+	cacheDir, err := getCacheDir()
+	if err != nil {
+		return "", err
 	}
 
 	// Example:
 	//
 	// $XDG_CACHE_HOME/stencil/nativeexts/github.com--rgst-io--plugin/v1.3.0/plugin
 	path := filepath.Join(
-		cacheDir, "stencil", "nativeexts",
+		cacheDir, "nativeexts",
 		strings.ReplaceAll(name, "/", "--"), version.Commit,
 		filepath.Base(name),
 	)
@@ -187,12 +209,19 @@ func (h *Host) getExtensionPath(version *resolver.Version, name string) (string,
 // downloadFromRemote downloads a release from github and extracts it to
 // disk
 func (h *Host) downloadFromRemote(ctx context.Context, source, name string, version *resolver.Version) (string, error) {
+	if unlock, err := h.mu.Lock(); err != nil {
+		h.log.WithError(err).Warn("failed to lock extension cache")
+	} else {
+		defer unlock()
+	}
+
 	// Check if the version we're pulling already exists on disk
 	dlPath, err := h.getExtensionPath(version, name)
 	if err != nil {
 		return "", fmt.Errorf("failed to get extension path: %w", err)
 	}
 	if info, err := os.Stat(dlPath); err == nil && info.Mode() == 0o755 {
+		h.log.With("name", name, "path", dlPath).Debug("using cached extension binary")
 		return dlPath, nil
 	}
 
@@ -225,7 +254,7 @@ func (h *Host) downloadFromRemote(ctx context.Context, source, name string, vers
 
 	// Lock ForkLock whenever we are writing to a file that will execute
 	// shortly after, to prevent its FD from leaking into a forked process
-	// and thus making exec fail with ETXBSY.
+	// and thus making exec fail with ETXTBSY.
 	//
 	// See: https://github.com/golang/go/issues/22315
 	syscall.ForkLock.RLock()
