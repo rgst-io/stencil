@@ -1,4 +1,4 @@
-// Copyright (C) 2024 stencil contributors
+// Copyright (C) 2024-2025 stencil contributors
 // Copyright (C) 2022-2023 Outreach Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,11 +23,11 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"reflect"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/osfs"
+	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
 )
 
@@ -128,38 +128,39 @@ func (s *TplStencil) GetGlobal(name string) any {
 //
 // This functions write to module hook owned by another module for
 // it to operate on. These are not strongly typed so it's best practice
-// to look at how the owning module uses it for now. Module hooks must always
-// be written to with a list to ensure that they can always be written to multiple
-// times.
+// to look at how the owning module uses it for now.
 //
 //	{{- /* This writes to a module hook */}}
 //	{{- stencil.AddToModuleHook "github.com/myorg/repo" "myModuleHook" (list "myData") }}
-func (s *TplStencil) AddToModuleHook(module, name string, data interface{}) (out string, err error) {
+func (s *TplStencil) AddToModuleHook(module, name string, data ...any) (out string, err error) {
+	// Attempt to read the destined module's manifest for extra features.
+	var mcfg *configuration.TemplateRepositoryManifest
+	for _, m := range s.s.modules {
+		if m.Name == module {
+			mcfg = m.Manifest
+			break
+		}
+	}
+	if mcfg != nil {
+		// Check if we have a schema. If we do, use it to validate our module
+		// hook data.
+		mhcfg, ok := mcfg.ModuleHooks[name]
+		if ok && mhcfg.Schema != nil {
+			for _, d := range data {
+				if err := validateJSONSchema("manifest.yaml/moduleHooks/"+name, mhcfg.Schema, d); err != nil {
+					return "", err
+				}
+			}
+		}
+	}
+
 	k := s.s.sharedState.key(module, name)
 	s.log.With("template", s.t.ImportPath(), "path", k, "data", spew.Sdump(data)).
 		Debug("adding to module hook")
 
-	v := reflect.ValueOf(data)
-	if !v.IsValid() {
-		err := fmt.Errorf("third parameter, data, must be set")
-		return "", err
-	}
-
-	// we only allow slices or maps to allow multiple templates to
-	// write to the same block
-	if v.Kind() != reflect.Slice {
-		err := fmt.Errorf("unsupported module block data type %q, supported type is slice", v.Kind())
-		return "", err
-	}
-
-	// convert the slice into a []any
-	interfaceSlice := make([]any, v.Len())
-	for i := 0; i < v.Len(); i++ {
-		interfaceSlice[i] = v.Index(i).Interface()
-	}
-
-	orig, _ := s.s.sharedState.ModuleHooks.Load(k)
-	s.s.sharedState.ModuleHooks.Store(k, append(orig, interfaceSlice...))
+	s.s.sharedState.ModuleHooks.Compute(k, func(old moduleHook, _ bool) (moduleHook, bool) {
+		return append(old, data...), false
+	})
 
 	return "", nil
 }
@@ -181,9 +182,11 @@ func (s *TplStencil) ReadFile(name string) (string, error) {
 	return string(b), nil
 }
 
-type ReadDirEntry struct {
-	Name  string
-	IsDir bool
+// ReadDirEntry is a partial of [os.DirEntry] returned by
+// [TplStencil.ReadDir]
+type ReadDirEntry interface {
+	Name() string
+	IsDir() bool
 }
 
 // ReadDir reads the contents of a directory and returns a list of files/directories
@@ -207,10 +210,7 @@ func (s *TplStencil) ReadDir(name string) ([]ReadDirEntry, error) {
 
 	rv := make([]ReadDirEntry, 0, len(entries))
 	for _, entry := range entries {
-		rv = append(rv, ReadDirEntry{
-			Name:  entry.Name(),
-			IsDir: entry.IsDir(),
-		})
+		rv = append(rv, entry)
 	}
 
 	return rv, nil

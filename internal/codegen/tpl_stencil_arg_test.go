@@ -347,26 +347,16 @@ func TestBuildErrorPath(t *testing.T) {
 			expectErr:               false,
 		},
 		{
-			name: "missing manifest",
+			name: "module hook",
 			//nolint:lll // Why: realistic test case
-			absoluteKeywordLocation: "file:///Users/test/rgst-io/stencil-smartstore/testapps/orgschemagrpc/arguments/postgreSQL#/items/properties/name/pattern",
-			expected:                "arguments.postgreSQL.items.properties.name",
-			expectErr:               true,
+			absoluteKeywordLocation: "file:///Users/test/rgst-io/stencil-smartstore/testapps/orgschemagrpc/manifest.yaml/moduleHooks/test#/items/properties/name/pattern",
+			expected:                "moduleHooks.test.items.properties.name",
+			expectErr:               false,
 		},
 	}
 
 	for _, tc := range testCases {
-		result, err := buildErrorPath(tc.absoluteKeywordLocation)
-		if tc.expectErr {
-			if err == nil {
-				t.Fatalf("expectd and error but got none")
-			}
-			continue
-		}
-		if err != nil {
-			t.Fatalf("did not expect error, but got: %v", err)
-		}
-
+		result := buildErrorPath(tc.absoluteKeywordLocation)
 		assert.Equal(t, result, tc.expected)
 	}
 }
