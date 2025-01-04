@@ -23,8 +23,8 @@ func ExampleValidateName() {
 	// success: false
 }
 
-func ExampleNewManifest() {
-	sm, err := configuration.NewManifest("testdata/stencil.yaml")
+func ExampleLoadManifest() {
+	sm, err := configuration.LoadManifest("testdata/stencil.yaml")
 	if err != nil {
 		// handle the error
 		fmt.Println("error:", err)
