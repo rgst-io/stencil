@@ -82,6 +82,10 @@ func NewHost(log slogext.Logger) (*Host, error) {
 		return nil, err
 	}
 
+	if err := os.MkdirAll(cacheDir, 0o755); err != nil {
+		log.WithError(err).Warn("failed to create native extension cache directory, native extensions may fail to download/run")
+	}
+
 	return &Host{
 		mu:         lockedfile.MutexAt(filepath.Join(cacheDir, "cache.lock")),
 		r:          resolver.NewResolver(),
