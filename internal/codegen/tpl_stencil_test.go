@@ -296,7 +296,7 @@ func TestTplStencil_ReadFile(t *testing.T) {
 	assert.Equal(t, true, errors.Is(err, os.ErrNotExist))
 }
 
-func TestTplStencil_ApplyTemplate(t *testing.T) {
+func TestTplStencil_Include(t *testing.T) {
 	type args struct {
 		name    string
 		dataSli []interface{}
@@ -339,7 +339,7 @@ func TestTplStencil_ApplyTemplate(t *testing.T) {
 				dataSli: []any{"xyz"},
 			},
 			subTemplate: `{{- define "hello-world" -}}{{ .Config.Name }}{{- end -}}`,
-			want:        "TestTplStencil_ApplyTemplate/should_pass_through_data_from_parent_template",
+			want:        "TestTplStencil_Include/should_pass_through_data_from_parent_template",
 		},
 	}
 	for _, tt := range tests {
@@ -379,13 +379,13 @@ func TestTplStencil_ApplyTemplate(t *testing.T) {
 				s:   st,
 				log: log,
 			}
-			got, err := s.ApplyTemplate(tt.args.name, tt.args.dataSli...)
+			got, err := s.Include(tt.args.name, tt.args.dataSli...)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("TplStencil.ApplyTemplate() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("TplStencil.Include() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if got != tt.want {
-				t.Errorf("TplStencil.ApplyTemplate() = %v, want %v", got, tt.want)
+				t.Errorf("TplStencil.Include() = %v, want %v", got, tt.want)
 			}
 		})
 	}

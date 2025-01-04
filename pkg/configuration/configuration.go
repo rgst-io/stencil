@@ -30,14 +30,6 @@ import (
 // ValidateNameRegexp is the regex used to validate the project's name
 const ValidateNameRegexp = `^[_a-z][_a-z0-9-]*$`
 
-// NewManifest reads a manifest from disk at the specified path, parses
-// it, and returns the output.
-//
-// Deprecated: Use LoadManifest instead.
-func NewManifest(path string) (*Manifest, error) {
-	return LoadManifest(path)
-}
-
 // LoadManifest reads a manifest from disk at the specified path, parses
 // it, and returns the output.
 //
@@ -61,14 +53,6 @@ func LoadManifest(path string) (*Manifest, error) {
 	}
 
 	return s, nil
-}
-
-// NewDefaultManifest returns a parsed project manifest
-// from a set default path on disk.
-//
-// Deprecated: Use LoadDefaultManifest instead.
-func NewDefaultManifest() (*Manifest, error) {
-	return LoadDefaultManifest()
 }
 
 // LoadDefaultManifest returns a parsed project manifest from a set
