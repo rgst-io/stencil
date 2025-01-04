@@ -67,7 +67,7 @@ func TestValues(t *testing.T) {
 			Dirty:         false,
 			DefaultBranch: "main",
 		},
-		Runtime: runtime{
+		Runtime: runtimeVals{
 			Generator:        "stencil",
 			GeneratorVersion: version.Version.GitVersion,
 			Modules: modulesSlice{

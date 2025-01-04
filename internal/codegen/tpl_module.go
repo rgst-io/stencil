@@ -104,8 +104,8 @@ func (tm *TplModule) Export(name string) (string, error) {
 // context of the owning template, not the template calling the function.
 //
 // `.` in a template function acts the same way as it does for
-// [TplStencil.ApplyTemplate] (`stencil.ApplyTemplate`). Meaning, it
-// points to [Values]. The caller passed data is accessible on `.Data`.
+// [TplStencil.Include] (`stencil.Include`). Meaning, it points to
+// [Values]. The caller passed data is accessible on `.Data`.
 //
 // Example:
 //

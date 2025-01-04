@@ -24,7 +24,7 @@ var multiFileTemplate string
 var multiFileInputTemplate string
 
 //go:embed testdata/apply-template-passthrough.tpl
-var applyTemplatePassthroughTemplate string
+var includePassthroughTemplate string
 
 //go:embed testdata/generated-block/template.txt.tpl
 var generatedBlockTemplate string
@@ -100,7 +100,7 @@ func TestMultiFileWithInputRender(t *testing.T) {
 	}
 }
 
-func TestApplyTemplateArgumentPassthrough(t *testing.T) {
+func TestIncludeArgumentPassthrough(t *testing.T) {
 	log := slogext.NewTestLogger(t)
 	fs, err := testmemfs.WithManifest("name: testing\narguments:\n  commands:\n    type: list")
 	assert.NilError(t, err, "failed to testmemfs.WithManifest")
@@ -108,7 +108,7 @@ func TestApplyTemplateArgumentPassthrough(t *testing.T) {
 	assert.NilError(t, err, "failed to NewWithFS")
 
 	tpl, err := NewTemplate(m, "apply-template-passthrough.tpl", 0o644,
-		time.Now(), []byte(applyTemplatePassthroughTemplate), log, nil)
+		time.Now(), []byte(includePassthroughTemplate), log, nil)
 	assert.NilError(t, err, "failed to create template")
 
 	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{
