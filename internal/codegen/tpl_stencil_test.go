@@ -84,26 +84,23 @@ func must[T any](v T, err error) T {
 }
 
 func TestTplStencil_GetModuleHook(t *testing.T) {
-	type args struct {
-		name string
-	}
+	moduleHookName := "test"
 	tests := []struct {
-		name    string
-		inserts []any
-		args    args
-		want    []any
+		name     string
+		inserts  [][]any
+		manifest *configuration.TemplateRepositoryManifest
+		want     []any
+		wantErr  bool
 	}{
 		{
-			inserts: []any{
-				[]string{"abc"},
-				[]string{"def"},
-				[]any{map[string]any{
+			name: "should be able to insert and read",
+			inserts: [][]any{
+				{"abc"},
+				{"def"},
+				{map[string]any{
 					"abc": "def",
 				}},
-				[]string{"abc"},
-			},
-			args: args{
-				name: "name",
+				{"abc"},
 			},
 			want: []any{
 				// This is what the hashing resulted in
@@ -115,10 +112,65 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 				"abc",
 			},
 		},
+		{
+			name: "should support valid data with schema",
+			inserts: [][]any{
+				{map[string]any{
+					"hello": "world",
+				}},
+			},
+			manifest: &configuration.TemplateRepositoryManifest{
+				ModuleHooks: map[string]configuration.ModuleHook{
+					moduleHookName: {
+						Schema: map[string]any{
+							"type": "object",
+							"properties": map[string]any{
+								"hello": map[string]any{
+									"type": "string",
+								},
+							},
+						},
+					},
+				},
+			},
+			want: []any{map[string]any{"hello": "world"}},
+		},
+		{
+			name: "should fail invalid data with schema",
+			inserts: [][]any{
+				{map[string]string{
+					"hello": "world",
+				}},
+			},
+			manifest: &configuration.TemplateRepositoryManifest{
+				ModuleHooks: map[string]configuration.ModuleHook{
+					moduleHookName: {
+						Schema: map[string]any{
+							"type": "object",
+							"properties": map[string]any{
+								"hello": map[string]any{
+									"type": "number",
+								},
+							},
+						},
+					},
+				},
+			},
+			want:    []any{},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
+		// TODO(jaredallard): We need a better test initializer instead
+		// of... this nightmare.
 		t.Run(tt.name, func(t *testing.T) {
 			log := slogext.NewTestLogger(t)
+
+			mods := make([]*modules.Module, 0)
+			if tt.manifest != nil {
+				mods = append(mods, &modules.Module{Name: "test", Manifest: tt.manifest})
+			}
+
 			s := &TplStencil{
 				t: must(
 					NewTemplate(
@@ -133,20 +185,27 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 						nil,
 					),
 				),
-				s:   &Stencil{sharedState: newSharedState()},
+				s:   &Stencil{sharedState: newSharedState(), modules: mods},
 				log: log,
 			}
 
 			for _, insert := range tt.inserts {
-				if _, err := s.AddToModuleHook(s.t.Module.Name, tt.args.name, insert); err != nil {
+				_, err := s.AddToModuleHook(s.t.Module.Name, moduleHookName, insert...)
+				if err != nil {
+					if tt.wantErr {
+						continue
+					}
+
 					t.Errorf("TplStencil.GetModuleHook() error = %v", err)
 					return
+				} else if tt.wantErr {
+					t.Errorf("TplStencil.GetModuleHook() wanted error, got nil")
 				}
 			}
 
 			s.s.sharedState.hash() // Sorts the module hooks
 
-			if got := s.GetModuleHook(tt.args.name); !reflect.DeepEqual(got, tt.want) {
+			if got := s.GetModuleHook(moduleHookName); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("TplStencil.GetModuleHook() = %v, want %v", got, tt.want)
 			}
 		})
@@ -364,9 +423,9 @@ func TestTplStencil_ReadDir(t *testing.T) {
 	assert.NilError(t, err)
 	assert.Equal(t, true, len(entries) > 5)
 	assert.Equal(t, true, slices.ContainsFunc(entries, func(entry ReadDirEntry) bool {
-		return entry.Name == "blocks-test.txt" && !entry.IsDir
+		return entry.Name() == "blocks-test.txt" && !entry.IsDir()
 	}))
 	assert.Equal(t, true, slices.ContainsFunc(entries, func(entry ReadDirEntry) bool {
-		return entry.Name == "args" && entry.IsDir
+		return entry.Name() == "args" && entry.IsDir()
 	}))
 }

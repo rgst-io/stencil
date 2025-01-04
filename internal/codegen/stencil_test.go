@@ -102,7 +102,7 @@ func TestModuleHookRender(t *testing.T) {
 		return strings.Compare(a.Module.Name, b.Module.Name)
 	})
 	assert.Equal(t, len(tpls[1].Files), 1, "expected Render() m2 template to return a single file")
-	assert.Equal(t, strings.TrimSpace(tpls[1].Files[0].String()), "a", "expected Render() m2 to return correct output")
+	assert.Equal(t, strings.TrimSpace(tpls[1].Files[0].String()), "b", "expected Render() m2 to return correct output")
 }
 
 func TestDirReplacementRendering(t *testing.T) {

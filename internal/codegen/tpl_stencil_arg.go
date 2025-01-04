@@ -19,15 +19,9 @@
 package codegen
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"regexp"
-	"strings"
 
-	"github.com/pkg/errors"
-	"github.com/santhosh-tekuri/jsonschema/v6"
 	"go.rgst.io/stencil/internal/dotnotation"
 	"go.rgst.io/stencil/pkg/configuration"
 )
@@ -171,63 +165,5 @@ func (s *TplStencil) resolveFrom(_ context.Context, pth string, arg *configurati
 
 // validateArg validates an argument against the schema
 func (s *TplStencil) validateArg(pth string, arg *configuration.Argument, v interface{}) error {
-	schemaBuf := new(bytes.Buffer)
-	if err := json.NewEncoder(schemaBuf).Encode(arg.Schema); err != nil {
-		return fmt.Errorf("failed to encode schema into JSON: %w", err)
-	}
-
-	jsc := jsonschema.NewCompiler()
-	jsc.DefaultDraft(jsonschema.Draft7)
-
-	schemaURL := "manifest.yaml/arguments/" + pth
-	doc, err := jsonschema.UnmarshalJSON(schemaBuf)
-	if err != nil {
-		return fmt.Errorf("failed to decode (re)encoded JSON schema: %w", err)
-	}
-	if err := jsc.AddResource(schemaURL, doc); err != nil {
-		return fmt.Errorf("failed to add argument %q json schema to compiler: %w", pth, err)
-	}
-
-	schema, err := jsc.Compile(schemaURL)
-	if err != nil {
-		return fmt.Errorf("failed to compile argument %q schema: %w", pth, err)
-	}
-
-	if err := schema.Validate(v); err != nil {
-		var validationError *jsonschema.ValidationError
-		if errors.As(err, &validationError) {
-			for _, validationErr := range validationError.DetailedOutput().Errors {
-				path, err := buildErrorPath(validationErr.AbsoluteKeywordLocation)
-				if err != nil {
-					s.log.Errorf("Validation failed but could not determine cause: %v", err)
-				}
-				s.log.Errorf("Encountered a validation error for %q: %v", path, validationErr.Error)
-			}
-
-			return fmt.Errorf("module %q validation failed", s.t.Module.Name)
-		}
-
-		return fmt.Errorf("module %q argument %q validation failed: %w", s.t.Module.Name, pth, err)
-	}
-
-	return nil
-}
-
-// buildErrorPath builds an error path from the provided absoluteKeywordLocation from jsonschema errors.
-func buildErrorPath(absoluteKeywordLocation string) (string, error) {
-	// Splits on manifest to retrieve only the path declared inside the manifest file.
-	splitOnManifest := strings.Split(absoluteKeywordLocation, "/manifest.yaml/")
-
-	// Validates that we have two items. We only want the second item which contains the path inside
-	// the manifest file.
-	if len(splitOnManifest) != 2 {
-		return "", fmt.Errorf("could not split provided path")
-	}
-
-	// The path is divided by either "/" or "#/" we want to remove both.
-	re := regexp.MustCompile("#*/")
-	split := re.Split(splitOnManifest[1], -1)
-
-	// Drops the final item in the split because it represents the error condition.
-	return strings.Join(split[:len(split)-1], "."), nil
+	return validateJSONSchema("manifest.yaml/arguments/"+pth, arg.Schema, v)
 }

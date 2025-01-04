@@ -30,6 +30,17 @@
 			"required": ["description", "schema"],
 			"description": "Argument is a user-input argument that can be passed to templates"
 		},
+		"ModuleHook": {
+			"properties": {
+				"schema": {
+					"type": "object",
+					"description": "Schema is a JSON schema. When set this is used to validate all\nmodule hook data as it is inserted."
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"description": "ModuleHook contains configuration for a module hook."
+		},
 		"PostRunCommandSpec": {
 			"properties": {
 				"name": {
@@ -95,6 +106,11 @@
 					"additionalProperties": { "type": "string" },
 					"type": "object",
 					"description": "DirReplacements is a list of directory name replacement templates to render"
+				},
+				"moduleHooks": {
+					"additionalProperties": { "$ref": "#/$defs/ModuleHook" },
+					"type": "object",
+					"description": "ModuleHooks contains configuration for module hooks, keyed by their\nname."
 				}
 			},
 			"additionalProperties": false,
