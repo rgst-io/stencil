@@ -19,7 +19,7 @@ template function, which is only available in this context.
 In addition, all of the file, stencil and other functions are in the
 context of the owning template, not the template calling the function.
 
-`.` in a template function acts the same way as it does for [TplStencil.ApplyTemplate](#TplStencil.ApplyTemplate) (`stencil.ApplyTemplate`). Meaning, it points to [Values](#Values). The caller passed data is accessible on `.Data`.
+`.` in a template function acts the same way as it does for [TplStencil.Include](#TplStencil.Include) (`stencil.Include`). Meaning, it points to [Values](#Values). The caller passed data is accessible on `.Data`.
 
 Example:
 

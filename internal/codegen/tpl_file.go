@@ -168,7 +168,7 @@ func (f *TplFile) Path() string {
 //	# Generate a "<commandName>.go" file for each command in .arguments.commands
 //	{{- range $_, $commandName := (stencil.Arg "commands") }}
 //	{{- file.Create (printf "cmd/%s.go" $commandName) 0600 now }}
-//	{{- stencil.ApplyTemplate "command" | file.SetContents }}
+//	{{- stencil.Include "command" | file.SetContents }}
 //	{{- end }}
 func (f *TplFile) Create(path string, mode os.FileMode, modTime time.Time) (out, err error) {
 	f.f, err = NewFile(path, mode, modTime, f.t)

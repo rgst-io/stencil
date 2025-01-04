@@ -30,10 +30,10 @@ import (
 	"go.rgst.io/stencil/pkg/configuration"
 )
 
-// runtime contains information about the current state
+// runtimeVals contains information about the current state
 // of an application. This includes things like Golang
 // version, stencil version, and other tool information.
-type runtime struct {
+type runtimeVals struct {
 	// Generator is the name of the tool that is generating this file
 	// generally this would be "stencil", this value should be changed
 	// if using stencil's codegen package outside of the stencil CLI.
@@ -115,7 +115,7 @@ type Values struct {
 	Git git
 
 	// Runtime is information about the current runtime environment
-	Runtime runtime
+	Runtime runtimeVals
 
 	// Config is strongly typed values from the project manifest
 	Config config
@@ -127,7 +127,7 @@ type Values struct {
 	Template stencilTemplate
 
 	// Data is only available when a template is being rendered through
-	// stencil.ApplyTemplate. It contains the data passed through said
+	// stencil.Include. It contains the data passed through said
 	// call.
 	Data any
 }
@@ -160,7 +160,7 @@ func (v *Values) WithTemplate(name string) *Values {
 func NewValues(ctx context.Context, sm *configuration.Manifest, mods []*modules.Module) *Values {
 	vals := &Values{
 		Git: git{},
-		Runtime: runtime{
+		Runtime: runtimeVals{
 			Generator:        "stencil",
 			GeneratorVersion: version.Version.GitVersion,
 			Modules:          modulesSlice{},

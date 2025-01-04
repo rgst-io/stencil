@@ -28,6 +28,6 @@ func main() {
 # Generate a "<commandName>.go" file for each command in .arguments.commands
 {{- range $_, $commandName := (stencil.Arg "commands") }}
 {{- file.Create (printf "cmd/%s.go" $commandName) 0600 now }}
-{{- stencil.ApplyTemplate "command" | file.SetContents }}
+{{- stencil.Include "command" | file.SetContents }}
 {{- end }}
 ```

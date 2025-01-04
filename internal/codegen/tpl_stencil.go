@@ -69,16 +69,18 @@ func (s *TplStencil) GetModuleHook(name string) []any {
 	return v
 }
 
-// SetGlobal sets a global to be used in the context of the current template module
-// repository. This is useful because sometimes you want to define variables inside
-// of a helpers template file after doing manifest argument processing and then use
-// them within one or more template files to be rendered; however, go templates limit
-// the scope of symbols to the current template they are defined in, so this is not
-// possible without external tooling like this function.
+// SetGlobal sets a global to be used in the context of the current
+// template module repository. This is useful because sometimes you want
+// to define variables inside of a helpers template file after doing
+// manifest argument processing and then use them within one or more
+// template files to be rendered; however, go templates limit the scope
+// of symbols to the current template they are defined in, so this is
+// not possible without external tooling like this function.
 //
-// This template function stores (and its inverse, GetGlobal, retrieves) data that is
-// not strongly typed, so use this at your own risk and be averse to panics that could
-// occur if you're using the data it returns in the wrong way.
+// This template function stores (and its inverse, GetGlobal, retrieves)
+// data that is not strongly typed, so use this at your own risk and be
+// averse to panics that could  occur if you're using the data it
+// returns in the wrong way.
 //
 //	{{- /* This writes a global into the current context of the template module repository */}}
 //	{{- stencil.SetGlobal "IsGeorgeCool" true -}}
@@ -95,9 +97,10 @@ func (s *TplStencil) SetGlobal(name string, data any) string {
 	return ""
 }
 
-// GetGlobal retrieves a global variable set by SetGlobal. The data returned from this function
-// is unstructured so by averse to panics - look at where it was set to ensure you're dealing
-// with the proper type of data that you think it is.
+// GetGlobal retrieves a global variable set by SetGlobal. The data
+// returned from this function is unstructured so by averse to panics -
+// look at where it was set to ensure you're dealing with the proper
+// type of data that you think it is.
 //
 //	{{- /* This retrieves a global from the current context of the template module repository */}}
 //	{{ $isGeorgeCool := stencil.GetGlobal "IsGeorgeCool" }}
@@ -126,11 +129,11 @@ func (s *TplStencil) GetGlobal(name string) any {
 
 // AddToModuleHook adds to a hook in another module
 //
-// This functions write to module hook owned by another module for
-// it to operate on. These are not strongly typed so it's best practice
-// to look at how the owning module uses it for now. Module hooks must always
-// be written to with a list to ensure that they can always be written to multiple
-// times.
+// This functions write to module hook owned by another module for it to
+// operate on. These are not strongly typed so it's best practice to
+// look at how the owning module uses it for now. Module hooks must
+// always be written to with a list to ensure that they can always be
+// written to multiple times.
 //
 //	{{- /* This writes to a module hook */}}
 //	{{- stencil.AddToModuleHook "github.com/myorg/repo" "myModuleHook" (list "myData") }}
@@ -164,7 +167,8 @@ func (s *TplStencil) AddToModuleHook(module, name string, data interface{}) (out
 	return "", nil
 }
 
-// ReadFile reads a file from the current directory and returns it's contents
+// ReadFile reads a file from the current directory and returns it's
+// contents
 //
 //	{{ stencil.ReadFile "myfile.txt" }}
 func (s *TplStencil) ReadFile(name string) (string, error) {
@@ -186,7 +190,8 @@ type ReadDirEntry struct {
 	IsDir bool
 }
 
-// ReadDir reads the contents of a directory and returns a list of files/directories
+// ReadDir reads the contents of a directory and returns a list of
+// files/directories
 //
 //	{{ range $entry := stencil.ReadDir "/tests" }}
 //	  {{ if $entry.IsDir }}
@@ -250,7 +255,7 @@ func (s *TplStencil) exists(name string) (billy.File, error) {
 	return f, nil
 }
 
-// ApplyTemplate executes a named template (defined through the `define`
+// Include executes a named template (defined through the `define`
 // function) with the provided optional data.
 //
 // The provided data can be accessed within the defined template under
@@ -274,7 +279,7 @@ func (s *TplStencil) exists(name string) (billy.File, error) {
 //
 //	{{- end }}
 //
-//	{{- stencil.ApplyTemplate "command" | file.SetContents }}
+//	{{- stencil.Include "command" | file.SetContents }}
 //
 // ### With Data
 //
@@ -291,13 +296,13 @@ func (s *TplStencil) exists(name string) (billy.File, error) {
 //	{{- end }}
 //
 //	{{- range $cliName := stencil.Arg "clis" }}
-//	{{- stencil.ApplyTemplate "command" $cliName | file.SetContents }}
+//	{{- stencil.Include "command" $cliName | file.SetContents }}
 //	{{- end }}
-func (s *TplStencil) ApplyTemplate(name string, dataSli ...any) (string, error) {
+func (s *TplStencil) Include(name string, dataSli ...any) (string, error) {
 	// We check for dataSli here because we had to set it to a range of arguments
 	// to allow it to be not set.
 	if len(dataSli) > 1 {
-		return "", fmt.Errorf("ApplyTemplate() only takes max two arguments, name and data")
+		return "", fmt.Errorf("Include() only takes max two arguments, name and data")
 	}
 
 	// Create a copy of the current values so we can set the data on it
@@ -314,14 +319,29 @@ func (s *TplStencil) ApplyTemplate(name string, dataSli ...any) (string, error) 
 	return buf.String(), nil
 }
 
-// ReadBlocks parses a file and attempts to read the blocks from it, and their data.
+// ApplyTemplate is an alias to stencil.Include.
 //
-// As a special case, if the file does not exist, an empty map is returned instead of an error.
+// Deprecated: Use stencil.Include instead.
+func (s *TplStencil) ApplyTemplate(name string, dataSli ...any) (string, error) {
+	s.log.With(
+		"module", s.t.Module.Name,
+		"template", s.t.Path,
+	).Warn("stencil.ApplyTemplate is deprecated, use stencil.Include instead")
+	return s.Include(name, dataSli...)
+}
+
+// ReadBlocks parses a file and attempts to read the blocks from it, and
+// their data.
 //
-// **NOTE**: This function does not guarantee that blocks are able to be read during runtime.
-// for example, if you try to read the blocks of a file from another module there is no guarantee
-// that that file will exist before you run this function. Nor is there the ability to tell stencil
-// to do that (stencil does not have any order guarantees). Keep that in mind when using this function.
+// As a special case, if the file does not exist, an empty map is
+// returned instead of an error.
+//
+// **NOTE**: This function does not guarantee that blocks are able to be
+// read during runtime. For example, if you try to read the blocks of a
+// file from another module there is no guarantee that that file will
+// exist before you run this function. Nor is there the ability to tell
+// stencil to do that (stencil does not have any order guarantees).
+// Keep that in mind when using this function.
 //
 //	{{- $blocks := stencil.ReadBlocks "myfile.txt" }}
 //	{{- range $name, $data := $blocks }}
@@ -347,7 +367,8 @@ func (s *TplStencil) ReadBlocks(fpath string) (map[string]string, error) {
 	return rv, nil
 }
 
-// Debug logs the provided arguments under the DEBUG log level (must run stencil with --debug).
+// Debug logs the provided arguments under the DEBUG log level (must run
+// stencil with --debug).
 //
 //	{{- stencil.Debug "I'm a log!" }}
 func (s *TplStencil) Debug(args ...interface{}) string {
