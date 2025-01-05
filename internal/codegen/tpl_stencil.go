@@ -150,7 +150,7 @@ func (s *TplStencil) AddToModuleHook(module, name string, data ...any) (out stri
 		mhcfg, ok := mcfg.ModuleHooks[name]
 		if ok && mhcfg.Schema != nil {
 			for _, d := range data {
-				if err := validateJSONSchema("manifest.yaml/moduleHooks/"+name, mhcfg.Schema, d); err != nil {
+				if err := validateJSONSchema(module+"/moduleHooks/"+name, mhcfg.Schema, d); err != nil {
 					return "", err
 				}
 			}

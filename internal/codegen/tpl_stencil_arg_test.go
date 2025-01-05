@@ -10,7 +10,6 @@ import (
 	"go.rgst.io/stencil/internal/modules/modulestest"
 	"go.rgst.io/stencil/pkg/configuration"
 	"go.rgst.io/stencil/pkg/slogext"
-	"gotest.tools/v3/assert"
 )
 
 type testTpl struct {
@@ -322,41 +321,5 @@ func TestTplStencil_Arg(t *testing.T) {
 				t.Errorf("TplStencil.Arg() = %v, want %v", got, tt.want)
 			}
 		})
-	}
-}
-
-func TestBuildErrorPath(t *testing.T) {
-	testCases := []struct {
-		name                    string
-		absoluteKeywordLocation string
-		expected                string
-		expectErr               bool
-	}{
-		{
-			name: "simple schema",
-			//nolint:lll // Why: realistic test case
-			absoluteKeywordLocation: "file:///home/test/rgst-io/stencil/manifest.yaml/arguments/releaseOptions.allowMajorVersions#/type",
-			expected:                "arguments.releaseOptions.allowMajorVersions",
-			expectErr:               false,
-		},
-		{
-			name: "complex schema",
-			//nolint:lll // Why: realistic test case
-			absoluteKeywordLocation: "file:///Users/test/rgst-io/stencil-smartstore/testapps/orgschemagrpc/manifest.yaml/arguments/postgreSQL#/items/properties/name/pattern",
-			expected:                "arguments.postgreSQL.items.properties.name",
-			expectErr:               false,
-		},
-		{
-			name: "module hook",
-			//nolint:lll // Why: realistic test case
-			absoluteKeywordLocation: "file:///Users/test/rgst-io/stencil-smartstore/testapps/orgschemagrpc/manifest.yaml/moduleHooks/test#/items/properties/name/pattern",
-			expected:                "moduleHooks.test.items.properties.name",
-			expectErr:               false,
-		},
-	}
-
-	for _, tc := range testCases {
-		result := buildErrorPath(tc.absoluteKeywordLocation)
-		assert.Equal(t, result, tc.expected)
 	}
 }

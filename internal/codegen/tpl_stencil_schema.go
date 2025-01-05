@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"regexp"
 	"strings"
 
 	"errors"
@@ -61,16 +60,19 @@ func validateJSONSchema(identifier string, schemaMap map[string]any, data any) e
 		var validationError *jsonschema.ValidationError
 		if errors.As(err, &validationError) {
 			for _, validationErr := range validationError.DetailedOutput().Errors {
-				path := buildErrorPath(validationErr.AbsoluteKeywordLocation)
-				if path == "" {
-					// Default to the identifier if we couldn't find anything
-					// interesting.
-					path = identifier
-				}
+				pth := strings.TrimPrefix(validationErr.InstanceLocation, "/")
 
 				//nolint:errcheck // Why: Best effort way to get the error.
 				b, _ := validationErr.Error.MarshalJSON()
-				errs = append(errs, fmt.Errorf("%s: %s", path, strings.TrimSuffix(strings.TrimPrefix(string(b), "\""), "\"")))
+
+				errStr := strings.TrimSuffix(strings.TrimPrefix(string(b), "\""), "\"")
+				if pth == "" {
+					// Can't provide detailed field information. Wrapped error
+					// will provide the top-level location.
+					errs = append(errs, fmt.Errorf("%s", errStr))
+				} else {
+					errs = append(errs, fmt.Errorf("%s: %s", pth, errStr))
+				}
 			}
 		} else {
 			errs = append(errs, err)
@@ -80,27 +82,4 @@ func validateJSONSchema(identifier string, schemaMap map[string]any, data any) e
 	}
 
 	return nil
-}
-
-// buildErrorPath builds an error path from the provided
-// absoluteKeywordLocation from jsonschema errors.
-func buildErrorPath(absoluteKeywordLocation string) string {
-	// Splits on manifest to retrieve only the path declared inside the manifest file.
-	splitOnManifest := strings.Split(absoluteKeywordLocation, "/manifest.yaml/")
-
-	fmt.Printf("%s: %v\n", absoluteKeywordLocation, splitOnManifest)
-
-	// Validates that we have two items. We only want the second item
-	// which contains the path inside the manifest file.
-	if len(splitOnManifest) != 2 {
-		return ""
-	}
-
-	// The path is divided by either "/" or "#/" we want to remove both.
-	re := regexp.MustCompile("#*/")
-	split := re.Split(splitOnManifest[1], -1)
-
-	// Drops the final item in the split because it represents the error
-	// condition.
-	return strings.Join(split[:len(split)-1], ".")
 }

@@ -92,7 +92,7 @@ func (s *TplStencil) resolveDefault(pth string, arg *configuration.Argument) (in
 	// json schema convention is to define "type" as the top level key.
 	typ, ok := arg.Schema["type"]
 	if !ok {
-		// We don't know what type this should bem so return nothing.
+		// We don't know what type this should be so return nothing.
 		return nil, nil
 	}
 	typs, ok := typ.(string)
@@ -100,12 +100,12 @@ func (s *TplStencil) resolveDefault(pth string, arg *configuration.Argument) (in
 		return nil, fmt.Errorf("module %q argument %q has invalid type: %v", s.t.Module.Name, pth, typ)
 	}
 
-	var v interface{}
+	var v any
 	switch typs {
 	case "map", "object":
-		v = make(map[interface{}]interface{})
+		v = make(map[any]any)
 	case "list", "array":
-		v = []interface{}{}
+		v = make([]any, 0)
 	case "boolean", "bool":
 		v = false
 	case "integer", "int", "number":
@@ -165,5 +165,5 @@ func (s *TplStencil) resolveFrom(_ context.Context, pth string, arg *configurati
 
 // validateArg validates an argument against the schema
 func (s *TplStencil) validateArg(pth string, arg *configuration.Argument, v interface{}) error {
-	return validateJSONSchema("manifest.yaml/arguments/"+pth, arg.Schema, v)
+	return validateJSONSchema(s.t.Module.Name+"/arguments/"+pth, arg.Schema, v)
 }
