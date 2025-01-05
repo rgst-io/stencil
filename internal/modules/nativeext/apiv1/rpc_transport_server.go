@@ -5,7 +5,7 @@
 package apiv1
 
 import (
-	"go.rgst.io/stencil/pkg/slogext"
+	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
 // rpcTransportServer implements a rpc backed implementation

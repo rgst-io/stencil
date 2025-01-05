@@ -25,9 +25,9 @@ import (
 	gogit "github.com/go-git/go-git/v5"
 	vcsgit "github.com/jaredallard/vcs/git"
 	"github.com/jaredallard/vcs/resolver"
-	"go.rgst.io/stencil/internal/modules"
-	"go.rgst.io/stencil/internal/version"
-	"go.rgst.io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/v2/internal/modules"
+	"go.rgst.io/stencil/v2/internal/version"
+	"go.rgst.io/stencil/v2/pkg/configuration"
 )
 
 // runtimeVals contains information about the current state

@@ -10,10 +10,10 @@ import (
 
 	"github.com/go-git/go-billy/v5"
 	"github.com/pkg/errors"
-	"go.rgst.io/stencil/internal/modules"
-	"go.rgst.io/stencil/internal/modules/modulestest"
-	"go.rgst.io/stencil/pkg/configuration"
-	"go.rgst.io/stencil/pkg/slogext"
+	"go.rgst.io/stencil/v2/internal/modules"
+	"go.rgst.io/stencil/v2/internal/modules/modulestest"
+	"go.rgst.io/stencil/v2/pkg/configuration"
+	"go.rgst.io/stencil/v2/pkg/slogext"
 	"gotest.tools/v3/assert"
 )
 

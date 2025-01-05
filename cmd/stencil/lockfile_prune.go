@@ -19,9 +19,9 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
-	"go.rgst.io/stencil/pkg/configuration"
-	"go.rgst.io/stencil/pkg/slogext"
-	"go.rgst.io/stencil/pkg/stencil"
+	"go.rgst.io/stencil/v2/pkg/configuration"
+	"go.rgst.io/stencil/v2/pkg/slogext"
+	"go.rgst.io/stencil/v2/pkg/stencil"
 )
 
 // NewLockfilePruneCommand returns a new urfave/cli.Command for the

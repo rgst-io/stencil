@@ -23,8 +23,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
-	"go.rgst.io/stencil/pkg/configuration"
-	"go.rgst.io/stencil/pkg/slogext"
+	"go.rgst.io/stencil/v2/pkg/configuration"
+	"go.rgst.io/stencil/v2/pkg/slogext"
 	"gopkg.in/yaml.v3"
 )
 

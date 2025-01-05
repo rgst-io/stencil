@@ -16,7 +16,7 @@
 // implement.
 package apiv1
 
-import "go.rgst.io/stencil/internal/modules/nativeext/apiv1"
+import "go.rgst.io/stencil/v2/internal/modules/nativeext/apiv1"
 
 const (
 	Version     = apiv1.Version

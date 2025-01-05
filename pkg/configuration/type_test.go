@@ -6,7 +6,7 @@ import (
 	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
 
-	"go.rgst.io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/v2/pkg/configuration"
 )
 
 func TestTemplateRepositoryType(t *testing.T) {

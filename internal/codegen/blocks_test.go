@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"go.rgst.io/stencil/internal/modules/modulestest"
-	"go.rgst.io/stencil/internal/testing/testmemfs"
-	"go.rgst.io/stencil/pkg/slogext"
+	"go.rgst.io/stencil/v2/internal/modules/modulestest"
+	"go.rgst.io/stencil/v2/internal/testing/testmemfs"
+	"go.rgst.io/stencil/v2/pkg/slogext"
 	"gotest.tools/v3/assert"
 )
 

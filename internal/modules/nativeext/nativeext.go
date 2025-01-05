@@ -34,8 +34,8 @@ import (
 	"github.com/jaredallard/vcs/releases"
 	"github.com/jaredallard/vcs/resolver"
 	"github.com/rogpeppe/go-internal/lockedfile"
-	"go.rgst.io/stencil/internal/modules/nativeext/apiv1"
-	"go.rgst.io/stencil/pkg/slogext"
+	"go.rgst.io/stencil/v2/internal/modules/nativeext/apiv1"
+	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
 // generatedTemplateFunc is the underlying type of a function

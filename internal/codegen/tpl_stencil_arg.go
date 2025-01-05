@@ -22,8 +22,8 @@ import (
 	"context"
 	"fmt"
 
-	"go.rgst.io/stencil/internal/dotnotation"
-	"go.rgst.io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/v2/internal/dotnotation"
+	"go.rgst.io/stencil/v2/pkg/configuration"
 )
 
 // Arg returns the value of an argument in the project's manifest

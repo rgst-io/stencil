@@ -8,7 +8,7 @@ import (
 	"net/rpc"
 
 	"github.com/hashicorp/go-plugin"
-	"go.rgst.io/stencil/pkg/slogext"
+	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
 // ExtensionPlugin is the high level plugin used by go-plugin
