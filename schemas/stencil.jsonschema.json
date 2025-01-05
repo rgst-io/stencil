@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json-schema.org/draft-07/schema#",
-	"$id": "https://go.rgst.io/stencil/pkg/configuration/manifest",
+	"$id": "https://go.rgst.io/stencil/v2/pkg/configuration/manifest",
 	"$ref": "#/$defs/Manifest",
 	"$defs": {
 		"Manifest": {
@@ -42,7 +42,7 @@
 				},
 				"version": {
 					"type": "string",
-					"description": "Version is a semantic version or branch of the template repository\nthat should be downloaded if not set then the latest version is used.\n\nVersion can also be a constraint as supported by the underlying\nresolver:\nhttps://pkg.go.dev/go.rgst.io/stencil/internal/modules/resolver\n\nBut note that constraints are currently not locked so the version\nwill change as the module is resolved on subsequent runs.\nEventually, this will be changed to use the lockfile by default."
+					"description": "Version is a semantic version or branch of the template repository\nthat should be downloaded if not set then the latest version is used.\n\nVersion can also be a constraint as supported by the underlying\nresolver:\nhttps://pkg.go.dev/go.rgst.io/stencil/v2/internal/modules/resolver\n\nBut note that constraints are currently not locked so the version\nwill change as the module is resolved on subsequent runs.\nEventually, this will be changed to use the lockfile by default."
 				}
 			},
 			"additionalProperties": false,

@@ -22,7 +22,7 @@ import (
 	"path/filepath"
 
 	"github.com/invopop/jsonschema"
-	"go.rgst.io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/v2/pkg/configuration"
 )
 
 type schema struct {
@@ -52,7 +52,7 @@ func main() {
 		r.FieldNameTag = "yaml"
 
 		// Add comments to the schema.
-		if err := r.AddGoComments("go.rgst.io/stencil", "pkg/configuration"); err != nil {
+		if err := r.AddGoComments("go.rgst.io/stencil/v2", "pkg/configuration"); err != nil {
 			fmt.Printf("error adding comments for %s: %v\n", s.FileName, err)
 			os.Exit(1)
 		}
