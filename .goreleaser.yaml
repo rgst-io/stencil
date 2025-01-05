@@ -12,11 +12,11 @@ builds:
       - -s
       - -w
       ## <<Stencil::Block(stencilLdflags)>>
-      - -X go.rgst.io/stencil/internal/version.version={{.Version}}
-      - -X go.rgst.io/stencil/internal/version.commit={{.Commit}}
-      - -X go.rgst.io/stencil/internal/version.date={{ .CommitDate }}
-      - -X go.rgst.io/stencil/internal/version.builtBy=goreleaser
-      - -X go.rgst.io/stencil/internal/version.treeState={{ if .IsGitDirty }}dirty{{ else }}clean{{ end }}
+      - -X go.rgst.io/stencil/v2/internal/version.version={{.Version}}
+      - -X go.rgst.io/stencil/v2/internal/version.commit={{.Commit}}
+      - -X go.rgst.io/stencil/v2/internal/version.date={{ .CommitDate }}
+      - -X go.rgst.io/stencil/v2/internal/version.builtBy=goreleaser
+      - -X go.rgst.io/stencil/v2/internal/version.treeState={{ if .IsGitDirty }}dirty{{ else }}clean{{ end }}
       ## <</Stencil::Block>>
     env:
       - CGO_ENABLED=0
