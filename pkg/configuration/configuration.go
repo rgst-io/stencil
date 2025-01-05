@@ -1,4 +1,4 @@
-// Copyright (C) 2024 stencil contributors
+// Copyright (C) 2024-2025 stencil contributors
 // Copyright (C) 2022-2023 Outreach Corporation
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -109,101 +109,6 @@ type TemplateRepository struct {
 	// will change as the module is resolved on subsequent runs.
 	// Eventually, this will be changed to use the lockfile by default.
 	Version string `yaml:"version,omitempty"`
-}
-
-// LoadTemplateRepositoryManifest reads a template repository manifest
-// from disk and returns it.
-//
-// In most cases, you should use LoadDefaultTemplateRepositoryManifest
-// instead as it contains the standard locations for a manifest.
-func LoadTemplateRepositoryManifest(path string) (*TemplateRepositoryManifest, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	var s TemplateRepositoryManifest
-	if err := yaml.NewDecoder(f).Decode(&s); err != nil {
-		return nil, err
-	}
-
-	return &s, nil
-}
-
-// LoadDefaultTemplateRepositoryManifest reads a template repository
-// manifest from disk and returns it, using a standard set of locations.
-func LoadDefaultTemplateRepositoryManifest() (*TemplateRepositoryManifest, error) {
-	manifestFiles := []string{"manifest.yaml"}
-	for _, file := range manifestFiles {
-		if _, err := os.Stat(file); err == nil {
-			return LoadTemplateRepositoryManifest(file)
-		}
-	}
-
-	return nil, fmt.Errorf("no manifest found (searched %v)", manifestFiles)
-}
-
-// TemplateRepositoryManifest is a manifest of a template repository
-type TemplateRepositoryManifest struct {
-	// Name is the name of this template repository.
-	// This must match the import path.
-	Name string `yaml:"name" jsonschema:"required"`
-
-	// Modules are template repositories that this manifest requires
-	Modules []*TemplateRepository `yaml:"modules,omitempty"`
-
-	// MinStencilVersion is the minimum version of stencil that is required to
-	// render this module.
-	MinStencilVersion string `yaml:"minStencilVersion,omitempty"`
-
-	// Type stores a comma-separated list of template repository types served by the current module.
-	// Use the TemplateRepositoryTypes.Contains method to check.
-	Type TemplateRepositoryTypes `yaml:"type,omitempty"`
-
-	// PostRunCommand is a command to be ran after rendering and post-processors
-	// have been ran on the project
-	PostRunCommand []*PostRunCommandSpec `yaml:"postRunCommand,omitempty"`
-
-	// Arguments are a declaration of arguments to the template generator
-	Arguments map[string]Argument `yaml:"arguments,omitempty"`
-
-	// DirReplacements is a list of directory name replacement templates to render
-	DirReplacements map[string]string `yaml:"dirReplacements,omitempty"`
-}
-
-// PostRunCommandSpec is the spec of a command to be ran and its
-// friendly name
-type PostRunCommandSpec struct {
-	// Name is the name of the command being ran, used for UX
-	Name string `yaml:"name,omitempty"`
-
-	// Command is the command to be ran, note: this is ran inside
-	// of a bash shell.
-	Command string `yaml:"command" jsonschema:"required"`
-}
-
-// Argument is a user-input argument that can be passed to
-// templates
-type Argument struct {
-	// Description is a description of this argument.
-	Description string `yaml:"description"`
-
-	// Required denotes this argument as required.
-	Required bool `yaml:"required,omitempty"`
-
-	// Default is the default value for this argument if it's not set.
-	// This cannot be set when required is true.
-	Default interface{} `yaml:"default,omitempty"`
-
-	// Schema is a JSON schema, in YAML, for the argument.
-	Schema map[string]any `yaml:"schema"`
-
-	// From is a reference to an argument in another module, if this is
-	// set, all other fields are ignored and instead the module referenced
-	// field's are used instead. The name of the argument, the key in the map,
-	// must be the same across both modules.
-	From string `yaml:"from,omitempty"`
 }
 
 // ValidateName ensures that the name of a project in the manifest
