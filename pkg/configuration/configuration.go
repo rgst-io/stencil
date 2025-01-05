@@ -103,7 +103,7 @@ type TemplateRepository struct {
 	//
 	// Version can also be a constraint as supported by the underlying
 	// resolver:
-	// https://pkg.go.dev/go.rgst.io/stencil/internal/modules/resolver
+	// https://pkg.go.dev/go.rgst.io/stencil/v2/internal/modules/resolver
 	//
 	// But note that constraints are currently not locked so the version
 	// will change as the module is resolved on subsequent runs.
