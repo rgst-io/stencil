@@ -1,4 +1,4 @@
-module go.rgst.io/stencil
+module go.rgst.io/stencil/v2
 
 go 1.23.4
 

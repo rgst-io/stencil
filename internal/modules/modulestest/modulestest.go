@@ -30,8 +30,8 @@ import (
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/jaredallard/vcs/resolver"
 	"github.com/pkg/errors"
-	"go.rgst.io/stencil/internal/modules"
-	"go.rgst.io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/v2/internal/modules"
+	"go.rgst.io/stencil/v2/pkg/configuration"
 	"gopkg.in/yaml.v3"
 )
 

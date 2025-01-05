@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"go.rgst.io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/v2/pkg/configuration"
 	"gotest.tools/v3/assert"
 	"gotest.tools/v3/env"
 )

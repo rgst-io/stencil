@@ -8,8 +8,8 @@ import (
 
 	"github.com/jaredallard/cmdexec"
 	"github.com/urfave/cli/v2"
-	"go.rgst.io/stencil/pkg/configuration"
-	"go.rgst.io/stencil/pkg/slogext"
+	"go.rgst.io/stencil/v2/pkg/configuration"
+	"go.rgst.io/stencil/v2/pkg/slogext"
 	"gotest.tools/v3/assert"
 	"gotest.tools/v3/env"
 )

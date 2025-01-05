@@ -32,8 +32,8 @@ import (
 	"github.com/jaredallard/vcs/git"
 	"github.com/jaredallard/vcs/resolver"
 	"github.com/pkg/errors"
-	"go.rgst.io/stencil/internal/modules/nativeext"
-	"go.rgst.io/stencil/pkg/configuration"
+	"go.rgst.io/stencil/v2/internal/modules/nativeext"
+	"go.rgst.io/stencil/v2/pkg/configuration"
 	"gopkg.in/yaml.v3"
 )
 

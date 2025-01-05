@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/go-git/go-billy/v5/osfs"
-	"go.rgst.io/stencil/pkg/slogext"
-	"go.rgst.io/stencil/pkg/stencil"
+	"go.rgst.io/stencil/v2/pkg/slogext"
+	"go.rgst.io/stencil/v2/pkg/stencil"
 )
 
 // TplFile is the current file we're writing output to in a

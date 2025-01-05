@@ -21,8 +21,8 @@ import (
 	"strings"
 	"sync"
 
-	"go.rgst.io/stencil/internal/modules"
-	"go.rgst.io/stencil/pkg/slogext"
+	"go.rgst.io/stencil/v2/internal/modules"
+	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
 // ErrStopProcessingTemplate is an error that can be returned to

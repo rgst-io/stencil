@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"github.com/jaredallard/vcs/resolver"
-	"go.rgst.io/stencil/pkg/stencil"
+	"go.rgst.io/stencil/v2/pkg/stencil"
 	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
 	"gotest.tools/v3/env"

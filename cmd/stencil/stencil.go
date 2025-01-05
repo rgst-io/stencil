@@ -22,10 +22,10 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"go.rgst.io/stencil/internal/cmd/stencil"
-	"go.rgst.io/stencil/internal/version"
-	"go.rgst.io/stencil/pkg/configuration"
-	"go.rgst.io/stencil/pkg/slogext"
+	"go.rgst.io/stencil/v2/internal/cmd/stencil"
+	"go.rgst.io/stencil/v2/internal/version"
+	"go.rgst.io/stencil/v2/pkg/configuration"
+	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
 // Set the version printer to do nothing but print the version.

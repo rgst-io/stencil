@@ -22,8 +22,8 @@ import (
 	"fmt"
 	"text/template"
 
-	"go.rgst.io/stencil/internal/modules/nativeext"
-	"go.rgst.io/stencil/pkg/slogext"
+	"go.rgst.io/stencil/v2/internal/modules/nativeext"
+	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
 // NewFuncMap returns the standard func map for a template
