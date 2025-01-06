@@ -134,7 +134,7 @@ func (s *TplStencil) GetGlobal(name string) any {
 // to look at how the owning module uses it for now.
 //
 //	{{- /* This writes to a module hook */}}
-//	{{- stencil.AddToModuleHook "github.com/myorg/repo" "myModuleHook" (list "myData") }}
+//	{{- stencil.AddToModuleHook "github.com/myorg/repo" "myModuleHook" "myData" }}
 func (s *TplStencil) AddToModuleHook(module, name string, data ...any) (out string, err error) {
 	// Attempt to read the destined module's manifest for extra features.
 	var mcfg *configuration.TemplateRepositoryManifest

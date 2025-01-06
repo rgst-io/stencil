@@ -14,5 +14,5 @@ at how the owning module uses it for now.
 
 ```go
 {{- /* This writes to a module hook */}}
-{{- stencil.AddToModuleHook "github.com/myorg/repo" "myModuleHook" (list "myData") }}
+{{- stencil.AddToModuleHook "github.com/myorg/repo" "myModuleHook" "myData" }}
 ```

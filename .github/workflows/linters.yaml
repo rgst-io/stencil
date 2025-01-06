@@ -58,7 +58,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
       - name: Retrieve golangci-lint version
         run: |
-          echo "version=$(mise current golangci-lint)" >> "$GITHUB_OUTPUT"
+          echo "version=$(mise current ubi:golangci/golangci-lint)" >> "$GITHUB_OUTPUT"
         id: golangci_lint
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v6
