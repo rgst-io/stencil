@@ -107,6 +107,10 @@ type TemplateRepository struct {
 	// will change as the module is resolved on subsequent runs.
 	// Eventually, this will be changed to use the lockfile by default.
 	Version string `yaml:"version,omitempty"`
+
+	// Arguments is a list of arguments to pass to this template module
+	// only.
+	Arguments map[string]any
 }
 
 // ValidateName ensures that the name of a project in the manifest
