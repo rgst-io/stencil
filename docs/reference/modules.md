@@ -23,7 +23,7 @@ A module consists of templates in a `templates/` directory in the root of the re
 
 ### Native Extensions
 
-Native extensions are modules that run binary code, and generally are written in Go but may be written in any language that can implement a `net/rpc` interface. Native extensions are accessible via the `extensions.Call "<importPath>.<functionName>"` method. For more information about the native extension module type see [the native extension module documentation]().
+Native extensions are modules that run binary code, and generally are written in Go but may be written in any language that can implement a `net/rpc` interface. Native extensions are accessible via the `extensions.Call "<importPath>.<functionName>"` method. For more information about the native extension module type see [the native extension module documentation](/reference/native-extensions).
 
 ## Creating a Module
 

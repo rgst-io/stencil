@@ -47,7 +47,7 @@ extension.
 
 The manifest.yaml file is arguably the most important file in a stencil module. This dictates the type of module, the arguments that the module accepts, and the dependencies that the module has.
 
-The important keys that a module has are listed below, but an exhaustive list can be found on the [pkg.go.dev](https://pkg.go.dev/github.com/rgst-io/stencil/pkg/configuration#TemplateRepositoryManifest)
+The below list can also be found as Go struct at [pkg.go.dev](https://pkg.go.dev/go.rgst.io/stencil/v2/pkg/configuration#TemplateRepositoryManifest).
 
 - `name` - The import path of the module
 - `description` - A description of the module
@@ -78,7 +78,12 @@ The important keys that a module has are listed below, but an exhaustive list ca
   - `schema` - a JSON schema for the argument
   - `required` - whether or not the argument is required to be set
   - `default` - a default value for the argument, cannot be set when required is true
-  - `from` - aliases this argument to another module's argument. Only supports one-level deep.
+  - `from` - aliases this argument to another module's argument. Only
+    supports one-level deep.
+- `moduleHooks` - an optional map of a [module hook](#module-hooks)'s
+  name to optional configuration.
+  - `schema` - a JSON schema for the module hook, applies to each item
+    being inserted into the module hook through `stencil.AddToModuleHook`.
 
 #### Writing a JSON Schema
 
@@ -93,8 +98,8 @@ For more complex types, like objects, and arrays the schema is an object with pr
 ```yaml
 type: object
 properties:
-	name:
-		type: string
+  name:
+    type: string
 ```
 
 For example, array of strings:
@@ -102,7 +107,7 @@ For example, array of strings:
 ```yaml
 type: array
 items:
-	type: string
+  type: string
 ```
 
 #### Aliasing an argument with `from`
