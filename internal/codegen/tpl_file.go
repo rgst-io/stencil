@@ -170,22 +170,59 @@ func (f *TplFile) Path() string {
 //	{{- file.Create (printf "cmd/%s.go" $commandName) 0600 now }}
 //	{{- stencil.Include "command" | file.SetContents }}
 //	{{- end }}
-func (f *TplFile) Create(path string, mode os.FileMode, modTime time.Time) (out, err error) {
+func (f *TplFile) Create(path string, mode os.FileMode, modTime time.Time) (out string, err error) {
 	f.f, err = NewFile(path, mode, modTime, f.t)
 	if err != nil {
-		return err, err
+		return "", err
 	}
 
 	f.t.Files = append(f.t.Files, f.f)
-	return nil, nil
+	return "", nil
 }
 
 // RemoveAll deletes all the contents in the provided path
 //
 //	{{- file.RemoveAll "path" }}
-func (f *TplFile) RemoveAll(path string) (out, err error) {
+func (f *TplFile) RemoveAll(path string) (out string, err error) {
 	if err := os.RemoveAll(path); err != nil {
-		return err, err
+		return "", err
 	}
-	return nil, nil
+	return "", nil
+}
+
+// MigrateTo migrates the current file to a new path.  If the old file doesn't exist, it is
+// treated as a `file.Skip`.  If the old file still exists, then it is moved to the new
+// path (via a create and write, then delete of the old path, not a filesystem move).  If
+// the MigrateTo target file already exists, it is overwritten.
+//
+//	{{- file.MigrateTo "new/path/to/file.txt" }}
+func (f *TplFile) MigrateTo(path string) (out string, err error) {
+	if _, err := osfs.Default.Stat(f.f.path); err != nil {
+		f.log.With("template", f.t.Path, "path", f.f.path).
+			Debug("Skipping MigrateTo because the file doesn't exist")
+		return f.Skip("MigrateTo file input doesn't exist")
+	}
+
+	f.log.With("path", f.f.path).With("to", path).
+		Debug("Migrating file to new path")
+	contents, err := os.ReadFile(f.f.path)
+	if err != nil {
+		return "", err
+	}
+
+	fn, err := osfs.Default.Create(path)
+	if err != nil {
+		return "", err
+	}
+	defer fn.Close()
+
+	if _, err := fn.Write(contents); err != nil {
+		return "", err
+	}
+
+	f.log.With("path", f.f.path).
+		Debug("Deleting original file after migration")
+	f.f.Deleted = true
+
+	return "", nil
 }
