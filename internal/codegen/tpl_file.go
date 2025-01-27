@@ -203,7 +203,7 @@ func (f *TplFile) MigrateTo(path string) (out string, err error) {
 		return f.Skip("MigrateTo file input doesn't exist")
 	}
 
-	f.log.With("path", f.f.path).With("migrateto", path).
+	f.log.With("path", f.f.path).With("to", path).
 		Debug("Migrating file to new path")
 	contents, err := os.ReadFile(f.f.path)
 	if err != nil {
@@ -216,8 +216,7 @@ func (f *TplFile) MigrateTo(path string) (out string, err error) {
 	}
 	defer fn.Close()
 
-	_, err = fn.Write(contents)
-	if err != nil {
+	if _, err := fn.Write(contents); err != nil {
 		return "", err
 	}
 
