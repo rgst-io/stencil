@@ -2,6 +2,7 @@ package codegen
 
 import (
 	"os"
+	"path"
 	"testing"
 
 	"go.rgst.io/stencil/v2/pkg/slogext"
@@ -151,4 +152,88 @@ func TestTplFile_OnceLockHasHistoryOfFile(t *testing.T) {
 	assert.NilError(t, err)
 	assert.Equal(t, "", fo)
 	assert.Equal(t, true, tplf.f.Skipped)
+}
+
+func TestTplFile_MigrateToSrcFileExistsNoDestFile(t *testing.T) {
+	tplf := TplFile{
+		f:   &File{path: path.Join(t.TempDir(), "test.go")},
+		log: slogext.NewTestLogger(t),
+	}
+
+	// Set up the initial state
+	contents := []byte("test")
+	assert.NilError(t, os.WriteFile(tplf.f.path, contents, 0o644))
+
+	newPath := path.Join(t.TempDir(), "testnew.go")
+	os.Remove(newPath)
+
+	fo, err := tplf.MigrateTo(newPath)
+	assert.NilError(t, err)
+	assert.Equal(t, "", fo)
+	// Deleted should be true but file should still exist (deleted is processed later)
+	assert.Equal(t, true, tplf.f.Deleted)
+	_, err = os.Stat(tplf.f.path)
+	assert.NilError(t, err)
+
+	_, err = os.Stat(newPath)
+	assert.NilError(t, err)
+
+	contentsNew, err := os.ReadFile(newPath)
+	assert.NilError(t, err)
+	assert.Equal(t, string(contentsNew), string(contents))
+}
+
+func TestTplFile_MigrateToSrcFileExistsDestFileExists(t *testing.T) {
+	tplf := TplFile{
+		f:   &File{path: path.Join(t.TempDir(), "test.go")},
+		log: slogext.NewTestLogger(t),
+	}
+
+	// Set up the initial state
+	contents := []byte("test")
+	assert.NilError(t, os.WriteFile(tplf.f.path, contents, 0o644))
+
+	newPath := path.Join(t.TempDir(), "testnew.go")
+	contentsNew := []byte("testnew")
+	assert.NilError(t, os.WriteFile(newPath, contentsNew, 0o644))
+
+	fo, err := tplf.MigrateTo(newPath)
+	assert.NilError(t, err)
+	assert.Equal(t, "", fo)
+	// Deleted should be true but file should still exist (deleted is processed later)
+	assert.Equal(t, true, tplf.f.Deleted)
+	_, err = os.Stat(tplf.f.path)
+	assert.NilError(t, err)
+
+	_, err = os.Stat(newPath)
+	assert.NilError(t, err)
+
+	contentsNewNew, err := os.ReadFile(newPath)
+	assert.NilError(t, err)
+	assert.Equal(t, string(contentsNewNew), string(contents))
+}
+
+func TestTplFile_MigrateToSrcFileNoExists(t *testing.T) {
+	tplf := TplFile{
+		f:   &File{path: path.Join(t.TempDir(), "test.go")},
+		t:   &Template{},
+		log: slogext.NewTestLogger(t),
+	}
+
+	// Set up the initial state
+	os.Remove(tplf.f.path)
+
+	newPath := path.Join(t.TempDir(), "testnew.go")
+
+	fo, err := tplf.MigrateTo(newPath)
+	assert.NilError(t, err)
+	assert.Equal(t, "", fo)
+
+	assert.Equal(t, false, tplf.f.Deleted)
+	assert.Equal(t, true, tplf.f.Skipped)
+
+	_, err = os.Stat(tplf.f.path)
+	assert.ErrorContains(t, err, "no such file")
+	_, err = os.Stat(newPath)
+	assert.ErrorContains(t, err, "no such file")
 }
