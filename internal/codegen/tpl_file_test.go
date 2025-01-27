@@ -237,3 +237,35 @@ func TestTplFile_MigrateToSrcFileNoExists(t *testing.T) {
 	_, err = os.Stat(newPath)
 	assert.ErrorContains(t, err, "no such file")
 }
+
+func TestTplFile_RemoveAll(t *testing.T) {
+	tplf := TplFile{
+		f: &File{path: "test.go"},
+	}
+
+	wd, err := os.Getwd()
+	assert.NilError(t, err, "failed to get working directory")
+	td := os.TempDir()
+	err = os.Chdir(td)
+	assert.NilError(t, err, "failed to change working directory")
+	defer os.Chdir(wd)
+
+	os.MkdirAll("test", 0o755)
+	os.WriteFile("test/test.go", []byte("test"), 0o644)
+	os.WriteFile("test/test2.go", []byte("test2"), 0o644)
+	_, err = os.Stat("test/test.go")
+	assert.NilError(t, err)
+	_, err = os.Stat("test/test2.go")
+	assert.NilError(t, err)
+
+	fo, err := tplf.RemoveAll("test")
+	assert.NilError(t, err)
+	assert.Equal(t, "", fo)
+
+	_, err = os.Stat("test")
+	assert.ErrorContains(t, err, "no such file")
+	_, err = os.Stat("test/test.go")
+	assert.ErrorContains(t, err, "no such file")
+	_, err = os.Stat("test/test2.go")
+	assert.ErrorContains(t, err, "no such file")
+}
