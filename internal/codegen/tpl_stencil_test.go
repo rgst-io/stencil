@@ -36,8 +36,8 @@ func TestTplStencil_ReadBlocks(t *testing.T) {
 				fpath: "testdata/blocks-test.txt",
 			},
 			want: map[string]string{
-				"helloWorld": "Hello, world!",
-				"e2e":        "content",
+				"hello-world": "Hello, world!",
+				"e2e":         "content",
 			},
 		},
 		{
