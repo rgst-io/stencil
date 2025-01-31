@@ -19,7 +19,7 @@ func fakeBlocksTemplate() *Template {
 func TestParseBlocks(t *testing.T) {
 	blocks, err := parseBlocks("testdata/blocks-test.txt", fakeBlocksTemplate())
 	assert.NilError(t, err, "expected parseBlocks() not to fail")
-	assert.Equal(t, blocks["helloWorld"].Contents, "Hello, world!", "expected parseBlocks() to parse basic block")
+	assert.Equal(t, blocks["hello-world"].Contents, "Hello, world!", "expected parseBlocks() to parse basic block")
 	assert.Equal(t, blocks["e2e"].Contents, "content", "expected parseBlocks() to parse e2e block")
 }
 
