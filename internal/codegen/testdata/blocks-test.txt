@@ -1,6 +1,6 @@
-###Block(helloWorld)
+###Block(hello-world)
 Hello, world!
-###EndBlock(helloWorld)
+###EndBlock(hello-world)
 
 ###Block(e2e)
 content

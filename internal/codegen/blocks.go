@@ -41,11 +41,11 @@ type blockInfo struct {
 
 // blockPattern is the regex used for parsing block commands.
 // For unit testing of this regex and explanation, see https://regex101.com/r/nFgOz0/1
-var blockPattern = regexp.MustCompile(`^\s*(///|###|<!---)\s*([a-zA-Z ]+)\(([a-zA-Z0-9 ]+)\)`)
+var blockPattern = regexp.MustCompile(`^\s*(///|###|<!---)\s*([a-zA-Z ]+)\(([a-zA-Z0-9 -]+)\)`)
 
 // v2BlockPattern is the new regex for parsing blocks
 // For unit testing of this regex and explanation, see https://regex101.com/r/EHkH5O/1
-var v2BlockPattern = regexp.MustCompile(`^\s*(//|##|--|<!--)\s{0,1}<<(/?)Stencil::([a-zA-Z ]+)(\([a-zA-Z0-9 ]+\))?>>`)
+var v2BlockPattern = regexp.MustCompile(`^\s*(//|##|--|<!--)\s{0,1}<<(/?)Stencil::([a-zA-Z ]+)(\([a-zA-Z0-9 -]+\))?>>`)
 
 // parseBlocks reads the blocks from an existing file, potentially adopting blocks based on the source template,
 // if so specified
