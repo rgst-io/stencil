@@ -33,10 +33,21 @@ import (
 // endStatement is a constant for the end of a statement
 const endStatement = "EndBlock"
 
+// BlockVersion is the version of a block
+type BlockVersion int8
+
+// Contains valid [BlockVersion] values
+const (
+	_ BlockVersion = iota
+	BlockVersion1
+	BlockVersion2
+)
+
 // blockInfo contains information about a block's contents/file location
 type blockInfo struct {
 	Name, Contents     string
 	StartLine, EndLine int
+	Version            BlockVersion
 }
 
 // blockPattern is the regex used for parsing block commands.
@@ -45,7 +56,7 @@ var blockPattern = regexp.MustCompile(`^\s*(///|###|<!---)\s*([a-zA-Z ]+)\(([a-z
 
 // v2BlockPattern is the new regex for parsing blocks
 // For unit testing of this regex and explanation, see https://regex101.com/r/EHkH5O/1
-var v2BlockPattern = regexp.MustCompile(`^\s*(//|##|--|<!--)\s{0,1}<<(/?)Stencil::([a-zA-Z ]+)(\([a-zA-Z0-9 -]+\))?>>`)
+var v2BlockPattern = regexp.MustCompile(`^\s*(//|##|--|<!--)\s{0,1}<<(/?)Stencil::([a-zA-Z ]+)(\([a-zA-Z0-9 -_]+\))?>>`)
 
 // parseBlocks reads the blocks from an existing file, potentially adopting blocks based on the source template,
 // if so specified
@@ -71,6 +82,7 @@ func parseBlocksInner(r io.ReadSeeker, filePath string, sourceTemplate *Template
 	for i := 0; scanner.Scan(); i++ {
 		line := scanner.Text()
 		matches := blockPattern.FindStringSubmatch(line)
+		version := BlockVersion1
 		if len(matches) == 0 {
 			// 0: full match
 			// 1: comment prefix
@@ -79,6 +91,7 @@ func parseBlocksInner(r io.ReadSeeker, filePath string, sourceTemplate *Template
 			// 4: block args, if present
 			v2Matches := v2BlockPattern.FindStringSubmatch(line)
 			if len(v2Matches) == 5 {
+				version = BlockVersion2
 				cmd := v2Matches[3]
 				if v2Matches[2] == "/" {
 					if curBlock == nil {
@@ -98,10 +111,9 @@ func parseBlocksInner(r io.ReadSeeker, filePath string, sourceTemplate *Template
 
 					v2Matches[4] = fmt.Sprintf("(%s)", curBlock.Name)
 				} else if cmd == endStatement {
-					// If it's not a closing tag, but the command is EndBlock,
-					// we should error. This is because we don't want to
-					// allow users to use the old EndBlock command
-					// without a closing tag
+					// If it's not a closing tag, but the command is EndBlock, we
+					// should error. This is because we don't want to allow users to
+					// use the old EndBlock command without a closing tag
 					return nil, errors.Errorf("line %d: <<Stencil::EndBlock>> should be <</Stencil::Block>>", i+1)
 				}
 
@@ -114,11 +126,11 @@ func parseBlocksInner(r io.ReadSeeker, filePath string, sourceTemplate *Template
 				}
 			}
 		}
-		isCommand := false
 
 		// 1: Comment (###|///)
 		// 2: Command
 		// 3: Argument to the command
+		var isCommand bool
 		if len(matches) == 4 {
 			cmd := matches[2]
 			isCommand = true
@@ -132,6 +144,7 @@ func parseBlocksInner(r io.ReadSeeker, filePath string, sourceTemplate *Template
 				curBlock = &blockInfo{
 					Name:      blockName,
 					StartLine: i,
+					Version:   version,
 				}
 				blocks[blockName] = curBlock
 			case endStatement:
@@ -148,6 +161,8 @@ func parseBlocksInner(r io.ReadSeeker, filePath string, sourceTemplate *Template
 					)
 				}
 
+				// In case we had a EndBlock that was V1 with a V2 start
+				curBlock.Version = version
 				curBlock.EndLine = i
 				curBlock = nil
 			default:

@@ -88,6 +88,17 @@ func (f *File) Block(name string) string {
 	if !ok {
 		return ""
 	}
+
+	// If a deprecated block is loaded, warn
+	if bi.Version == BlockVersion1 {
+		f.sourceTemplate.log.Warnf(
+			"Deprecated V1 block (%s) found at %s:%d-%d",
+			name,
+			f.path,
+			bi.StartLine, bi.EndLine,
+		)
+	}
+
 	return bi.Contents
 }
 
