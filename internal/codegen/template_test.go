@@ -130,7 +130,7 @@ func TestGeneratedBlock(t *testing.T) {
 
 	fs, err := testmemfs.WithManifest("name: testing\n")
 	assert.NilError(t, err, "failed to testmemfs.WithManifest")
-	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]interface{}{}}
+	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]any{}}
 	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
@@ -142,7 +142,7 @@ func TestGeneratedBlock(t *testing.T) {
 		time.Now(), []byte(generatedBlockTemplate), log, nil)
 	assert.NilError(t, err, "failed to create template")
 
-	tplf, err := NewFile(fakeFilePath, 0o644, time.Now(), fakeBlocksTemplate())
+	tplf, err := NewFile(fakeFilePath, 0o644, time.Now(), fakeBlocksTemplate(t))
 	assert.NilError(t, err, "failed to create file")
 
 	// Add the file (fake) to the template so that the template uses it for blocks

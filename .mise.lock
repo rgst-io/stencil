@@ -1,0 +1,39 @@
+[tools.bun]
+version = "1.2.4"
+backend = "core:bun"
+
+[tools.go]
+version = "1.24.1"
+backend = "core:go"
+
+[tools."go:github.com/golangci/golangci-lint/cmd/golangci-lint"]
+version = "1.64.6"
+backend = "go:github.com/golangci/golangci-lint/cmd/golangci-lint"
+
+[tools."go:github.com/thenativeweb/get-next-version"]
+version = "latest"
+backend = "go:github.com/thenativeweb/get-next-version"
+
+[tools."go:golang.org/x/tools/cmd/goimports"]
+version = "0.30.0"
+backend = "go:golang.org/x/tools/cmd/goimports"
+
+[tools."go:gotest.tools/gotestsum"]
+version = "1.12.0"
+backend = "go:gotest.tools/gotestsum"
+
+[tools."go:mvdan.cc/sh/v3/cmd/shfmt"]
+version = "3.10.0"
+backend = "go:mvdan.cc/sh/v3/cmd/shfmt"
+
+[tools."go:sigs.k8s.io/mdtoc"]
+version = "1.4.0"
+backend = "go:sigs.k8s.io/mdtoc"
+
+[tools."ubi:goreleaser/goreleaser"]
+version = "2.7.0"
+backend = "ubi:goreleaser/goreleaser"
+
+[tools."ubi:orhun/git-cliff"]
+version = "2.8.0"
+backend = "ubi:orhun/git-cliff"
