@@ -4,6 +4,8 @@ backend = "core:bun"
 
 [tools.bun.checksums]
 "bun-darwin-aarch64.zip" = "sha256:fd4702870bbb911836469a703aee7c1c7dbafc7cd8fc580429ba2dda18bb5aa1"
+"bun-linux-aarch64.zip" = "sha256:694a1b39ad3560f3fc7c8e0ac42df277d7ac4f28fe373646104000ddff9ae85c"
+"bun-linux-x64-baseline.zip" = "sha256:e03eb2559a61af0cfb7acf3e59272d55613ef14078f156f7b22512456caa0f8b"
 
 [tools.go]
 version = "1.24.1"
@@ -11,6 +13,8 @@ backend = "core:go"
 
 [tools.go.checksums]
 "go1.24.1.darwin-arm64.tar.gz" = "sha256:295581b5619acc92f5106e5bcb05c51869337eb19742fdfa6c8346c18e78ff88"
+"go1.24.1.linux-amd64.tar.gz" = "sha256:cb2396bae64183cdccf81a9a6df0aea3bce9511fc21469fb89a0c00470088073"
+"go1.24.1.linux-arm64.tar.gz" = "sha256:8df5750ffc0281017fb6070fba450f5d22b600a02081dceef47966ffaf36a3af"
 
 [tools."go:github.com/golangci/golangci-lint/cmd/golangci-lint"]
 version = "1.64.6"
@@ -41,8 +45,14 @@ version = "2.7.0"
 backend = "ubi:goreleaser/goreleaser"
 
 [tools."ubi:goreleaser/goreleaser".checksums]
+goreleaser-linux-aarch64 = "sha256:b71d24c60c9e46b3362f1f60de6824854a99c5bab4c3a074ca574d61623cbaa8"
+goreleaser-linux-x86_64 = "sha256:20688b4fe60a116298eefc6f8765e1f0b1e34b8324acad0af6b2d66d0e540cd0"
 goreleaser-macos-aarch64 = "sha256:59363d84429648399ba1d0f5fa838ddb25c8454bec28522fb01278080f7724a4"
 
 [tools."ubi:orhun/git-cliff"]
 version = "2.8.0"
 backend = "ubi:orhun/git-cliff"
+
+[tools."ubi:orhun/git-cliff".checksums]
+git-cliff-linux-aarch64 = "sha256:f4887b3cd7686fd2559eb8f4c38ec0ac963f118ceb3d2a0a33c5ab04c61e8d81"
+git-cliff-linux-x86_64 = "sha256:8290346a28e6c6f055594ff06bf8bd4d6d6d67ef84b9065d372df6f09e14ec35"
