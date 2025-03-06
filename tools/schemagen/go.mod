@@ -1,6 +1,6 @@
 module go.rgst.io/stencil/v2/tools/schemagen
 
-go 1.23
+go 1.24
 
 replace go.rgst.io/stencil/v2 => ../..
 

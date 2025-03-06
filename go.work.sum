@@ -1860,6 +1860,8 @@ github.com/jackc/puddle v0.0.0-20190413234325-e4ced69a3a2b/go.mod h1:m4B5Dj62Y0f
 github.com/jackc/puddle v0.0.0-20190608224051-11cab39313c9/go.mod h1:m4B5Dj62Y0fbyuIc15OsIqK0+JU8nkqQjsgx7dvjSWk=
 github.com/jackc/puddle v1.1.3/go.mod h1:m4B5Dj62Y0fbyuIc15OsIqK0+JU8nkqQjsgx7dvjSWk=
 github.com/jackc/puddle v1.3.0/go.mod h1:m4B5Dj62Y0fbyuIc15OsIqK0+JU8nkqQjsgx7dvjSWk=
+github.com/jaredallard/cmdexec v1.2.2 h1:96xWYRM7mAM7PZTO7Y2q2GREtC857CYPzWN5cfYVT+A=
+github.com/jaredallard/cmdexec v1.2.2/go.mod h1:cwOAlWkQmZOGRjiSMQVSL9GZ2eThrxEadpmo5N9nKlI=
 github.com/jaredallard/vcs v0.1.2 h1:aR2zqmcKKTl375a+AcZdag7RJJLN1DiBGpPUbl2Op+Y=
 github.com/jaredallard/vcs v0.1.2/go.mod h1:uuPO306/V15VR0YY8B+G0T2jmlw7f3JUzxyeIvcX5Z8=
 github.com/jaredallard/vcs v0.3.0 h1:AI3RapXEBU2POjgQTi7eCOwQyErUSVJPpPRL5nnJalI=
