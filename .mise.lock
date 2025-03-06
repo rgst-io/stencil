@@ -2,9 +2,15 @@
 version = "1.2.4"
 backend = "core:bun"
 
+[tools.bun.checksums]
+"bun-darwin-aarch64.zip" = "sha256:fd4702870bbb911836469a703aee7c1c7dbafc7cd8fc580429ba2dda18bb5aa1"
+
 [tools.go]
 version = "1.24.1"
 backend = "core:go"
+
+[tools.go.checksums]
+"go1.24.1.darwin-arm64.tar.gz" = "sha256:295581b5619acc92f5106e5bcb05c51869337eb19742fdfa6c8346c18e78ff88"
 
 [tools."go:github.com/golangci/golangci-lint/cmd/golangci-lint"]
 version = "1.64.6"
@@ -15,7 +21,7 @@ version = "latest"
 backend = "go:github.com/thenativeweb/get-next-version"
 
 [tools."go:golang.org/x/tools/cmd/goimports"]
-version = "0.30.0"
+version = "0.31.0"
 backend = "go:golang.org/x/tools/cmd/goimports"
 
 [tools."go:gotest.tools/gotestsum"]
@@ -23,7 +29,7 @@ version = "1.12.0"
 backend = "go:gotest.tools/gotestsum"
 
 [tools."go:mvdan.cc/sh/v3/cmd/shfmt"]
-version = "3.10.0"
+version = "3.11.0"
 backend = "go:mvdan.cc/sh/v3/cmd/shfmt"
 
 [tools."go:sigs.k8s.io/mdtoc"]
@@ -33,6 +39,9 @@ backend = "go:sigs.k8s.io/mdtoc"
 [tools."ubi:goreleaser/goreleaser"]
 version = "2.7.0"
 backend = "ubi:goreleaser/goreleaser"
+
+[tools."ubi:goreleaser/goreleaser".checksums]
+goreleaser-macos-aarch64 = "sha256:59363d84429648399ba1d0f5fa838ddb25c8454bec28522fb01278080f7724a4"
 
 [tools."ubi:orhun/git-cliff"]
 version = "2.8.0"
