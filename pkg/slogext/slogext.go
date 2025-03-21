@@ -1,4 +1,4 @@
-// Copyright (C) 2024 stencil contributors
+// Copyright (C) 2025 stencil contributors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ type Logger interface {
 	With(...any) Logger
 	WithError(error) Logger
 	SetLevel(charmlog.Level)
+	GetHandler() slog.Handler
 }
 
 // Level is a logging level.
@@ -102,4 +103,10 @@ func (l *logger) Errorf(format string, args ...any) {
 // Warnf wraps Warn with a formatted message.
 func (l *logger) Warnf(format string, args ...any) {
 	l.Warn(fmt.Sprintf(format, args...))
+}
+
+// GetHandler returns the [slog.Handler] used by this logger, for
+// interoperability purposes.
+func (l *logger) GetHandler() slog.Handler {
+	return l.handler
 }

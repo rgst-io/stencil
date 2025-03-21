@@ -1,4 +1,4 @@
-// Copyright (C) 2024 stencil contributors
+// Copyright (C) 2025 stencil contributors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
