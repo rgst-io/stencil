@@ -1,11 +1,11 @@
 [tools.bun]
-version = "1.2.4"
+version = "1.2.5"
 backend = "core:bun"
 
 [tools.bun.checksums]
-"bun-darwin-aarch64.zip" = "sha256:fd4702870bbb911836469a703aee7c1c7dbafc7cd8fc580429ba2dda18bb5aa1"
-"bun-linux-aarch64.zip" = "sha256:694a1b39ad3560f3fc7c8e0ac42df277d7ac4f28fe373646104000ddff9ae85c"
-"bun-linux-x64-baseline.zip" = "sha256:e03eb2559a61af0cfb7acf3e59272d55613ef14078f156f7b22512456caa0f8b"
+"bun-darwin-aarch64.zip" = "sha256:55e6520a172e22a37d4822f23afde90b26f36880ce3eaad348699418dbf788bb"
+"bun-linux-aarch64.zip" = "sha256:ee1b5cabb5fdbb25640787e329846ef41384ca8699db504f45bfee015f348b58"
+"bun-linux-x64-baseline.zip" = "sha256:0e61e7932b0b63b7416028da4be8479562e16b880b3a8e07b6ed457d6d0322e3"
 
 [tools.go]
 version = "1.24.1"
@@ -41,13 +41,13 @@ version = "1.4.0"
 backend = "go:sigs.k8s.io/mdtoc"
 
 [tools."ubi:goreleaser/goreleaser"]
-version = "2.7.0"
+version = "2.8.1"
 backend = "ubi:goreleaser/goreleaser"
 
 [tools."ubi:goreleaser/goreleaser".checksums]
-goreleaser-linux-aarch64 = "sha256:b71d24c60c9e46b3362f1f60de6824854a99c5bab4c3a074ca574d61623cbaa8"
-goreleaser-linux-x86_64 = "sha256:20688b4fe60a116298eefc6f8765e1f0b1e34b8324acad0af6b2d66d0e540cd0"
-goreleaser-macos-aarch64 = "sha256:59363d84429648399ba1d0f5fa838ddb25c8454bec28522fb01278080f7724a4"
+goreleaser-linux-aarch64 = "sha256:0dc6a70be7c0cdc0ff155721b8a1cbf4a47766d002d6d489c98a57912addc64e"
+goreleaser-linux-x86_64 = "sha256:b5e71e67c65a668137a415b5c8952e8f3869bd1f72078fd4848ff78cd8a094f6"
+goreleaser-macos-aarch64 = "sha256:368a8d48377698c2c782d7b9b4a4a8ea1a928b5556001216384626aefd6ec266"
 
 [tools."ubi:orhun/git-cliff"]
 version = "2.8.0"
