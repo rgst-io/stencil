@@ -15,6 +15,7 @@
 
 // Description: This file contains the logic and type for a template
 // that is being rendered by stencil.
+
 package codegen
 
 import (
@@ -75,6 +76,7 @@ type Template struct {
 	Library bool
 }
 
+// NewTemplateOpts contains options for creating a new [Template].
 type NewTemplateOpts struct {
 	// Enable the adoptMode option for the Template file (see [codegen.Template.adoptMode])
 	Adopt bool

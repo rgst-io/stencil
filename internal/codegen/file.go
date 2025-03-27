@@ -21,6 +21,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/pkg/errors"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
@@ -187,7 +188,9 @@ func (f *File) Write(log slogext.Logger, dryRun bool) error {
 		action = "Deleted"
 
 		if !dryRun {
-			os.Remove(f.Name())
+			if err := os.Remove(f.Name()); err != nil && !errors.Is(err, os.ErrNotExist) {
+				return err
+			}
 		}
 	} else if f.Skipped {
 		action = "Skipped"
@@ -197,10 +200,11 @@ func (f *File) Write(log slogext.Logger, dryRun bool) error {
 
 	if action == "Created" || action == "Updated" {
 		if !dryRun {
-			if err := os.MkdirAll(filepath.Dir(f.Name()), 0o755); err != nil {
+			if err := os.MkdirAll(filepath.Dir(f.Name()), 0o750); err != nil {
 				return fmt.Errorf("failed to create directory %q: %w", filepath.Dir(f.Name()), err)
 			}
 
+			//nolint:gosec // Why: By design.
 			if err := os.WriteFile(f.Name(), f.Bytes(), f.Mode()); err != nil {
 				return fmt.Errorf("failed to write file %q: %w", f.Name(), err)
 			}

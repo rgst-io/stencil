@@ -2,17 +2,14 @@
 # Default versions of tools, to update these, set [tools.override]
 [tools]
 bun = "latest"
+git-cliff = "latest"
 golang = "1.24.1"
-"go:gotest.tools/gotestsum" = "1.12.0"
+golangci-lint = "2.0.2"
+goreleaser = "latest"
+"go:gotest.tools/gotestsum" = "1.12.1"
 "go:golang.org/x/tools/cmd/goimports" = "latest"
 "go:mvdan.cc/sh/v3/cmd/shfmt" = "latest"
 "go:github.com/thenativeweb/get-next-version" = "latest"
-"go:sigs.k8s.io/mdtoc" = "latest"
-# FIXME(jaredallard): Disabled until OOM issue is fixed.
-# "ubi:golangci/golangci-lint" = "1.64.6"
-"go:github.com/golangci/golangci-lint/cmd/golangci-lint" = "1.64.6"
-"ubi:goreleaser/goreleaser" = "2"
-"ubi:orhun/git-cliff" = "2"
 
 [tasks.build]
 description = "Build a binary for the current platform/architecture"

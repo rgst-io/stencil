@@ -84,6 +84,7 @@ func uriForModule(name, replacement string) string {
 	return replacement
 }
 
+// NewModuleOpts contains options for creating a [Module].
 type NewModuleOpts struct {
 	// ImportPath is the import path of the module. This should be the
 	// Name field of [configuration.TemplateRepository].

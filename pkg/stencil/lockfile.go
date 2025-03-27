@@ -88,6 +88,7 @@ type Lockfile struct {
 // LoadLockfile loads a lockfile at the specified path. If 'path' is
 // empty, the default path (curdir+LockfileName) is used.
 func LoadLockfile(path string) (*Lockfile, error) {
+	//nolint:gosec // Why: Not user input.
 	f, err := os.Open(filepath.Join(path, LockfileName))
 	if err != nil {
 		return nil, err
@@ -149,6 +150,7 @@ func (lf *Lockfile) Write() error {
 	return nil
 }
 
+// PruneFiles prunes files form the lockfile.
 func (lf *Lockfile) PruneFiles(onlyFiles []string) []string {
 	missingFilesList := []*LockfileFileEntry{}
 	for _, lf := range lf.Files {
@@ -172,6 +174,7 @@ func (lf *Lockfile) PruneFiles(onlyFiles []string) []string {
 	return missingFilenames
 }
 
+// PruneModules prunes modules from the lockfile
 func (lf *Lockfile) PruneModules(newModuleNames, onlyModules []string) []string {
 	missingModulesList := []*LockfileModuleEntry{}
 	for _, lf := range lf.Modules {

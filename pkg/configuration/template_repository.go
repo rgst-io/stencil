@@ -102,6 +102,7 @@ type ModuleHook struct {
 // In most cases, you should use LoadDefaultTemplateRepositoryManifest
 // instead as it contains the standard locations for a manifest.
 func LoadTemplateRepositoryManifest(path string) (*TemplateRepositoryManifest, error) {
+	//nolint:gosec // Why: Not user input.
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err

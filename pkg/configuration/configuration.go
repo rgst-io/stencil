@@ -37,6 +37,7 @@ const ValidateNameRegexp = `^[_a-z][_a-z0-9-]*$`
 // contains the standard locations for a manifest as well as
 // getoutreach/stencil interop.
 func LoadManifest(path string) (*Manifest, error) {
+	//nolint:gosec // Why: This is required for it to work.
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err

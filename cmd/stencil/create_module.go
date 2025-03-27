@@ -31,6 +31,7 @@ import (
 // encodeToFile encodes the provided data [d] to the provided file path,
 // it is done by streaming to the created file.
 func encodeToFile(d any, outputFilePath string) error {
+	//nolint:gosec // Why: By design.
 	f, err := os.Create(outputFilePath)
 	if err != nil {
 		return err

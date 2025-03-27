@@ -82,6 +82,7 @@ func NewHost(log slogext.Logger) (*Host, error) {
 		return nil, err
 	}
 
+	//nolint:gosec // Why: Not user input.
 	if err := os.MkdirAll(cacheDir, 0o755); err != nil {
 		log.WithError(err).Warn("failed to create native extension cache directory, native extensions may fail to download/run")
 	}
@@ -202,6 +203,8 @@ func (h *Host) getExtensionPath(version *resolver.Version, name string) (string,
 		strings.ReplaceAll(name, "/", "--"), version.Commit,
 		filepath.Base(name),
 	)
+
+	//nolint:gosec // Why: Required for it to work. Already sanitized.
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return "", fmt.Errorf("failed to create directory: %w", err)
 	}
@@ -263,6 +266,7 @@ func (h *Host) downloadFromRemote(ctx context.Context, source, name string, vers
 	syscall.ForkLock.RLock()
 	defer syscall.ForkLock.RUnlock()
 
+	//nolint:gosec // Why: By design.
 	f, err := os.OpenFile(dlPath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0o755)
 	if err != nil {
 		return "", fmt.Errorf("failed to create file: %w", err)

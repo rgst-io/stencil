@@ -7,6 +7,10 @@ backend = "core:bun"
 "bun-linux-aarch64.zip" = "sha256:ee1b5cabb5fdbb25640787e329846ef41384ca8699db504f45bfee015f348b58"
 "bun-linux-x64-baseline.zip" = "sha256:0e61e7932b0b63b7416028da4be8479562e16b880b3a8e07b6ed457d6d0322e3"
 
+[tools.git-cliff]
+version = "2.8.0"
+backend = "asdf:git-cliff"
+
 [tools.go]
 version = "1.24.1"
 backend = "core:go"
@@ -15,10 +19,6 @@ backend = "core:go"
 "go1.24.1.darwin-arm64.tar.gz" = "sha256:295581b5619acc92f5106e5bcb05c51869337eb19742fdfa6c8346c18e78ff88"
 "go1.24.1.linux-amd64.tar.gz" = "sha256:cb2396bae64183cdccf81a9a6df0aea3bce9511fc21469fb89a0c00470088073"
 "go1.24.1.linux-arm64.tar.gz" = "sha256:8df5750ffc0281017fb6070fba450f5d22b600a02081dceef47966ffaf36a3af"
-
-[tools."go:github.com/golangci/golangci-lint/cmd/golangci-lint"]
-version = "1.64.6"
-backend = "go:github.com/golangci/golangci-lint/cmd/golangci-lint"
 
 [tools."go:github.com/thenativeweb/get-next-version"]
 version = "latest"
@@ -29,30 +29,21 @@ version = "0.31.0"
 backend = "go:golang.org/x/tools/cmd/goimports"
 
 [tools."go:gotest.tools/gotestsum"]
-version = "1.12.0"
+version = "1.12.1"
 backend = "go:gotest.tools/gotestsum"
 
 [tools."go:mvdan.cc/sh/v3/cmd/shfmt"]
 version = "3.11.0"
 backend = "go:mvdan.cc/sh/v3/cmd/shfmt"
 
-[tools."go:sigs.k8s.io/mdtoc"]
-version = "1.4.0"
-backend = "go:sigs.k8s.io/mdtoc"
+[tools.golangci-lint]
+version = "2.0.2"
+backend = "asdf:golangci-lint"
 
-[tools."ubi:goreleaser/goreleaser"]
+[tools.goreleaser]
 version = "2.8.1"
 backend = "ubi:goreleaser/goreleaser"
 
-[tools."ubi:goreleaser/goreleaser".checksums]
+[tools.goreleaser.checksums]
 goreleaser-linux-aarch64 = "sha256:0dc6a70be7c0cdc0ff155721b8a1cbf4a47766d002d6d489c98a57912addc64e"
 goreleaser-linux-x86_64 = "sha256:b5e71e67c65a668137a415b5c8952e8f3869bd1f72078fd4848ff78cd8a094f6"
-goreleaser-macos-aarch64 = "sha256:368a8d48377698c2c782d7b9b4a4a8ea1a928b5556001216384626aefd6ec266"
-
-[tools."ubi:orhun/git-cliff"]
-version = "2.8.0"
-backend = "ubi:orhun/git-cliff"
-
-[tools."ubi:orhun/git-cliff".checksums]
-git-cliff-linux-aarch64 = "sha256:f4887b3cd7686fd2559eb8f4c38ec0ac963f118ceb3d2a0a33c5ab04c61e8d81"
-git-cliff-linux-x86_64 = "sha256:8290346a28e6c6f055594ff06bf8bd4d6d6d67ef84b9065d372df6f09e14ec35"

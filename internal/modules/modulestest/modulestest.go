@@ -37,6 +37,7 @@ import (
 
 // addTemplateToFS adds a template to a billy.Filesystem
 func addTemplateToFS(fs billy.Filesystem, tpl string) error {
+	//nolint:gosec // Why: Test library.
 	srcFile, err := os.Open(tpl)
 	if err != nil {
 		return errors.Wrapf(err, "failed to open template file %q", tpl)
@@ -54,8 +55,8 @@ func addTemplateToFS(fs billy.Filesystem, tpl string) error {
 	return errors.Wrapf(err, "failed to copy template %q to memfs", tpl)
 }
 
-// NewModuleFromTemplate creates a module with the provided template
-// being the only file in the module.
+// NewModuleFromTemplates creates a module with the provided template(s)
+// being the only file(s) in the module.
 func NewModuleFromTemplates(manifest *configuration.TemplateRepositoryManifest,
 	templates ...string) (*modules.Module, error) {
 	fs := memfs.New()

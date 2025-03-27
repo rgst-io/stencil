@@ -28,6 +28,7 @@ import (
 // _ ensures that the logger struct satisfies the Logger interface.
 var _ Logger = &logger{}
 
+// Logger is a [slog.Logger] interface with extra functionality.
 type Logger interface {
 	Info(string, ...any)
 	Infof(string, ...any)
@@ -46,12 +47,22 @@ type Logger interface {
 // Level is a logging level.
 type Level = charmlog.Level
 
+// Contains valid [Level] values.
 const (
-	DebugLevel = charmlog.DebugLevel
-	InfoLevel  = charmlog.InfoLevel
-	WarnLevel  = charmlog.WarnLevel
-	ErrorLevel = charmlog.ErrorLevel
-	FatalLevel = charmlog.FatalLevel
+	// DebugLevel is for debug level logs.
+	DebugLevel Level = charmlog.DebugLevel
+
+	// InfoLevel is for info level logs.
+	InfoLevel Level = charmlog.InfoLevel
+
+	// WarnLevel is for warn level logs.
+	WarnLevel Level = charmlog.WarnLevel
+
+	// ErrorLevel is for error level logs
+	ErrorLevel Level = charmlog.ErrorLevel
+
+	// FatalLevel is for fatal level logs.
+	FatalLevel Level = charmlog.FatalLevel
 )
 
 // New creates a new logger using the slog package.

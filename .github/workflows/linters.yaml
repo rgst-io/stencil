@@ -61,7 +61,7 @@ jobs:
           echo "version=$(mise current "go:github.com/golangci/golangci-lint/cmd/golangci-lint")" >> "$GITHUB_OUTPUT"
         id: golangci_lint
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           version: v${{ steps.golangci_lint.outputs.version }}
           args: --timeout=30m

@@ -14,6 +14,7 @@
 // limitations under the License.
 
 // Description: Implements the stencil function passed to templates
+
 package codegen
 
 import (

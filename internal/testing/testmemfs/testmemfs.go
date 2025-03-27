@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package testmemfs is a helper for tests that rely on the filesystem.
 package testmemfs
 
 import (

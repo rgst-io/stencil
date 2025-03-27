@@ -18,10 +18,18 @@ package apiv1
 
 import "go.rgst.io/stencil/v2/internal/modules/nativeext/apiv1"
 
+// Contains aliases to make them accessible to consumers.
 const (
-	Version     = apiv1.Version
-	Name        = apiv1.Name
-	CookieKey   = apiv1.CookieKey
+	// Version is an alias to [apiv1.Version]
+	Version = apiv1.Version
+
+	// Name is an alias to [apiv1.Name].
+	Name = apiv1.Name
+
+	// CookieKey is an alias to [apiv1.CookieKey].
+	CookieKey = apiv1.CookieKey
+
+	// CookieValue is an alias to [apiv1.CookieValue].
 	CookieValue = apiv1.CookieValue
 )
 
@@ -39,4 +47,6 @@ type TemplateFunctionExec = apiv1.TemplateFunctionExec
 // host.
 type Config = apiv1.Config
 
+// NewExtensionImplementation is an alias to
+// [apiv1.NewExtensionImplementation] to allow usage of it by consumers.
 var NewExtensionImplementation = apiv1.NewExtensionImplementation

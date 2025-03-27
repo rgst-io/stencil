@@ -1,9 +1,7 @@
 {
-	// TODO(jaredallard): Deviated from stencil-golang.
 	"go.lintTool": "golangci-lint",
 	"go.formatTool": "goimports",
 	"go.useLanguageServer": true,
-	"go.testFlags": ["-v"],
 	"files.trimTrailingWhitespace": true,
 	"editor.formatOnSave": true,
 	"shellcheck.customArgs": ["-P", "SCRIPTDIR", "-x"],
@@ -12,13 +10,5 @@
 	},
 	"[yaml]": {
 		"editor.defaultFormatter": "redhat.vscode-yaml"
-	},
-	"cSpell.words": ["codegen", "getoutreach", "gogit", "templating", "worktree"],
-	"cSpell.words": ["codegen", "gogit", "templating", "worktree"],
-
-	// Schema support OOTB.
-	"yaml.schemas": {
-		"schemas/manifest.jsonschema.json": ["manifest.yaml"],
-		"schemas/stencil.jsonschema.json": ["stencil.yaml"]
 	}
 }

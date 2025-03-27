@@ -77,7 +77,7 @@ func entrypoint(ctx context.Context, args []string) error {
 	// Need to setup QEMU
 	if runtime.GOOS == "linux" {
 		fmt.Println(" [update-mise-lock] Ensuring QEMU emulation is configured (binfmt)")
-		//nolint:errcheck // Why: Best effort.
+		//nolint:gosec,errcheck // Why: Best effort.
 		cmdexec.CommandContext(ctx, "docker", "run", "--privileged", "--rm", "tonistiigi/binfmt", "--uninstall", "all").Run()
 		cmd := cmdexec.CommandContext(ctx, "docker", "run", "--privileged", "--rm", "tonistiigi/binfmt", "--install", "all")
 		cmd.UseOSStreams(true)
