@@ -119,8 +119,8 @@ github.com/huandu/xstrings v1.5.0 h1:2ag3IFq9ZDANvthTwTiqSSZLjDc+BedvHPAp5tJy2TI
 github.com/huandu/xstrings v1.5.0/go.mod h1:y5/lhBue+AyNmUVz9RLU9xbLR0o4KIIExikq4ovT0aE=
 github.com/jamespfennell/xz v0.1.2 h1:iCw5kScLfGCceOKgQaGuj5RilAAlV4iiwauYntak2oU=
 github.com/jamespfennell/xz v0.1.2/go.mod h1:DhpWvZY1xDkK/6BREFl3c3R/fZh7IBdYq2m7xh4uLl0=
-github.com/jaredallard/archives v1.0.0 h1:x6weFBLlp3crfLfRPDuHcMdG+5gnsx7KiDeycns3eRM=
-github.com/jaredallard/archives v1.0.0/go.mod h1:fvpez+QAtT6OHiiPsEq41wuWQb9C09HKFT/4+4p4JHQ=
+github.com/jaredallard/archives v1.0.1 h1:3bh7LxIeKsk1HriIvpG8WtRFYrdu3O44Bo4wxg6kqWI=
+github.com/jaredallard/archives v1.0.1/go.mod h1:JOlx/hhUSK9qcs/wMjz5sbC8R9zDF9pmMLS9iUinGuk=
 github.com/jaredallard/cmdexec v1.2.2 h1:96xWYRM7mAM7PZTO7Y2q2GREtC857CYPzWN5cfYVT+A=
 github.com/jaredallard/cmdexec v1.2.2/go.mod h1:cwOAlWkQmZOGRjiSMQVSL9GZ2eThrxEadpmo5N9nKlI=
 github.com/jaredallard/vcs v0.5.2 h1:0jUHef38j72Ah03JoSC11r4H4ctBwaHgMSBYOxi8xEI=
@@ -131,8 +131,8 @@ github.com/jhump/protoreflect v1.15.1 h1:HUMERORf3I3ZdX05WaQ6MIpd/NJ434hTp5YiKgf
 github.com/jhump/protoreflect v1.15.1/go.mod h1:jD/2GMKKE6OqX8qTjhADU1e6DShO+gavG9e0Q693nKo=
 github.com/kevinburke/ssh_config v1.2.0 h1:x584FjTGwHzMwvHx18PXxbBVzfnxogHaAReU4gf13a4=
 github.com/kevinburke/ssh_config v1.2.0/go.mod h1:CT57kijsi8u/K/BOFA39wgDQJ9CxiF4nAY/ojJ6r6mM=
-github.com/klauspost/compress v1.17.11 h1:In6xLpyWOi1+C7tXUUWv2ot1QvBjxevKAaI6IXrJmUc=
-github.com/klauspost/compress v1.17.11/go.mod h1:pMDklpSncoRMuLFrf1W9Ss9KT+0rH90U12bZKk7uwG0=
+github.com/klauspost/compress v1.18.0 h1:c/Cqfb0r+Yi+JtIEq73FWXVkRonBlf0CRNYc8Zttxdo=
+github.com/klauspost/compress v1.18.0/go.mod h1:2Pp+KzxcywXVXMr50+X0Q/Lsb43OQHYWRCY2AiWywWQ=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pretty v0.3.1 h1:flRD4NNwYAUpkphVc1HcthR4KEIFJ65n8Mw5qdRn3LE=
 github.com/kr/pretty v0.3.1/go.mod h1:hoEshYVHaxMs3cyo3Yncou5ZscifuDolrwPKZanG3xk=
