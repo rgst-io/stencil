@@ -15,10 +15,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/pkg/errors"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"go.rgst.io/stencil/v2/pkg/stencil"
@@ -45,7 +46,7 @@ func NewLockfilePruneCommand(log slogext.Logger) *cli.Command {
 					"passed module names for pruning",
 			},
 		},
-		Action: func(c *cli.Context) error {
+		Action: func(_ context.Context, c *cli.Command) error {
 			l, err := stencil.LoadLockfile("")
 			if err != nil {
 				return errors.Wrap(err, "failed to load lockfile")

@@ -20,7 +20,7 @@ import (
 	"sort"
 
 	"github.com/mitchellh/hashstructure/v2"
-	"github.com/puzpuzpuz/xsync/v3"
+	"github.com/puzpuzpuz/xsync/v4"
 )
 
 // hashModuleHookValue hashes the module hook value using the
@@ -70,18 +70,18 @@ type exportedFunction struct {
 type sharedState struct {
 	// functions is a map of modules to templates that have been exported
 	// through [TplModule].
-	Functions   *xsync.MapOf[string, exportedFunction]
-	Globals     *xsync.MapOf[string, global]
-	ModuleHooks *xsync.MapOf[string, moduleHook]
+	Functions   *xsync.Map[string, exportedFunction]
+	Globals     *xsync.Map[string, global]
+	ModuleHooks *xsync.Map[string, moduleHook]
 }
 
 // newSharedState returns an initialized (empty underlying maps)
 // sharedData type.
 func newSharedState() *sharedState {
 	return &sharedState{
-		Functions:   xsync.NewMapOf[string, exportedFunction](),
-		ModuleHooks: xsync.NewMapOf[string, moduleHook](),
-		Globals:     xsync.NewMapOf[string, global](),
+		Functions:   xsync.NewMap[string, exportedFunction](),
+		ModuleHooks: xsync.NewMap[string, moduleHook](),
+		Globals:     xsync.NewMap[string, global](),
 	}
 }
 

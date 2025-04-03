@@ -7,11 +7,10 @@ import (
 	"testing"
 
 	"github.com/jaredallard/cmdexec"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"gotest.tools/v3/assert"
-	"gotest.tools/v3/env"
 )
 
 // prepareTestRun sets up the environment for running a stencil command.
@@ -25,30 +24,21 @@ func prepareTestRun(t *testing.T, dir string) {
 	assert.NilError(t, err)
 	repoRoot := strings.TrimSuffix(strings.TrimSpace(string(b)), "/go.mod")
 
-	env.ChangeWorkingDir(t, repoRoot)
+	t.Chdir(repoRoot)
 
 	// Use a temporary directory for the test if one is not provided.
 	if dir == "" {
 		dir = t.TempDir()
 	}
-	env.ChangeWorkingDir(t, dir)
+	t.Chdir(dir)
 }
 
-// testRunApp runs the provided cli.App with the provided arguments.
-func testRunApp(t *testing.T, dir string, app *cli.App, args ...string) error {
-	prepareTestRun(t, dir)
-
-	return app.Run(append([]string{"test"}, args...))
-}
-
-// testRunCommand runs a command with the provided arguments. It does
-// not support global flags.
+// testRunCommand runs the provided [cli.Command].
 func testRunCommand(t *testing.T, cmd *cli.Command, dir string, args ...string) error {
 	prepareTestRun(t, dir)
 
-	app := cli.NewApp()
-	app.Commands = []*cli.Command{cmd}
-	return app.Run(append([]string{"test", cmd.Name}, args...))
+	wCmd := &cli.Command{Name: "test", Commands: []*cli.Command{cmd}}
+	return wCmd.Run(t.Context(), append([]string{"test", cmd.Name}, args...))
 }
 
 func TestCanCreateModule(t *testing.T) {

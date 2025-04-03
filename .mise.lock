@@ -12,13 +12,13 @@ version = "2.8.0"
 backend = "asdf:git-cliff"
 
 [tools.go]
-version = "1.24.1"
+version = "1.24.2"
 backend = "core:go"
 
 [tools.go.checksums]
-"go1.24.1.darwin-arm64.tar.gz" = "sha256:295581b5619acc92f5106e5bcb05c51869337eb19742fdfa6c8346c18e78ff88"
-"go1.24.1.linux-amd64.tar.gz" = "sha256:cb2396bae64183cdccf81a9a6df0aea3bce9511fc21469fb89a0c00470088073"
-"go1.24.1.linux-arm64.tar.gz" = "sha256:8df5750ffc0281017fb6070fba450f5d22b600a02081dceef47966ffaf36a3af"
+"go1.24.2.darwin-arm64.tar.gz" = "sha256:b70f8b3c5b4ccb0ad4ffa5ee91cd38075df20fdbd953a1daedd47f50fbcff47a"
+"go1.24.2.linux-amd64.tar.gz" = "sha256:68097bd680839cbc9d464a0edce4f7c333975e27a90246890e9f1078c7e702ad"
+"go1.24.2.linux-arm64.tar.gz" = "sha256:756274ea4b68fa5535eb9fe2559889287d725a8da63c6aae4d5f23778c229f4b"
 
 [tools."go:github.com/thenativeweb/get-next-version"]
 version = "latest"
