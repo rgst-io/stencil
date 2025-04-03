@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       ## <<Stencil::Block(releaseSetup)>>
-      - uses: actions/create-github-app-token@v1
+      - uses: actions/create-github-app-token@v2
         id: homebrew-tap-github-app
         with:
           # https://github.com/organizations/rgst-io/settings/apps/rgst-io-stencil-homebrew
