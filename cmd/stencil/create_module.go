@@ -15,14 +15,14 @@
 package main
 
 import (
-	"flag"
+	"context"
 	"fmt"
 	"os"
 	"path"
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"gopkg.in/yaml.v3"
@@ -95,10 +95,10 @@ func NewCreateModuleCommand(log slogext.Logger) *cli.Command {
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:  "native-extension",
-				Usage: "Generate a module with a native extension. ",
+				Usage: "Generate a module with a native extension",
 			},
 		},
-		Action: func(c *cli.Context) error {
+		Action: func(ctx context.Context, c *cli.Command) error {
 			var stencilManifestName = "stencil.yaml"
 
 			// ensure we have a name
@@ -113,6 +113,9 @@ func NewCreateModuleCommand(log slogext.Logger) *cli.Command {
 			// sense to generate broken templates on some other VCS provider.
 			// Note that you can still have template modules on, say, Gitlab,
 			// but we just can't generate them (yet!).
+			//
+			// TODO(jaredallard): We support forgejo now, for instance, so we
+			// should remove this.
 			if !strings.HasPrefix(moduleName, "github.com/") {
 				return fmt.Errorf("currently, only github based modules are supported")
 			}
@@ -143,7 +146,8 @@ func NewCreateModuleCommand(log slogext.Logger) *cli.Command {
 			}
 
 			// Run the standard stencil command.
-			if err := NewStencilAction(log)(cli.NewContext(c.App, flag.NewFlagSet("", flag.ExitOnError), c)); err != nil {
+			cmd := NewStencil(log)
+			if err := cmd.Run(ctx, []string{os.Args[0]}); err != nil {
 				return err
 			}
 

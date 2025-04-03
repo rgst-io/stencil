@@ -15,9 +15,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	"go.rgst.io/stencil/v2/internal/cmd/stencil"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
@@ -31,8 +32,8 @@ func NewUpgradeCommand(log slogext.Logger) *cli.Command {
 		Usage:       "upgrade stencil modules",
 		Description: "Runs stencil with newer modules and updates stencil.lock to use them",
 		UsageText:   "upgrade",
-		Action: func(c *cli.Context) error {
-			log.Infof("stencil %s", c.App.Version)
+		Action: func(ctx context.Context, c *cli.Command) error {
+			log.Infof("stencil %s", c.Root().Version)
 
 			if c.Bool("debug") {
 				log.SetLevel(slogext.DebugLevel)
@@ -44,7 +45,7 @@ func NewUpgradeCommand(log slogext.Logger) *cli.Command {
 				return fmt.Errorf("failed to parse stencil.yaml: %w", err)
 			}
 
-			return stencil.NewCommand(log, manifest, c.Bool("dry-run"), c.Bool("adopt")).Upgrade(c.Context)
+			return stencil.NewCommand(log, manifest, c.Bool("dry-run"), c.Bool("adopt")).Upgrade(ctx)
 		},
 	}
 }

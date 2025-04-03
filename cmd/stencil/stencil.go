@@ -18,9 +18,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 
 	"go.rgst.io/stencil/v2/internal/cmd/stencil"
 	"go.rgst.io/stencil/v2/internal/version"
@@ -32,7 +33,7 @@ import (
 //
 //nolint:gochecknoinits // Why: This is acceptable.
 func init() {
-	cli.VersionPrinter = func(_ *cli.Context) {
+	cli.VersionPrinter = func(_ *cli.Command) {
 		fmt.Println(version.Version.String())
 	}
 }
@@ -46,8 +47,8 @@ var description = "" +
 // NewStencilAction returns a new cli.ActionFunc for the plain stencil
 // command.
 func NewStencilAction(log slogext.Logger) cli.ActionFunc {
-	return func(c *cli.Context) error {
-		log.Infof("stencil %s", c.App.Version)
+	return func(ctx context.Context, c *cli.Command) error {
+		log.Infof("stencil %s", c.Root().Version)
 
 		// We don't accept arguments, a user is likely trying to run a
 		// subcommand here anyways (e.g., typo).
@@ -65,13 +66,13 @@ func NewStencilAction(log slogext.Logger) cli.ActionFunc {
 			return fmt.Errorf("failed to parse stencil.yaml: %w", err)
 		}
 
-		return stencil.NewCommand(log, manifest, c.Bool("dry-run"), c.Bool("adopt")).Run(c.Context)
+		return stencil.NewCommand(log, manifest, c.Bool("dry-run"), c.Bool("adopt")).Run(ctx)
 	}
 }
 
 // NewStencil returns a new CLI application for stencil.
-func NewStencil(log slogext.Logger) *cli.App {
-	return &cli.App{
+func NewStencil(log slogext.Logger) *cli.Command {
+	return &cli.Command{
 		Version:     version.Version.GitVersion,
 		Name:        "stencil",
 		Usage:       "a smart templating engine for project development",

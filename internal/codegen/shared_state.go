@@ -20,7 +20,7 @@ import (
 	"sort"
 
 	"github.com/mitchellh/hashstructure/v2"
-	"github.com/puzpuzpuz/xsync/v3"
+	"github.com/puzpuzpuz/xsync/v4"
 )
 
 // hashModuleHookValue hashes the module hook value using the

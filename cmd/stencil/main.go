@@ -30,7 +30,7 @@ func entrypoint(log slogext.Logger) error {
 	defer cancel()
 
 	app := NewStencil(log)
-	return app.RunContext(ctx, os.Args)
+	return app.Run(ctx, os.Args)
 }
 
 // main calls the entrypoint, logs errors, and exits with a non-zero

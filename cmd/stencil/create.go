@@ -18,7 +18,7 @@
 package main
 
 import (
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
@@ -29,7 +29,7 @@ func NewCreateCommand(log slogext.Logger) *cli.Command {
 		Name:        "create",
 		Usage:       "create a new stencil project or module",
 		Description: "Commands to create template repositories, or stencil powered repositories",
-		Subcommands: []*cli.Command{
+		Commands: []*cli.Command{
 			NewCreateModuleCommand(log),
 		},
 	}

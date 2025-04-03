@@ -27,6 +27,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/osfs"
+	"github.com/puzpuzpuz/xsync/v4"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 )
@@ -161,8 +162,8 @@ func (s *TplStencil) AddToModuleHook(module, name string, data ...any) (out stri
 	s.log.With("template", s.t.ImportPath(), "path", k, "data", spew.Sdump(data)).
 		Debug("adding to module hook")
 
-	s.s.sharedState.ModuleHooks.Compute(k, func(old moduleHook, _ bool) (moduleHook, bool) {
-		return append(old, data...), false
+	s.s.sharedState.ModuleHooks.Compute(k, func(old moduleHook, _ bool) (moduleHook, xsync.ComputeOp) {
+		return append(old, data...), xsync.UpdateOp
 	})
 
 	return "", nil

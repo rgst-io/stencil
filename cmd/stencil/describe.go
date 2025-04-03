@@ -15,6 +15,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -22,7 +23,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/urfave/cli/v2"
+	"github.com/urfave/cli/v3"
 	"go.rgst.io/stencil/v2/pkg/stencil"
 )
 
@@ -33,8 +34,9 @@ func NewDescribeCommand() *cli.Command {
 		Name:        "describe",
 		Usage:       "describe a file created by stencil",
 		Description: "Print information about a known file rendered by a template",
-		Args:        true,
-		Action: func(c *cli.Context) error {
+		// TODO(jaredallard): Switch to named arguments once
+		// https://github.com/urfave/cli/pull/2088 lands.
+		Action: func(_ context.Context, c *cli.Command) error {
 			if c.NArg() != 1 {
 				return errors.New("expected exactly one argument, path to file")
 			}
