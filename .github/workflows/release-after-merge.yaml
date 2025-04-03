@@ -1,0 +1,32 @@
+name: Trigger Release (if label is set)
+
+# Only run on closed PRs, which is both merged and unmerged. We filter
+# more in the job.
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  trigger-release:
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'release-after-merge') && github.event.pull_request.merged == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger release workflow
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.TRIGGER_WORKFLOW_GITHUB_TOKEN }}
+          script: |-
+            const response = await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'release.yaml',
+              ref: 'main'
+            });
+            console.log(response.status);
