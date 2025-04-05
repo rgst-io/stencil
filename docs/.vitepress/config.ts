@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import VitePressSidebar from 'vitepress-sidebar';
+import { generateSidebar } from 'vitepress-sidebar';
 
 const vitepressSidebarOptions = {
   documentRootPath: '/',
@@ -24,7 +24,7 @@ export default defineConfig({
 		logo: 'logo.png',
     outline: 'deep',
     nav: [],
-    sidebar: VitePressSidebar.generateSidebar(vitepressSidebarOptions),
+    sidebar: generateSidebar(vitepressSidebarOptions),
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/rgst-io/stencil' }
@@ -44,7 +44,7 @@ export default defineConfig({
     },
     footer: {
       message: 'Licensed under the Apache-2.0 License. Maintained by <a href="https://github.com/jaredallard">@jaredallard</a> and <a href="https://github.com/rgst-io/stencil/graphs/contributors">friends</a>.',
-      copyright: 'Copyright © 2024 <a href="https://github.com/jaredallard">@jaredallard</a>',
+      copyright: 'Copyright © 2025 <a href="https://github.com/jaredallard">@jaredallard</a>',
     },
   },
   markdown: {},
