@@ -23,7 +23,7 @@ require (
 	github.com/puzpuzpuz/xsync/v4 v4.0.0
 	github.com/rogpeppe/go-internal v1.14.1
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.1
-	github.com/urfave/cli/v3 v3.1.1
+	github.com/urfave/cli/v3 v3.3.2
 	golang.org/x/mod v0.24.0
 	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools/v3 v3.5.2
