@@ -195,7 +195,10 @@ func (c *Command) resolveModules(ctx context.Context, ignoreLockfile bool) ([]*m
 // Upgrade checks for upgrades to the modules in the project and
 // upgrades them if necessary. If no lockfile is present, it will
 // log a message and return without doing anything.
-func (c *Command) Upgrade(ctx context.Context) error {
+//
+// If skipRender is true, then re-render will be skipped if there's no
+// changes. Otherwise, stencil will be ran anyways.
+func (c *Command) Upgrade(ctx context.Context, skipRender bool) error {
 	if c.lock == nil {
 		c.log.Info("No lockfile found, run 'stencil' to fetch dependencies first")
 		return nil
@@ -233,7 +236,7 @@ func (c *Command) Upgrade(ctx context.Context) error {
 			hadChanges = true
 		}
 	}
-	if !hadChanges {
+	if skipRender && !hadChanges {
 		c.log.Info("No new versions found")
 		return nil
 	}
