@@ -32,6 +32,14 @@ func NewUpgradeCommand(log slogext.Logger) *cli.Command {
 		Usage:       "upgrade stencil modules",
 		Description: "Runs stencil with newer modules and updates stencil.lock to use them",
 		UsageText:   "upgrade",
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:        "skip-render-no-changes",
+				Aliases:     []string{"s"},
+				DefaultText: "Skip re-rendering templates if there's no newer versions",
+				Value:       false,
+			},
+		},
 		Action: func(ctx context.Context, c *cli.Command) error {
 			log.Infof("stencil %s", c.Root().Version)
 
@@ -45,7 +53,8 @@ func NewUpgradeCommand(log slogext.Logger) *cli.Command {
 				return fmt.Errorf("failed to parse stencil.yaml: %w", err)
 			}
 
-			return stencil.NewCommand(log, manifest, c.Bool("dry-run"), c.Bool("adopt")).Upgrade(ctx)
+			return stencil.NewCommand(log, manifest, c.Bool("dry-run"), c.Bool("adopt")).
+				Upgrade(ctx, c.Bool("skip-render-no-changes"))
 		},
 	}
 }
