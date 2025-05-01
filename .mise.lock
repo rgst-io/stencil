@@ -37,7 +37,7 @@ version = "3.11.0"
 backend = "go:mvdan.cc/sh/v3/cmd/shfmt"
 
 [tools.golangci-lint]
-version = "2.0.2"
+version = "2.1.5"
 backend = "asdf:golangci-lint"
 
 [tools.goreleaser]
