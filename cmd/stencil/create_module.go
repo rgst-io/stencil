@@ -98,15 +98,20 @@ func NewCreateModuleCommand(log slogext.Logger) *cli.Command {
 				Usage: "Generate a module with a native extension",
 			},
 		},
+		Arguments: []cli.Argument{&cli.StringArg{
+			Name:      "name",
+			UsageText: "<name>",
+		}},
 		Action: func(ctx context.Context, c *cli.Command) error {
 			var stencilManifestName = "stencil.yaml"
 
+			moduleName := c.StringArg("name")
+
 			// ensure we have a name
-			if c.NArg() != 1 {
-				return errors.New("must provide a name for the module")
+			if moduleName == "" {
+				return errors.New("expected one argument, name for the module")
 			}
 
-			moduleName := c.Args().Get(0)
 			hasNativeExt := c.Bool("native-extension")
 
 			// stencil-golang requires Github right now, so it doesn't make

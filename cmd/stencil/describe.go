@@ -34,14 +34,16 @@ func NewDescribeCommand() *cli.Command {
 		Name:        "describe",
 		Usage:       "describe a file created by stencil",
 		Description: "Print information about a known file rendered by a template",
-		// TODO(jaredallard): Switch to named arguments once
-		// https://github.com/urfave/cli/pull/2088 lands.
+		Arguments: []cli.Argument{&cli.StringArg{
+			Name:      "file",
+			UsageText: "<file>",
+		}},
 		Action: func(_ context.Context, c *cli.Command) error {
-			if c.NArg() != 1 {
+			if c.StringArg("file") == "" {
 				return errors.New("expected exactly one argument, path to file")
 			}
 
-			return describeFile(c.Args().First(), os.Stdout)
+			return describeFile(c.StringArg("file"), os.Stdout)
 		},
 	}
 }
