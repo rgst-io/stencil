@@ -1,15 +1,20 @@
 [tools.bun]
-version = "1.2.5"
+version = "1.2.10"
 backend = "core:bun"
 
 [tools.bun.checksums]
-"bun-darwin-aarch64.zip" = "sha256:55e6520a172e22a37d4822f23afde90b26f36880ce3eaad348699418dbf788bb"
-"bun-linux-aarch64.zip" = "sha256:ee1b5cabb5fdbb25640787e329846ef41384ca8699db504f45bfee015f348b58"
-"bun-linux-x64-baseline.zip" = "sha256:0e61e7932b0b63b7416028da4be8479562e16b880b3a8e07b6ed457d6d0322e3"
+"bun-darwin-aarch64.zip" = "sha256:07895ef0fb661249b86b0b723b65b1cc4790c7f3685b63cda90122b00299972c"
+"bun-linux-aarch64.zip" = "sha256:54592fd0237e3ec91a2933dff015e15a78989d97234042e7d5334a4c0ad50603"
+"bun-linux-x64-baseline.zip" = "sha256:4b62f599048ef320a761bacbeeb71f8784f5e373b976a9d53b3ee7811f19b004"
 
 [tools.git-cliff]
 version = "2.8.0"
-backend = "asdf:git-cliff"
+backend = "ubi:orhun/git-cliff"
+
+[tools.git-cliff.checksums]
+git-cliff-linux-aarch64 = "sha256:f4887b3cd7686fd2559eb8f4c38ec0ac963f118ceb3d2a0a33c5ab04c61e8d81"
+git-cliff-linux-x86_64 = "sha256:8290346a28e6c6f055594ff06bf8bd4d6d6d67ef84b9065d372df6f09e14ec35"
+git-cliff-macos-aarch64 = "sha256:79d22153ee98404f8f70359bc3846552b8a69ec461b5088bffd7a66198a1bb77"
 
 [tools.go]
 version = "1.24.2"
@@ -25,7 +30,7 @@ version = "latest"
 backend = "go:github.com/thenativeweb/get-next-version"
 
 [tools."go:golang.org/x/tools/cmd/goimports"]
-version = "0.31.0"
+version = "latest"
 backend = "go:golang.org/x/tools/cmd/goimports"
 
 [tools."go:gotest.tools/gotestsum"]
@@ -33,17 +38,23 @@ version = "1.12.1"
 backend = "go:gotest.tools/gotestsum"
 
 [tools."go:mvdan.cc/sh/v3/cmd/shfmt"]
-version = "3.11.0"
+version = "latest"
 backend = "go:mvdan.cc/sh/v3/cmd/shfmt"
 
 [tools.golangci-lint]
 version = "2.1.5"
-backend = "asdf:golangci-lint"
+backend = "aqua:golangci-lint"
+
+[tools.golangci-lint.checksums]
+"golangci-lint-2.1.5-darwin-arm64.tar.gz" = "sha256:de757442ad87df8b094afb610ea92f85a8e46c687b496a3b8d708c94dec16526"
+"golangci-lint-2.1.5-linux-amd64.tar.gz" = "sha256:8c71aea61ce6ef83f32c23a0067ba5b6b7064043767bcb99ddfdd6678e3c7644"
+"golangci-lint-2.1.5-linux-arm64.tar.gz" = "sha256:76ef18939e16308b01a90d2e28abd5ce888435fa25467c432dc0da9469f998c9"
 
 [tools.goreleaser]
-version = "2.8.1"
-backend = "ubi:goreleaser/goreleaser"
+version = "2.8.2"
+backend = "aqua:goreleaser"
 
 [tools.goreleaser.checksums]
-goreleaser-linux-aarch64 = "sha256:0dc6a70be7c0cdc0ff155721b8a1cbf4a47766d002d6d489c98a57912addc64e"
-goreleaser-linux-x86_64 = "sha256:b5e71e67c65a668137a415b5c8952e8f3869bd1f72078fd4848ff78cd8a094f6"
+"goreleaser_Darwin_all.tar.gz" = "sha256:7331f6217ba3683a3b2e7c726d55aa6add3f3991716a87dd08533312464f24bf"
+"goreleaser_Linux_arm64.tar.gz" = "sha256:ebf55249a59a4073b89379316953b3ce2e7505e5980f9c22e23399aa4679be69"
+"goreleaser_Linux_x86_64.tar.gz" = "sha256:847e2105d50da9133e567cf5450cd437ae29181cabf13ad42683151ba0f5b587"
