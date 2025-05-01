@@ -94,6 +94,7 @@ func NewStencil(log slogext.Logger) *cli.Command {
 				Usage: "Uses heuristics to detect code that should go into blocks to assist with first-time adoption of templates",
 			},
 		},
+		EnableShellCompletion: true,
 		Commands: []*cli.Command{
 			NewDescribeCommand(),
 			NewCreateCommand(log),

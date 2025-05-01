@@ -38,6 +38,9 @@ func NewDescribeCommand() *cli.Command {
 			Name:      "file",
 			UsageText: "<file>",
 		}},
+		// Empty function means the file-system will be looked at instead of
+		// trying to generate our own completion.
+		ShellComplete: func(ctx context.Context, c *cli.Command) {},
 		Action: func(_ context.Context, c *cli.Command) error {
 			if c.StringArg("file") == "" {
 				return errors.New("expected exactly one argument, path to file")
