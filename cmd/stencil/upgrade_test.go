@@ -40,20 +40,25 @@ func selectUpgradeCanary(t *testing.T, dir string) string {
 }
 
 // writeML writes the provided manifest and lock to their known
-// locations in the provided directory.
+// locations in the provided directory. If any of the provided manifest
+// or lockfile arguments are nil, they are not written to disk.
 func writeML(t *testing.T, mf *configuration.Manifest, lock *stencil.Lockfile, dir string) {
-	// Write the manifest and lockfile to disk
-	mfBytes, err := yaml.Marshal(mf)
-	assert.NilError(t, err, "failed to marshal manifest")
+	if mf != nil {
+		// Write the manifest and lockfile to disk
+		mfBytes, err := yaml.Marshal(mf)
+		assert.NilError(t, err, "failed to marshal manifest")
 
-	lockBytes, err := yaml.Marshal(lock)
-	assert.NilError(t, err, "failed to marshal lockfile")
+		err = os.WriteFile(filepath.Join(dir, "stencil.yaml"), mfBytes, 0o644)
+		assert.NilError(t, err, "failed to write manifest")
+	}
 
-	err = os.WriteFile(filepath.Join(dir, "stencil.yaml"), mfBytes, 0o644)
-	assert.NilError(t, err, "failed to write manifest")
+	if lock != nil {
+		lockBytes, err := yaml.Marshal(lock)
+		assert.NilError(t, err, "failed to marshal lockfile")
 
-	os.WriteFile(filepath.Join(dir, stencil.LockfileName), lockBytes, 0o644)
-	assert.NilError(t, err, "failed to write lockfile")
+		os.WriteFile(filepath.Join(dir, stencil.LockfileName), lockBytes, 0o644)
+		assert.NilError(t, err, "failed to write lockfile")
+	}
 }
 
 // TestCanUpgradeModules tests that the upgrade command can upgrade
@@ -192,4 +197,33 @@ func TestUpgradeDoesNotReRunStencilWhenTold(t *testing.T) {
 
 	_, err := os.Stat(file)
 	assert.ErrorIs(t, err, os.ErrNotExist, "expected file %s to not exist", file)
+}
+
+// TestCanRunWithoutLock ensures that stencil upgrade can be ran without
+// a lock file, but do nothing.
+func TestCanRunWithoutLock(t *testing.T) {
+	tmpDir := t.TempDir()
+
+	cmd := NewUpgradeCommand(slogext.NewTestLogger(t))
+	assert.Assert(t, cmd != nil, "expected NewUpgradeCommand() to not return nil")
+
+	// Create a project that consumes stencil-golang at a known low
+	// version. If it upgrades, we consider success. Given this is a
+	// high-level test, we rely on other unit tests to ensure that the
+	// underlying resolver works as expected.
+	writeML(t, &configuration.Manifest{
+		Name: "testing",
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Arguments: map[string]any{
+			"org": "rgst-io",
+		},
+	}, nil, tmpDir)
+
+	assert.NilError(t, testRunCommand(t, cmd, tmpDir), "expected stencil to not fail")
+
+	dirs, err := os.ReadDir(tmpDir)
+	assert.NilError(t, err, "expected ReadDir() to not fail")
+	assert.Equal(t, len(dirs), 1, "expected stencil to have not ran")
 }
