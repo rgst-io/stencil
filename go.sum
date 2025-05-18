@@ -125,8 +125,8 @@ github.com/jamespfennell/xz v0.1.2 h1:iCw5kScLfGCceOKgQaGuj5RilAAlV4iiwauYntak2o
 github.com/jamespfennell/xz v0.1.2/go.mod h1:DhpWvZY1xDkK/6BREFl3c3R/fZh7IBdYq2m7xh4uLl0=
 github.com/jaredallard/archives v1.0.1 h1:3bh7LxIeKsk1HriIvpG8WtRFYrdu3O44Bo4wxg6kqWI=
 github.com/jaredallard/archives v1.0.1/go.mod h1:JOlx/hhUSK9qcs/wMjz5sbC8R9zDF9pmMLS9iUinGuk=
-github.com/jaredallard/cmdexec v1.2.2 h1:96xWYRM7mAM7PZTO7Y2q2GREtC857CYPzWN5cfYVT+A=
-github.com/jaredallard/cmdexec v1.2.2/go.mod h1:cwOAlWkQmZOGRjiSMQVSL9GZ2eThrxEadpmo5N9nKlI=
+github.com/jaredallard/cmdexec v1.3.0 h1:hn+N8gQJUm2j9kUwxA3db9Tl98+ebEOT/PeHWw/HjhM=
+github.com/jaredallard/cmdexec v1.3.0/go.mod h1:vqXk8cMGX2lEVVVlN8r8A/AvioVAysF09L9r1RpsgY4=
 github.com/jaredallard/vcs v0.5.3 h1:x4DMB4UBcQrlDEsg1Eks618MiqaIlQf7MI/fZCJR/WI=
 github.com/jaredallard/vcs v0.5.3/go.mod h1:Dfgmyicad0DScZ2I6DTxq4kjd38++6tyVdXVvc/ktIk=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 h1:BQSFePA1RWJOlocH6Fxy8MmwDt+yVQYULKfN0RoTN8A=
