@@ -22,7 +22,7 @@ require (
 	github.com/princjef/gomarkdoc v1.1.0
 	github.com/puzpuzpuz/xsync/v4 v4.1.0
 	github.com/rogpeppe/go-internal v1.14.1
-	github.com/santhosh-tekuri/jsonschema/v6 v6.0.1
+	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/urfave/cli/v3 v3.3.3
 	golang.org/x/mod v0.24.0
 	gopkg.in/yaml.v3 v3.0.1
