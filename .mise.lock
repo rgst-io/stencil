@@ -34,7 +34,7 @@ version = "latest"
 backend = "go:golang.org/x/tools/cmd/goimports"
 
 [tools."go:gotest.tools/gotestsum"]
-version = "1.12.1"
+version = "1.12.2"
 backend = "go:gotest.tools/gotestsum"
 
 [tools."go:mvdan.cc/sh/v3/cmd/shfmt"]
@@ -52,9 +52,10 @@ backend = "aqua:golangci-lint"
 
 [tools.goreleaser]
 version = "2.8.2"
-backend = "aqua:goreleaser"
+backend = "aqua:goreleaser/goreleaser"
 
 [tools.goreleaser.checksums]
+goreleaser-macos-aarch64 = "sha256:3378bf41ce5e94e936225f533dd5041daf7464c83192c80f66f9137de28171cc"
 "goreleaser_Darwin_all.tar.gz" = "sha256:7331f6217ba3683a3b2e7c726d55aa6add3f3991716a87dd08533312464f24bf"
 "goreleaser_Linux_arm64.tar.gz" = "sha256:ebf55249a59a4073b89379316953b3ce2e7505e5980f9c22e23399aa4679be69"
 "goreleaser_Linux_x86_64.tar.gz" = "sha256:847e2105d50da9133e567cf5450cd437ae29181cabf13ad42683151ba0f5b587"

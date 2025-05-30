@@ -70,7 +70,7 @@ run = ["mdtoc --inplace --max-depth=5 README.md"]
 [alias]
 golangci-lint = "aqua:golangci-lint"
 git-cliff = "ubi:orhun/git-cliff"
-goreleaser = "aqua:goreleaser"
+goreleaser = "aqua:goreleaser/goreleaser"
 
 [settings]
 # Conflicts with bun, and we don't use it anyways.
