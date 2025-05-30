@@ -6,7 +6,7 @@ git-cliff = "latest"
 golang = "1.24.3"
 golangci-lint = "2.1.6"
 goreleaser = "latest"
-"go:gotest.tools/gotestsum" = "1.12.1"
+"go:gotest.tools/gotestsum" = "1.12.2"
 "go:golang.org/x/tools/cmd/goimports" = "latest"
 "go:mvdan.cc/sh/v3/cmd/shfmt" = "latest"
 "go:github.com/thenativeweb/get-next-version" = "latest"
@@ -70,7 +70,7 @@ run = ["mdtoc --inplace --max-depth=5 README.md"]
 [alias]
 golangci-lint = "aqua:golangci-lint"
 git-cliff = "ubi:orhun/git-cliff"
-goreleaser = "aqua:goreleaser"
+goreleaser = "aqua:goreleaser/goreleaser"
 
 [settings]
 # Conflicts with bun, and we don't use it anyways.
