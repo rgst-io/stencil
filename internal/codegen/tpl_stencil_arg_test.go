@@ -82,9 +82,16 @@ func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]interface
 			continue
 		}
 
+		// Add all previous modules as dependencies for the current module
+		var deps []*configuration.TemplateRepository
+		for j := i; j < len(args); j++ {
+			deps = append(deps, &configuration.TemplateRepository{Name: fmt.Sprintf("test-%d", j)})
+		}
+
 		man := &configuration.TemplateRepositoryManifest{
 			Name:      fmt.Sprintf("test-%d", i),
 			Arguments: args[i],
+			Modules:   deps,
 		}
 		m, err := modulestest.NewModuleFromTemplates(man, "testdata/args/test.tpl")
 		if err != nil {
@@ -124,7 +131,7 @@ func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]interface
 	// which we've created earlier after loading the module in the
 	// NewModuleFromTemplates call. This won't be used, but it's
 	// enough to set up the correct environment for running template test functions.
-	tpls, err := test.s.getTemplates(context.Background(), log)
+	tpls, err := test.s.getTemplates(t.Context(), log)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -336,6 +343,39 @@ func TestTplStencil_Arg(t *testing.T) {
 			},
 			want:    "world",
 			wantErr: false,
+		},
+		{
+			name: "should support recursive from schema fail",
+			fields: fakeTemplateMultipleModules(t,
+				map[string]interface{}{
+					"hello": "world",
+				},
+				// test-0
+				map[string]configuration.Argument{
+					"hello": {
+						From: "test-1",
+					},
+				},
+				// test-1
+				map[string]configuration.Argument{
+					"hello": {
+						From: "test-2",
+					},
+				},
+				// test-2
+				map[string]configuration.Argument{
+					"hello": {
+						Schema: map[string]interface{}{
+							"type": "number",
+						},
+					},
+				},
+			),
+			args: args{
+				pth: "hello",
+			},
+			want:    nil,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
