@@ -1,11 +1,11 @@
 [tools.bun]
-version = "1.2.10"
+version = "1.2.15"
 backend = "core:bun"
 
 [tools.bun.checksums]
-"bun-darwin-aarch64.zip" = "sha256:07895ef0fb661249b86b0b723b65b1cc4790c7f3685b63cda90122b00299972c"
-"bun-linux-aarch64.zip" = "sha256:54592fd0237e3ec91a2933dff015e15a78989d97234042e7d5334a4c0ad50603"
-"bun-linux-x64-baseline.zip" = "sha256:4b62f599048ef320a761bacbeeb71f8784f5e373b976a9d53b3ee7811f19b004"
+"bun-darwin-aarch64.zip" = "sha256:ab0cd6fc7fc8d1ee4f8166d99b71086d4793c5aee0d0b5c73fdf9b70fa47ded4"
+"bun-linux-aarch64.zip" = "sha256:3c3d006148f37200f967fd8070eefb340468287bacb44524a31cad1ee9d3bb7b"
+"bun-linux-x64-baseline.zip" = "sha256:386ca291c7fa98720d0e94daa1133af811e69fa24352558a403c1b9759e7eb98"
 
 [tools.git-cliff]
 version = "2.8.0"
@@ -30,7 +30,7 @@ version = "latest"
 backend = "go:github.com/thenativeweb/get-next-version"
 
 [tools."go:golang.org/x/tools/cmd/goimports"]
-version = "latest"
+version = "0.33.0"
 backend = "go:golang.org/x/tools/cmd/goimports"
 
 [tools."go:gotest.tools/gotestsum"]
@@ -38,7 +38,7 @@ version = "1.12.2"
 backend = "go:gotest.tools/gotestsum"
 
 [tools."go:mvdan.cc/sh/v3/cmd/shfmt"]
-version = "latest"
+version = "3.11.0"
 backend = "go:mvdan.cc/sh/v3/cmd/shfmt"
 
 [tools.golangci-lint]
@@ -51,11 +51,10 @@ backend = "aqua:golangci-lint"
 "golangci-lint-2.1.6-linux-arm64.tar.gz" = "sha256:582eb73880f4408d7fb89f12b502d577bd7b0b63d8c681da92bb6b9d934d4363"
 
 [tools.goreleaser]
-version = "2.8.2"
+version = "2.9.0"
 backend = "aqua:goreleaser/goreleaser"
 
 [tools.goreleaser.checksums]
-goreleaser-macos-aarch64 = "sha256:3378bf41ce5e94e936225f533dd5041daf7464c83192c80f66f9137de28171cc"
-"goreleaser_Darwin_all.tar.gz" = "sha256:7331f6217ba3683a3b2e7c726d55aa6add3f3991716a87dd08533312464f24bf"
-"goreleaser_Linux_arm64.tar.gz" = "sha256:ebf55249a59a4073b89379316953b3ce2e7505e5980f9c22e23399aa4679be69"
-"goreleaser_Linux_x86_64.tar.gz" = "sha256:847e2105d50da9133e567cf5450cd437ae29181cabf13ad42683151ba0f5b587"
+"goreleaser_Darwin_all.tar.gz" = "sha256:82953b65c4b64e73b1077827663d97bf8e32592b4fc2cdb55c738bd484260a47"
+"goreleaser_Linux_arm64.tar.gz" = "sha256:574e83f5f0fc97803ff734c9342f8fd446d77e5e7ccac53debf09b4a8dbded80"
+"goreleaser_Linux_x86_64.tar.gz" = "sha256:a066fcd713684abed0d750d7559f1a5d794fa2faa8e8f1ad2eecec8c373668a7"
