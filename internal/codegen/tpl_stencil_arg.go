@@ -19,7 +19,6 @@
 package codegen
 
 import (
-	"context"
 	"fmt"
 
 	"go.rgst.io/stencil/v2/internal/dotnotation"
@@ -34,10 +33,6 @@ func (s *TplStencil) Arg(pth string) (interface{}, error) {
 		return nil, fmt.Errorf("path cannot be empty")
 	}
 
-	// This is a TODO because I don't know if template functions
-	// can even get a context passed to them
-	ctx := context.TODO()
-
 	mf := s.t.Module.Manifest
 	if _, ok := mf.Arguments[pth]; !ok {
 		return "", fmt.Errorf("module %q doesn't list argument %q as an argument in its manifest", s.t.Module.Name, pth)
@@ -47,7 +42,7 @@ func (s *TplStencil) Arg(pth string) (interface{}, error) {
 	// If there's a "from" we should handle that now before anything else,
 	// so that its definition is used.
 	if arg.From != "" {
-		fromArg, err := s.resolveFrom(ctx, pth, &arg)
+		fromArg, err := s.resolveFrom(pth, &arg)
 		if err != nil {
 			return "", err
 		}
@@ -120,7 +115,7 @@ func (s *TplStencil) resolveDefault(pth string, arg *configuration.Argument) (in
 }
 
 // resolveFrom resoles the "from" field of an argument
-func (s *TplStencil) resolveFrom(ctx context.Context, pth string, arg *configuration.Argument) (*configuration.Argument, error) {
+func (s *TplStencil) resolveFrom(pth string, arg *configuration.Argument) (*configuration.Argument, error) {
 	var foundModuleInDeps bool
 	// Ensure that the module imports the referenced module
 	for _, m := range s.t.Module.Manifest.Modules {
@@ -164,7 +159,7 @@ func (s *TplStencil) resolveFrom(ctx context.Context, pth string, arg *configura
 	// If we are, ourselves, a from then we need to resolve it again.
 	if fromArg.From != "" {
 		// Reusing 'pth' is safe because from key's must be equal.
-		recurFromArg, err := s.resolveFrom(ctx, pth, &fromArg)
+		recurFromArg, err := s.resolveFrom(pth, &fromArg)
 		if err != nil {
 			return nil, fmt.Errorf("recursive from resolve failed for module %s -> %s: %w", arg.From, fromArg.From, err)
 		}
