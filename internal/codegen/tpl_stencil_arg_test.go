@@ -82,7 +82,7 @@ func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]interface
 			continue
 		}
 
-		// Add all previous modules as dependencies for the current module
+		// Depend on all modules that come after us to allow for from calls.
 		var deps []*configuration.TemplateRepository
 		for j := i; j < len(args); j++ {
 			deps = append(deps, &configuration.TemplateRepository{Name: fmt.Sprintf("test-%d", j)})
