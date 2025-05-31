@@ -304,6 +304,39 @@ func TestTplStencil_Arg(t *testing.T) {
 			want:    nil,
 			wantErr: true,
 		},
+		{
+			name: "should support recursive from",
+			fields: fakeTemplateMultipleModules(t,
+				map[string]interface{}{
+					"hello": "world",
+				},
+				// test-0
+				map[string]configuration.Argument{
+					"hello": {
+						From: "test-1",
+					},
+				},
+				// test-1
+				map[string]configuration.Argument{
+					"hello": {
+						From: "test-2",
+					},
+				},
+				// test-2
+				map[string]configuration.Argument{
+					"hello": {
+						Schema: map[string]interface{}{
+							"type": "string",
+						},
+					},
+				},
+			),
+			args: args{
+				pth: "hello",
+			},
+			want:    "world",
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

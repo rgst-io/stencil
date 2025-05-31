@@ -120,8 +120,8 @@ func (s *TplStencil) resolveDefault(pth string, arg *configuration.Argument) (in
 }
 
 // resolveFrom resoles the "from" field of an argument
-func (s *TplStencil) resolveFrom(_ context.Context, pth string, arg *configuration.Argument) (*configuration.Argument, error) {
-	foundModuleInDeps := false
+func (s *TplStencil) resolveFrom(ctx context.Context, pth string, arg *configuration.Argument) (*configuration.Argument, error) {
+	var foundModuleInDeps bool
 	// Ensure that the module imports the referenced module
 	for _, m := range s.t.Module.Manifest.Modules {
 		if m.Name == arg.From {
@@ -160,6 +160,17 @@ func (s *TplStencil) resolveFrom(_ context.Context, pth string, arg *configurati
 			s.t.Module.Name, pth, arg.From,
 		)
 	}
+
+	// If we are, ourselves, a from then we need to resolve it again.
+	if fromArg.From != "" {
+		// Reusing 'pth' is safe because from key's must be equal.
+		recurFromArg, err := s.resolveFrom(ctx, pth, &fromArg)
+		if err != nil {
+			return nil, fmt.Errorf("recursive from resolve failed for module %s -> %s: %w", arg.From, fromArg.From, err)
+		}
+		return recurFromArg, nil
+	}
+
 	return &fromArg, nil
 }
 
