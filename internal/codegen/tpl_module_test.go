@@ -1,7 +1,6 @@
 package codegen
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -149,7 +148,7 @@ func TestTplModule_Tpl(t *testing.T) {
 			)
 			assert.NilError(t, err, "expected NewTemplate to succeed")
 
-			vals := NewValues(context.Background(), &configuration.Manifest{Name: t.Name()}, mods)
+			vals := NewValues(t.Context(), &configuration.Manifest{Name: t.Name()}, mods)
 
 			// render template to register it
 			st.renderStage = tt.renderStage

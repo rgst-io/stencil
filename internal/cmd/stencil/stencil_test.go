@@ -3,7 +3,6 @@
 package stencil
 
 import (
-	"context"
 	"path/filepath"
 	"testing"
 
@@ -38,7 +37,7 @@ func TestResolveModulesShouldUseModulesFromLockfile(t *testing.T) {
 		}},
 	}
 
-	mods, err := s.resolveModules(context.Background(), false)
+	mods, err := s.resolveModules(t.Context(), false)
 	assert.NilError(t, err, "failed to resolve modules")
 	assert.Equal(t, len(mods), 1, "expected exactly one module")
 	assert.DeepEqual(t, mods[0].Version, s.lock.Modules[0].Version)
@@ -65,7 +64,7 @@ func TestResolveModulesShouldUpgradeWhenExplicitlyAsked(t *testing.T) {
 		}},
 	}
 
-	mods, err := s.resolveModules(context.Background(), false)
+	mods, err := s.resolveModules(t.Context(), false)
 	assert.NilError(t, err, "failed to resolve modules")
 	assert.Equal(t, len(mods), 1, "expected exactly one module")
 	assert.DeepEqual(t, mods[0].Version, &resolver.Version{
@@ -107,7 +106,7 @@ func TestResolveShouldNotUpgradeOtherModulesWhenUpgradingOne(t *testing.T) {
 		}},
 	}
 
-	mods, err := s.resolveModules(context.Background(), false)
+	mods, err := s.resolveModules(t.Context(), false)
 	assert.NilError(t, err, "failed to resolve modules")
 	assert.Equal(t, len(mods), 2, "expected exactly two modules")
 
@@ -145,7 +144,7 @@ func TestResolveModulesShouldUpdateReplacements(t *testing.T) {
 		}},
 	}
 
-	mods, err := s.resolveModules(context.Background(), false)
+	mods, err := s.resolveModules(t.Context(), false)
 	assert.NilError(t, err, "failed to resolve modules")
 	assert.Equal(t, len(mods), 1, "expected exactly one module")
 	assert.DeepEqual(t, mods[0].Version, &resolver.Version{Virtual: "local"})
@@ -176,7 +175,7 @@ func TestResolveModulesShouldAllowAdds(t *testing.T) {
 		}},
 	}
 
-	mods, err := s.resolveModules(context.Background(), false)
+	mods, err := s.resolveModules(t.Context(), false)
 	assert.NilError(t, err, "failed to resolve modules")
 	assert.Equal(t, len(mods), 2, "expected exactly one module")
 

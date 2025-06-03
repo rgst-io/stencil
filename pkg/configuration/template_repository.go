@@ -77,7 +77,7 @@ type Argument struct {
 
 	// Default is the default value for this argument if it's not set.
 	// This cannot be set when required is true.
-	Default interface{} `yaml:"default,omitempty"`
+	Default any `yaml:"default,omitempty"`
 
 	// Schema is a JSON schema, in YAML, for the argument.
 	Schema map[string]any `yaml:"schema"`

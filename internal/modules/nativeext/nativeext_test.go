@@ -30,7 +30,7 @@ func TestCanImportNativeExtension(t *testing.T) {
 		})
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 
 	ext, err := nativeext.NewHost(slogext.NewTestLogger(t))

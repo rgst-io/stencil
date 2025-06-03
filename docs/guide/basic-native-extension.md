@@ -68,7 +68,7 @@ func (tp *TestPlugin) GetConfig() (*apiv1.Config, error) {
 	return &apiv1.Config{}, nil
 }
 
-func (tp *TestPlugin) ExecuteTemplateFunction(t *apiv1.TemplateFunctionExec) (interface{}, error) {
+func (tp *TestPlugin) ExecuteTemplateFunction(t *apiv1.TemplateFunctionExec) (any, error) {
 	if t.Name == "helloWorld" {
 		return "helloWorld"
 	}
@@ -84,7 +84,7 @@ func (tp *TestPlugin) GetTemplateFunctions() ([]*apiv1.TemplateFunction, error) 
 	}, nil
 }
 
-func helloWorld() (interface{}, error) {
+func helloWorld() (any, error) {
 	fmt.Println("👋 from the test plugin")
 	return "hello from a plugin!", nil
 }

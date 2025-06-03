@@ -1,7 +1,6 @@
 package codegen
 
 import (
-	"context"
 	"os"
 	"testing"
 	"time"
@@ -51,7 +50,7 @@ func TestValues(t *testing.T) {
 		Name: "testing",
 	}
 
-	vals := NewValues(context.Background(), sm, []*modules.Module{
+	vals := NewValues(t.Context(), sm, []*modules.Module{
 		{
 			Name: "testing",
 			Version: &resolver.Version{
@@ -94,9 +93,9 @@ func TestGeneratedValues(t *testing.T) {
 
 	st := NewStencil(&configuration.Manifest{
 		Name:      "testing",
-		Arguments: map[string]interface{}{},
+		Arguments: map[string]any{},
 	}, nil, []*modules.Module{m}, log, false)
-	tpls, err := st.Render(context.Background(), log)
+	tpls, err := st.Render(t.Context(), log)
 	assert.NilError(t, err, "failed to render templates")
 	assert.Equal(t,
 		tpls[0].Files[0].String(),

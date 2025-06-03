@@ -1,7 +1,6 @@
 package codegen
 
 import (
-	"context"
 	"os"
 	"path"
 	"slices"
@@ -22,7 +21,7 @@ import (
 
 func TestBasicE2ERender(t *testing.T) {
 	fs := memfs.New()
-	ctx := context.Background()
+	ctx := t.Context()
 	log := slogext.NewTestLogger(t)
 
 	// create stub manifest
@@ -70,7 +69,7 @@ func TestBasicE2ERender(t *testing.T) {
 }
 
 func TestModuleHookRender(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	log := slogext.NewTestLogger(t)
 
 	// create modules
@@ -91,7 +90,7 @@ func TestModuleHookRender(t *testing.T) {
 
 	st := NewStencil(&configuration.Manifest{
 		Name:      "test",
-		Arguments: map[string]interface{}{},
+		Arguments: map[string]any{},
 	}, nil, []*modules.Module{m1, m2}, log, false)
 
 	tpls, err := st.Render(ctx, log)
@@ -121,7 +120,7 @@ func TestDirReplacementRendering(t *testing.T) {
 
 	st := NewStencil(sm, nil, []*modules.Module{m1}, log, false)
 
-	tps, err := st.Render(context.Background(), log)
+	tps, err := st.Render(t.Context(), log)
 	assert.NilError(t, err, "failed to render template")
 	assert.Equal(t, len(tps), 1)
 	assert.Equal(t, len(tps[0].Files), 1)
@@ -139,7 +138,7 @@ func TestBinaryRender(t *testing.T) {
 
 	st := NewStencil(sm, nil, []*modules.Module{m1}, log, false)
 
-	tpls, err := st.Render(context.Background(), log)
+	tpls, err := st.Render(t.Context(), log)
 	assert.NilError(t, err, "failed to render template")
 	assert.Equal(t, len(tpls), 1)
 	assert.Equal(t, len(tpls[0].Files), 1)
@@ -170,7 +169,7 @@ func TestBadDirReplacement(t *testing.T) {
 	assert.NilError(t, err, "failed to NewModuleFromTemplates")
 
 	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
-	vals := NewValues(context.Background(), sm, nil)
+	vals := NewValues(t.Context(), sm, nil)
 	_, err = st.renderDirReplacement("b/c", m, vals)
 	assert.ErrorContains(t, err, "contains path separator in output")
 }
@@ -179,7 +178,7 @@ func TestBadDirReplacement(t *testing.T) {
 // on state, in this case through global variables.
 func TestIterations(t *testing.T) {
 	fs := memfs.New()
-	ctx := context.Background()
+	ctx := t.Context()
 	log := slogext.NewTestLogger(t)
 
 	// create stub manifest

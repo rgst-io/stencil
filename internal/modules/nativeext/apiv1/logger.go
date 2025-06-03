@@ -12,7 +12,7 @@ var _ io.Writer = &logger{}
 
 // logger implements io.Writer to write to a function with a fmt.Print signature
 type logger struct {
-	fn func(args ...interface{})
+	fn func(args ...any)
 }
 
 // Write writes the data to the logger

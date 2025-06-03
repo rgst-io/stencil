@@ -24,14 +24,14 @@ type rpcTransportClient struct {
 // GetConfig returns the config for the extension
 func (g *rpcTransportClient) GetConfig() (*Config, error) {
 	var resp *Config
-	err := g.client.Call("Plugin.GetConfig", new(interface{}), &resp)
+	err := g.client.Call("Plugin.GetConfig", new(any), &resp)
 	return resp, err
 }
 
 // GetTemplateFunctions returns the template functions for this extension
 func (g *rpcTransportClient) GetTemplateFunctions() ([]*TemplateFunction, error) {
 	var resp []*TemplateFunction
-	err := g.client.Call("Plugin.GetTemplateFunctions", new(interface{}), &resp)
+	err := g.client.Call("Plugin.GetTemplateFunctions", new(any), &resp)
 	return resp, err
 }
 

@@ -24,7 +24,7 @@ func NewExtensionClient(ctx context.Context, extPath string, log slogext.Logger)
 	client := plugin.NewClient(&plugin.ClientConfig{
 		Logger: hclog.New(&hclog.LoggerOptions{
 			Level: hclog.Trace,
-			Output: &logger{fn: func(args ...interface{}) {
+			Output: &logger{fn: func(args ...any) {
 				log.Debug(fmt.Sprint(args...))
 			}},
 			DisableTime: true,

@@ -91,13 +91,13 @@ func (t *implementationTransportToImplementation) GetTemplateFunctions() ([]*Tem
 
 // ExecuteTemplateFunction calls the implementation to execute a template function
 // and serializes the response to json to be sent over the wire.
-func (t *implementationTransportToImplementation) ExecuteTemplateFunction(exec *TemplateFunctionExec) (interface{}, error) {
+func (t *implementationTransportToImplementation) ExecuteTemplateFunction(exec *TemplateFunctionExec) (any, error) {
 	resp, err := t.impl.ExecuteTemplateFunction(exec)
 	if err != nil {
 		return nil, err
 	}
 
-	var respVal interface{}
+	var respVal any
 	if err := json.NewDecoder(bytes.NewReader(resp)).Decode(&respVal); err != nil {
 		return nil, errors.Wrap(err, "failed to encode response")
 	}
