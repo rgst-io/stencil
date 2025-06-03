@@ -3,7 +3,6 @@
 package modules_test
 
 import (
-	"context"
 	"testing"
 
 	"github.com/jaredallard/vcs/resolver"
@@ -21,7 +20,7 @@ func newLogger(t *testing.T) slogext.Logger {
 }
 
 func TestCanFetchModule(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	m, err := modules.New(ctx, "", modules.NewModuleOpts{
 		ImportPath: "github.com/rgst-io/stencil-module", Version: &resolver.Version{Branch: "main"},
 	})
@@ -48,7 +47,7 @@ func TestReplacementLocalModule(t *testing.T) {
 		},
 	}
 
-	mods, err := modules.FetchModules(context.Background(), &modules.ModuleResolveOptions{Manifest: sm, Log: newLogger(t)})
+	mods, err := modules.FetchModules(t.Context(), &modules.ModuleResolveOptions{Manifest: sm, Log: newLogger(t)})
 	assert.NilError(t, err, "expected GetModulesForProject() to not error")
 	assert.Equal(t, len(mods), 1, "expected exactly one module to be returned")
 	assert.Equal(t, mods[0].URI, sm.Replacements["github.com/rgst-io/stencil-module"],
@@ -56,7 +55,7 @@ func TestReplacementLocalModule(t *testing.T) {
 }
 
 func TestCanGetLatestVersion(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	mods, err := modules.FetchModules(ctx, &modules.ModuleResolveOptions{
 		Manifest: &configuration.Manifest{
 			Name: "testing-project",
@@ -73,7 +72,7 @@ func TestCanGetLatestVersion(t *testing.T) {
 }
 
 func TestHandleMultipleConstraints(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	mods, err := modules.FetchModules(ctx, &modules.ModuleResolveOptions{
 		Manifest: &configuration.Manifest{
 			Name: "testing-project",
@@ -111,7 +110,7 @@ func TestHandleMultipleConstraints(t *testing.T) {
 }
 
 func TestHandleNestedModules(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	mods, err := modules.FetchModules(ctx, &modules.ModuleResolveOptions{
 		Manifest: &configuration.Manifest{
 			Name: "testing-project",
@@ -144,7 +143,7 @@ func TestHandleNestedModules(t *testing.T) {
 }
 
 func TestFailOnIncompatibleConstraints(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	_, err := modules.FetchModules(ctx, &modules.ModuleResolveOptions{
 		Manifest: &configuration.Manifest{
 			Name: "testing-project",
@@ -174,7 +173,7 @@ func TestFailOnIncompatibleConstraints(t *testing.T) {
 }
 
 func TestCanUseBranch(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	mods, err := modules.FetchModules(ctx, &modules.ModuleResolveOptions{
 		Manifest: &configuration.Manifest{
 			Name: "testing-project",
@@ -204,7 +203,7 @@ func TestCanUseBranch(t *testing.T) {
 }
 
 func TestBranchAlwaysUsedOverDependency(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	// Create in-memory module that also requires stencil-base
 	man := &configuration.TemplateRepositoryManifest{
@@ -254,7 +253,7 @@ func TestBranchAlwaysUsedOverDependency(t *testing.T) {
 }
 
 func TestShouldResolveInMemoryModule(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 
 	// require test-dep which is also an in-memory module to make sure that we can resolve at least once
 	// an in-memory module
@@ -305,7 +304,7 @@ func TestShouldResolveInMemoryModule(t *testing.T) {
 }
 
 func TestShouldErrorOnTwoDifferentBranches(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	_, err := modules.FetchModules(ctx, &modules.ModuleResolveOptions{
 		Manifest: &configuration.Manifest{
 			Name: "testing-project",
@@ -334,7 +333,7 @@ func TestShouldErrorOnTwoDifferentBranches(t *testing.T) {
 func TestSimpleDirReplacement(t *testing.T) {
 	fs, err := testmemfs.WithManifest("name: testing\ndirReplacements:\n  a: 'b'\n")
 	assert.NilError(t, err, "failed to testmemfs.WithManifest")
-	m, err := modulestest.NewWithFS(context.Background(), "testing", fs)
+	m, err := modulestest.NewWithFS(t.Context(), "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
 	m.StoreDirReplacements(map[string]string{"a": "b"})
@@ -343,7 +342,7 @@ func TestSimpleDirReplacement(t *testing.T) {
 }
 
 func TestShouldErrorOnNonExistentRepo(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	_, err := modules.FetchModules(ctx, &modules.ModuleResolveOptions{
 		Manifest: &configuration.Manifest{
 			Name: "testing-project",

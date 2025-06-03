@@ -177,7 +177,7 @@ func (f *File) Size() int64 {
 
 // Sys implements the os.FileInfo.Sys method. This does
 // not do anything.
-func (f *File) Sys() interface{} {
+func (f *File) Sys() any {
 	return nil
 }
 

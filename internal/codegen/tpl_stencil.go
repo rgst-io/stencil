@@ -372,7 +372,7 @@ func (s *TplStencil) ReadBlocks(fpath string) (map[string]string, error) {
 // stencil with --debug).
 //
 //	{{- stencil.Debug "I'm a log!" }}
-func (s *TplStencil) Debug(args ...interface{}) string {
+func (s *TplStencil) Debug(args ...any) string {
 	s.log.With("path", s.t.Path).Debugf("%s", args...)
 
 	return ""

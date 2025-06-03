@@ -1,7 +1,6 @@
 package codegen
 
 import (
-	"context"
 	"os"
 	"reflect"
 	"slices"
@@ -299,7 +298,7 @@ func TestTplStencil_ReadFile(t *testing.T) {
 func TestTplStencil_Include(t *testing.T) {
 	type args struct {
 		name    string
-		dataSli []interface{}
+		dataSli []any
 	}
 	tests := []struct {
 		name        string
@@ -369,7 +368,7 @@ func TestTplStencil_Include(t *testing.T) {
 
 			// render template to register it
 			tpl.Render(st,
-				NewValues(context.Background(), &configuration.Manifest{
+				NewValues(t.Context(), &configuration.Manifest{
 					Name: t.Name(),
 				}, []*modules.Module{module}),
 			)

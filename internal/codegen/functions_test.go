@@ -29,7 +29,7 @@ func Example_quotejoinstrings() {
 }
 
 func Example_toYaml() {
-	example := map[string]interface{}{
+	example := map[string]any{
 		"a": "b",
 		"c": "d",
 	}
@@ -52,7 +52,7 @@ c: d
 }
 
 func Example_toJson() {
-	example := map[string]interface{}{
+	example := map[string]any{
 		"a": "b",
 		"c": "d",
 	}

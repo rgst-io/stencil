@@ -138,7 +138,7 @@ There's a few limitations with aliasing arguments:
 
 ## Module Hooks
 
-Module hooks enable other modules to write to a section of a file in your module. This can be done with the [`stencil.GetModuleHook "name"`](/funcs/stencil.GetModuleHook) function. This returns a `[]interface{}`, or for non-gophers a list of any type. You can process this with a `range` or in any other method you'd like to generate whatever you need for your DSL.
+Module hooks enable other modules to write to a section of a file in your module. This can be done with the [`stencil.GetModuleHook "name"`](/funcs/stencil.GetModuleHook) function. This returns a `[]any`, or for non-gophers a list of any type. You can process this with a `range` or in any other method you'd like to generate whatever you need for your DSL.
 
 A module can write to a module hook with the [`stencil.AddToModuleHook "importPath" "hookName"`](/funcs/stencil.AddToModuleHook) function.
 
@@ -179,7 +179,7 @@ func TestGoMod(t \*testing.T) {
 	st := stenciltest.New(t, "go.mod.tpl")
 
 	// Define the arguments to pass to stencil
-	st.Args(map[string]interface{}{"org": "rgst-io"})
+	st.Args(map[string]any{"org": "rgst-io"})
 
 	// Run the test, persisting the snapshot to disk if it changed.
 	// Default is set to false.

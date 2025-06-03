@@ -26,7 +26,7 @@ func NewHandshake() plugin.HandshakeConfig {
 func NewExtensionImplementation(impl Implementation, log slogext.Logger) error {
 	logger := hclog.New(&hclog.LoggerOptions{
 		Level:       hclog.Trace,
-		Output:      &logger{fn: func(args ...interface{}) { log.Debugf("%s", args...) }},
+		Output:      &logger{fn: func(args ...any) { log.Debugf("%s", args...) }},
 		DisableTime: true,
 	})
 

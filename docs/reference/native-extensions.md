@@ -38,4 +38,4 @@ Once a connection has been established stencil communicates with the plugin over
 4. The response from the RPC is returned directly to the go-template with no processing.
 
 > [!TIP]
-> While `ExecuteTemplateFunction`'s return value is a `interface{}`, that is actually just a wrapper around the lower level implementation dubbed as [`implementationTransport`](https://github.com/rgst-io/stencil/blob/main/pkg/extensions/apiv1/transport.go#L25). The return value of that is `[]byte`, which is expected to be valid JSON to be decoded by stencil before being passed to the template that called it. This is done to ensure typed data is always able to be sent over.
+> While `ExecuteTemplateFunction`'s return value is a `any`, that is actually just a wrapper around the lower level implementation dubbed as [`implementationTransport`](https://github.com/rgst-io/stencil/blob/main/pkg/extensions/apiv1/transport.go#L25). The return value of that is `[]byte`, which is expected to be valid JSON to be decoded by stencil before being passed to the template that called it. This is done to ensure typed data is always able to be sent over.

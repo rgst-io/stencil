@@ -14,7 +14,7 @@
 // limitations under the License.
 
 // Package dotnotation implements a dotnotation (hello.world) for
-// accessing fields within a map[string]interface{}
+// accessing fields within a map[string]any
 package dotnotation
 
 import (
@@ -24,12 +24,12 @@ import (
 )
 
 // Get looks up an entry in data by parsing the "key" into deeply nested keys, traversing it by "dots" in the key name.
-func Get(data interface{}, key string) (interface{}, error) {
+func Get(data any, key string) (any, error) {
 	return get(data, key)
 }
 
 // getFieldOnMap returns a field on a given map
-func getFieldOnMap(data interface{}, key string) (interface{}, error) {
+func getFieldOnMap(data any, key string) (any, error) {
 	dataVal := reflect.ValueOf(data)
 	dataTyp := dataVal.Type()
 	if dataTyp.Kind() != reflect.Map {
@@ -45,7 +45,7 @@ func getFieldOnMap(data interface{}, key string) (interface{}, error) {
 		v := iter.Value()
 
 		if k.Kind() == reflect.Interface {
-			// convert interface{} keys into their actual
+			// convert any keys into their actual
 			// values
 			k = reflect.ValueOf(k.Interface())
 		}
@@ -60,11 +60,11 @@ func getFieldOnMap(data interface{}, key string) (interface{}, error) {
 	return nil, fmt.Errorf("key %q not found", key)
 }
 
-// get is a recursive function to get a field from a map[interface{}]interface{}
+// get is a recursive function to get a field from a map[any]any
 // this is done by splitting the key on "." and using the first part of the
 // split, if there is anymore parts of the key then get() is called with
 // the non processed part
-func get(data interface{}, key string) (interface{}, error) {
+func get(data any, key string) (any, error) {
 	spl := strings.Split(key, ".")
 
 	v, err := getFieldOnMap(data, spl[0])

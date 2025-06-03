@@ -11,9 +11,9 @@ import "encoding/gob"
 
 // init registers known types
 func init() { //nolint:gochecknoinits // Why: see comment
-	gob.Register([]interface{}{})
-	gob.Register(map[string]interface{}{})
-	gob.Register(map[interface{}]interface{}{})
+	gob.Register([]any{})
+	gob.Register(map[string]any{})
+	gob.Register(map[any]any{})
 }
 
 // This block contains the constants for the go-plugin
@@ -52,7 +52,7 @@ type TemplateFunctionExec struct {
 	Name string
 
 	// Arguments are the arbitrary arguments that were passed to this function
-	Arguments []interface{}
+	Arguments []any
 }
 
 // Config is configuration returned by an extension
@@ -72,5 +72,5 @@ type Implementation interface {
 
 	// ExecuteTemplateFunction executes a provided template function
 	// and returns its response.
-	ExecuteTemplateFunction(t *TemplateFunctionExec) (interface{}, error)
+	ExecuteTemplateFunction(t *TemplateFunctionExec) (any, error)
 }
