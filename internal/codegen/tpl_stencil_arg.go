@@ -116,7 +116,11 @@ func (s *TplStencil) resolveDefault(pth string, arg *configuration.Argument) (an
 }
 
 // resolveFrom resoles the "from" field of an argument
-func (s *TplStencil) resolveFrom(pth string, mf *configuration.TemplateRepositoryManifest, arg *configuration.Argument) (*configuration.Argument, error) {
+func (s *TplStencil) resolveFrom(
+	pth string,
+	mf *configuration.TemplateRepositoryManifest,
+	arg *configuration.Argument,
+) (*configuration.Argument, error) {
 	foundModuleInDeps := slices.ContainsFunc(mf.Modules, func(m *configuration.TemplateRepository) bool {
 		return m.Name == arg.From
 	})
