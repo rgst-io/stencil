@@ -20,6 +20,7 @@ package codegen
 
 import (
 	"fmt"
+	"slices"
 
 	"go.rgst.io/stencil/v2/internal/dotnotation"
 	"go.rgst.io/stencil/v2/pkg/configuration"
@@ -28,7 +29,7 @@ import (
 // Arg returns the value of an argument in the project's manifest
 //
 //	{{- stencil.Arg "name" }}
-func (s *TplStencil) Arg(pth string) (interface{}, error) {
+func (s *TplStencil) Arg(pth string) (any, error) {
 	if pth == "" {
 		return nil, fmt.Errorf("path cannot be empty")
 	}
@@ -42,7 +43,7 @@ func (s *TplStencil) Arg(pth string) (interface{}, error) {
 	// If there's a "from" we should handle that now before anything else,
 	// so that its definition is used.
 	if arg.From != "" {
-		fromArg, err := s.resolveFrom(pth, &arg)
+		fromArg, err := s.resolveFrom(pth, s.t.Module.Manifest, &arg)
 		if err != nil {
 			return "", err
 		}
@@ -50,7 +51,7 @@ func (s *TplStencil) Arg(pth string) (interface{}, error) {
 		arg = *fromArg
 	}
 
-	mapInf := make(map[interface{}]interface{})
+	mapInf := make(map[any]any)
 	for k, v := range s.s.m.Arguments {
 		mapInf[k] = v
 	}
@@ -75,7 +76,7 @@ func (s *TplStencil) Arg(pth string) (interface{}, error) {
 }
 
 // resolveDefault resolves the default value of an argument from the manifest
-func (s *TplStencil) resolveDefault(pth string, arg *configuration.Argument) (interface{}, error) {
+func (s *TplStencil) resolveDefault(pth string, arg *configuration.Argument) (any, error) {
 	if arg.Default != nil {
 		return arg.Default, nil
 	}
@@ -115,14 +116,14 @@ func (s *TplStencil) resolveDefault(pth string, arg *configuration.Argument) (in
 }
 
 // resolveFrom resoles the "from" field of an argument
-func (s *TplStencil) resolveFrom(pth string, arg *configuration.Argument) (*configuration.Argument, error) {
-	var foundModuleInDeps bool
-	// Ensure that the module imports the referenced module
-	for _, m := range s.t.Module.Manifest.Modules {
-		if m.Name == arg.From {
-			foundModuleInDeps = true
-		}
-	}
+func (s *TplStencil) resolveFrom(
+	pth string,
+	mf *configuration.TemplateRepositoryManifest,
+	arg *configuration.Argument,
+) (*configuration.Argument, error) {
+	foundModuleInDeps := slices.ContainsFunc(mf.Modules, func(m *configuration.TemplateRepository) bool {
+		return m.Name == arg.From
+	})
 	if !foundModuleInDeps {
 		return nil, fmt.Errorf(
 			"module %q argument %q references an argument in module %q, but doesn't list it as a dependency",
@@ -159,7 +160,7 @@ func (s *TplStencil) resolveFrom(pth string, arg *configuration.Argument) (*conf
 	// If we are, ourselves, a from then we need to resolve it again.
 	if fromArg.From != "" {
 		// Reusing 'pth' is safe because from key's must be equal.
-		recurFromArg, err := s.resolveFrom(pth, &fromArg)
+		recurFromArg, err := s.resolveFrom(pth, fromMf, &fromArg)
 		if err != nil {
 			return nil, fmt.Errorf("recursive from resolve failed for module %s -> %s: %w", arg.From, fromArg.From, err)
 		}
@@ -170,6 +171,6 @@ func (s *TplStencil) resolveFrom(pth string, arg *configuration.Argument) (*conf
 }
 
 // validateArg validates an argument against the schema
-func (s *TplStencil) validateArg(pth string, arg *configuration.Argument, v interface{}) error {
+func (s *TplStencil) validateArg(pth string, arg *configuration.Argument, v any) error {
 	return validateJSONSchema(s.t.Module.Name+"/arguments/"+pth, arg.Schema, v)
 }
