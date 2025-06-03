@@ -10,6 +10,7 @@ import (
 	"go.rgst.io/stencil/v2/internal/modules/modulestest"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
+	"gotest.tools/v3/assert"
 )
 
 type testTpl struct {
@@ -56,7 +57,7 @@ func fakeTemplate(t *testing.T, args map[string]interface{},
 	// which we've created earlier after loading the module in the
 	// NewModuleFromTemplates call. This won't be used, but it's
 	// enough to set up the correct environment for running template test functions.
-	tpls, err := test.s.getTemplates(context.Background(), log)
+	tpls, err := test.s.getTemplates(t.Context(), log)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -76,55 +77,27 @@ func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]interface
 	log := slogext.NewTestLogger(t)
 
 	mods := make([]*modules.Module, len(args))
-	importList := []string{}
 	for i := range args {
-		if i == 0 {
-			continue
-		}
-
-		// Depend on all modules that come after us to allow for from calls.
+		// Depend on the first module after us, if it exists.
 		var deps []*configuration.TemplateRepository
-		for j := i; j < len(args); j++ {
-			deps = append(deps, &configuration.TemplateRepository{Name: fmt.Sprintf("test-%d", j)})
+		if i+1 < len(args) {
+			deps = append(deps, &configuration.TemplateRepository{Name: fmt.Sprintf("test-%d", i+1)})
 		}
 
-		man := &configuration.TemplateRepositoryManifest{
+		var err error
+		mods[i], err = modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{
 			Name:      fmt.Sprintf("test-%d", i),
 			Arguments: args[i],
 			Modules:   deps,
-		}
-		m, err := modulestest.NewModuleFromTemplates(man, "testdata/args/test.tpl")
-		if err != nil {
-			t.Fatal(err)
-		}
-		importList = append(importList, m.Name)
-		mods[i] = m
-	}
-
-	var trs []*configuration.TemplateRepository
-	for _, imp := range importList {
-		trs = append(trs, &configuration.TemplateRepository{Name: imp})
-	}
-	man := &configuration.TemplateRepositoryManifest{
-		Name:      "test-0",
-		Arguments: args[0],
-		Modules:   trs,
-	}
-	var err error
-	mods[0], err = modulestest.NewModuleFromTemplates(man, "testdata/args/test.tpl")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	moduleTr := make([]*configuration.TemplateRepository, len(mods))
-	for i := range mods {
-		moduleTr[i] = &configuration.TemplateRepository{Name: mods[i].Name}
+		}, "testdata/args/test.tpl")
+		assert.NilError(t, err)
 	}
 
 	test.s = NewStencil(&configuration.Manifest{
 		Name:      "testing",
 		Arguments: manifestArgs,
-		Modules:   moduleTr,
+		// The first module brings in all the others.
+		Modules: []*configuration.TemplateRepository{{Name: mods[0].Name}},
 	}, nil, mods, log, false)
 
 	// use the first template from the module
@@ -132,9 +105,7 @@ func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]interface
 	// NewModuleFromTemplates call. This won't be used, but it's
 	// enough to set up the correct environment for running template test functions.
 	tpls, err := test.s.getTemplates(t.Context(), log)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NilError(t, err)
 	test.t = tpls[0]
 	test.log = log
 
@@ -162,8 +133,7 @@ func TestTplStencil_Arg(t *testing.T) {
 			args: args{
 				pth: "hello",
 			},
-			want:    "world",
-			wantErr: false,
+			want: "world",
 		},
 		{
 			name: "should fail when an argument is not defined",
@@ -190,8 +160,7 @@ func TestTplStencil_Arg(t *testing.T) {
 			args: args{
 				pth: "hello",
 			},
-			want:    "world",
-			wantErr: false,
+			want: "world",
 		},
 		{
 			name: "should fail when provided value doesn't match json schema",
@@ -254,8 +223,7 @@ func TestTplStencil_Arg(t *testing.T) {
 			args: args{
 				pth: "hello",
 			},
-			want:    "",
-			wantErr: false,
+			want: "",
 		},
 		{
 			name: "should support from",
@@ -281,8 +249,7 @@ func TestTplStencil_Arg(t *testing.T) {
 			args: args{
 				pth: "hello",
 			},
-			want:    "world",
-			wantErr: false,
+			want: "world",
 		},
 		{
 			name: "should support from schema fail",
@@ -341,8 +308,7 @@ func TestTplStencil_Arg(t *testing.T) {
 			args: args{
 				pth: "hello",
 			},
-			want:    "world",
-			wantErr: false,
+			want: "world",
 		},
 		{
 			name: "should support recursive from schema fail",
