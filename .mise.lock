@@ -33,7 +33,7 @@ version = "0.33.0"
 backend = "go:golang.org/x/tools/cmd/goimports"
 
 [tools."go:gotest.tools/gotestsum"]
-version = "1.12.2"
+version = "1.12.3"
 backend = "go:gotest.tools/gotestsum"
 
 [tools."go:mvdan.cc/sh/v3/cmd/shfmt"]
