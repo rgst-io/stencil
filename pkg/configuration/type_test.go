@@ -3,8 +3,8 @@ package configuration_test
 import (
 	"testing"
 
-	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
+	"sigs.k8s.io/yaml"
 
 	"go.rgst.io/stencil/v2/pkg/configuration"
 )

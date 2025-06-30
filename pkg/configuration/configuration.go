@@ -24,7 +24,7 @@ import (
 	"os"
 	"regexp"
 
-	"gopkg.in/yaml.v3"
+	"sigs.k8s.io/yaml"
 )
 
 // ValidateNameRegexp is the regex used to validate the project's name
@@ -38,22 +38,19 @@ const ValidateNameRegexp = `^[_a-z][_a-z0-9-]*$`
 // getoutreach/stencil interop.
 func LoadManifest(path string) (*Manifest, error) {
 	//nolint:gosec // Why: This is required for it to work.
-	f, err := os.Open(path)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
 
-	var s *Manifest
-	if err := yaml.NewDecoder(f).Decode(&s); err != nil {
-		return nil, err
+	var s Manifest
+	if err := yaml.Unmarshal(b, &s); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal manifest: %w", err)
 	}
-
 	if !ValidateName(s.Name) {
 		return nil, fmt.Errorf("name field in %q was invalid", path)
 	}
-
-	return s, nil
+	return &s, nil
 }
 
 // LoadDefaultManifest returns a parsed project manifest from a set
@@ -73,31 +70,31 @@ func LoadDefaultManifest() (*Manifest, error) {
 // what files are included
 type Manifest struct {
 	// Name is the name of the project
-	Name string `yaml:"name" jsonschema:"required"`
+	Name string `json:"name" jsonschema:"required"`
 
 	// Modules are the template modules that this project depends
 	// on and utilizes
-	Modules []*TemplateRepository `yaml:"modules,omitempty"`
+	Modules []*TemplateRepository `json:"modules,omitempty"`
 
 	// Versions is a map of versions of certain tools, this is used by templates
 	// and will likely be replaced with something better in the future.
-	Versions map[string]string `yaml:"versions,omitempty"`
+	Versions map[string]string `json:"versions,omitempty"`
 
 	// Arguments is a map of arbitrary arguments to pass to the generator
-	Arguments map[string]any `yaml:"arguments"`
+	Arguments map[string]any `json:"arguments"`
 
 	// Replacements is a list of module names to replace their URI.
 	//
 	// Expected format:
 	// - local file: path/to/module
 	// - remote file: https://github.com/rgst-io/stencil-base
-	Replacements map[string]string `yaml:"replacements,omitempty"`
+	Replacements map[string]string `json:"replacements,omitempty"`
 }
 
 // TemplateRepository is a repository of template files.
 type TemplateRepository struct {
 	// Name is the name of this module. This should be a valid go import path
-	Name string `yaml:"name" jsonschema:"required"`
+	Name string `json:"name" jsonschema:"required"`
 
 	// Version is a semantic version or branch of the template repository
 	// that should be downloaded if not set then the latest version is used.
@@ -109,7 +106,7 @@ type TemplateRepository struct {
 	// But note that constraints are currently not locked so the version
 	// will change as the module is resolved on subsequent runs.
 	// Eventually, this will be changed to use the lockfile by default.
-	Version string `yaml:"version,omitempty"`
+	Version string `json:"version,omitempty"`
 }
 
 // ValidateName ensures that the name of a project in the manifest

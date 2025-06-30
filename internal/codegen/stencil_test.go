@@ -15,8 +15,8 @@ import (
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"go.rgst.io/stencil/v2/pkg/stencil"
-	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
+	"sigs.k8s.io/yaml"
 )
 
 func TestBasicE2ERender(t *testing.T) {
@@ -193,9 +193,9 @@ func TestIterations(t *testing.T) {
 {{- stencil.SetGlobal "z" (add (stencil.GetGlobal "y") 1) }}
 {{- stencil.SetGlobal "y" (add (stencil.GetGlobal "x") 1) }}
 
-x: {{ stencil.GetGlobal "x" }}
-y: {{ stencil.GetGlobal "y" }}
-z: {{ stencil.GetGlobal "z" }}`))
+one: {{ stencil.GetGlobal "x" }}
+two: {{ stencil.GetGlobal "y" }}
+three: {{ stencil.GetGlobal "z" }}`))
 	assert.NilError(t, f.Close(), "failed to close stub template")
 
 	tp, err := modulestest.NewWithFS(ctx, "testing", fs)
@@ -211,8 +211,9 @@ z: {{ stencil.GetGlobal "z" }}`))
 	assert.Equal(t, len(tpls[0].Files), 1, "expected Render() template to return a single file")
 
 	var resp map[string]int
+	t.Log("template data", string(tpls[0].Files[0].contents))
 	assert.NilError(t, yaml.Unmarshal(tpls[0].Files[0].contents, &resp), "failed to unmarshal response")
-	assert.DeepEqual(t, resp, map[string]int{"x": 1, "y": 2, "z": 3})
+	assert.DeepEqual(t, resp, map[string]int{"one": 1, "two": 2, "three": 3})
 
 	lock := st.GenerateLockfile(tpls)
 	assert.DeepEqual(t, lock, &stencil.Lockfile{
