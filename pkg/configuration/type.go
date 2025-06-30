@@ -23,7 +23,7 @@ import (
 	"slices"
 	"strings"
 
-	stdyaml "gopkg.in/yaml.v3"
+	stdyaml "go.yaml.in/yaml/v3"
 )
 
 // TemplateRepositoryType specifies what type of a stencil repository
