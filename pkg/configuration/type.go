@@ -18,16 +18,14 @@
 package configuration
 
 import (
-	"encoding/json"
 	"fmt"
 	"slices"
 	"strings"
 
-	stdyaml "go.yaml.in/yaml/v3"
+	"gopkg.in/yaml.v3"
 )
 
-// TemplateRepositoryType specifies what type of a stencil repository
-// the current one is.
+// TemplateRepositoryType specifies what type of a stencil repository the current one is.
 type TemplateRepositoryType string
 
 // This block contains all of the TemplateRepositoryType values
@@ -38,27 +36,23 @@ const (
 	// this type is used together with the TemplateRepositoryTypeTemplates.
 	TemplateRepositoryTypeExt TemplateRepositoryType = "extension"
 
-	// TemplateRepositoryTypeTemplates denotes a repository as being a
-	// standard template repository.
-	// When the same module/repo serves more than one type, join this
-	// explicit value with other types, e.g. "templates,extension".
+	// TemplateRepositoryTypeTemplates denotes a repository as being a standard template repository.
+	// When the same module/repo serves more than one type, join this explicit value with other
+	// types, e.g. "templates,extension".
 	TemplateRepositoryTypeTemplates TemplateRepositoryType = "templates"
 )
 
-// TemplateRepositoryTypes specifies what type of a stencil repository
-// the current one is.
-// Use Contains to check for a type - it has special handling for the
-// default case.
-// Even though it is a struct, it is marshalled and unmarshalled as a
-// string with comma separated values of TemplateRepositoryType.
+// TemplateRepositoryTypes specifies what type of a stencil repository the current one is.
+// Use Contains to check for a type - it has special handling for the default case.
+// Even though it is a struct, it is marshalled and unmarshalled as a string with comma separated
+// values of TemplateRepositoryType.
 type TemplateRepositoryTypes []TemplateRepositoryType
 
-// UnmarshalYAML unmarshals TemplateRepositoryTypes from a string with
-// comma-separated values.
-func (ts *TemplateRepositoryTypes) UnmarshalYAML(value *stdyaml.Node) error {
+// UnmarshalYAML unmarshals TemplateRepositoryTypes from a string with comma-separated values.
+func (ts *TemplateRepositoryTypes) UnmarshalYAML(value *yaml.Node) error {
 	//nolint:exhaustive // Why: default catches ones we care about here.
 	switch value.Kind {
-	case stdyaml.ScalarNode:
+	case yaml.ScalarNode:
 		var csv string
 		if err := value.Decode(&csv); err != nil {
 			return fmt.Errorf("failed to parse as csv: %w", err)
@@ -67,7 +61,7 @@ func (ts *TemplateRepositoryTypes) UnmarshalYAML(value *stdyaml.Node) error {
 		for _, t := range strings.Split(csv, ",") {
 			*ts = append(*ts, TemplateRepositoryType(t))
 		}
-	case stdyaml.SequenceNode:
+	case yaml.SequenceNode:
 		var types []TemplateRepositoryType
 		if err := value.Decode(&types); err != nil {
 			return fmt.Errorf("failed to parse as sequence: %w", err)
@@ -79,28 +73,6 @@ func (ts *TemplateRepositoryTypes) UnmarshalYAML(value *stdyaml.Node) error {
 	}
 
 	return nil
-}
-
-// UnmarshalJSON unmarshals TemplateRepositoryTypes from a JSON string
-// (comma-separated) or array.
-func (ts *TemplateRepositoryTypes) UnmarshalJSON(data []byte) error {
-	// Try to unmarshal as a string first
-	var csv string
-	if err := json.Unmarshal(data, &csv); err == nil {
-		for _, t := range strings.Split(csv, ",") {
-			*ts = append(*ts, TemplateRepositoryType(strings.TrimSpace(t)))
-		}
-		return nil
-	}
-
-	// Try to unmarshal as a slice
-	var types []TemplateRepositoryType
-	if err := json.Unmarshal(data, &types); err == nil {
-		*ts = TemplateRepositoryTypes(types)
-		return nil
-	}
-
-	return fmt.Errorf("TemplateRepositoryTypes: invalid JSON input: %s", string(data))
 }
 
 // Contains returns true if current repo needs to serve inpt type, with default assumed

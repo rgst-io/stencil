@@ -12,8 +12,9 @@ import (
 
 	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/v2/pkg/stencil"
+	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
-	"sigs.k8s.io/yaml"
+	"gotest.tools/v3/env"
 )
 
 func Test_cleanPath(t *testing.T) {
@@ -82,7 +83,8 @@ func Test_cleanPath(t *testing.T) {
 // file out of a lockfile, when present.
 func Test_describeFile_shouldFunction(t *testing.T) {
 	tmpDir := t.TempDir()
-	t.Chdir(tmpDir)
+
+	env.ChangeWorkingDir(t, tmpDir)
 
 	lock := &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
@@ -101,7 +103,6 @@ func Test_describeFile_shouldFunction(t *testing.T) {
 
 	// write the lockfile
 	b, err := yaml.Marshal(lock)
-	t.Log("lockfile", string(b))
 	assert.NilError(t, err)
 	assert.NilError(t, os.WriteFile(stencil.LockfileName, b, 0o600))
 	assert.NilError(t, os.WriteFile("hello-world", []byte{}, 0o644))
