@@ -10,6 +10,7 @@ import (
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"gotest.tools/v3/assert"
+	"sigs.k8s.io/yaml"
 )
 
 type testTpl struct {
@@ -44,6 +45,10 @@ func fakeTemplate(t *testing.T, args map[string]any,
 	}
 	if err := f.Close(); err != nil {
 		t.Fatal(err)
+	}
+
+	if args != nil {
+		args = emulateYAMLParsing(t, args).(map[string]any)
 	}
 
 	test.s = NewStencil(&configuration.Manifest{
@@ -92,6 +97,10 @@ func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]any,
 		assert.NilError(t, err)
 	}
 
+	if manifestArgs != nil {
+		manifestArgs = emulateYAMLParsing(t, manifestArgs).(map[string]any)
+	}
+
 	test.s = NewStencil(&configuration.Manifest{
 		Name:      "testing",
 		Arguments: manifestArgs,
@@ -109,6 +118,16 @@ func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]any,
 	test.log = log
 
 	return test
+}
+
+// emulateYAMLParsing takes the provided data, encodes it to yaml and
+// then decodes it. This is done to allow for emulation of real yaml
+// encoding.
+func emulateYAMLParsing(t *testing.T, i any) (o any) {
+	b, err := yaml.Marshal(i)
+	assert.NilError(t, err, "expected encode to succeed")
+	assert.NilError(t, yaml.Unmarshal(b, &o), "expected decode to succeed")
+	return
 }
 
 func TestTplStencil_Arg(t *testing.T) {
@@ -341,6 +360,36 @@ func TestTplStencil_Arg(t *testing.T) {
 			},
 			want:    nil,
 			wantErr: true,
+		},
+		{
+			name: "should return default value when not set and support json schema",
+			fields: fakeTemplate(t, map[string]any{}, map[string]configuration.Argument{
+				"hello": {
+					Schema: map[string]any{
+						"type": "object",
+					},
+				},
+			}),
+			args: args{
+				pth: "hello",
+			},
+			want: map[string]any{},
+		},
+		{
+			name: "should not return map[any]any",
+			fields: fakeTemplate(t, map[string]any{
+				"hello": map[int]string{0: "1"},
+			}, map[string]configuration.Argument{
+				"hello": {
+					Schema: map[string]any{
+						"type": "object",
+					},
+				},
+			}),
+			args: args{
+				pth: "hello",
+			},
+			want: map[string]any{"0": "1"},
 		},
 	}
 	for _, tt := range tests {
