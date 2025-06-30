@@ -25,7 +25,7 @@ import (
 	"github.com/urfave/cli/v3"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
-	"sigs.k8s.io/yaml"
+	"gopkg.in/yaml.v3"
 )
 
 // encodeToFile encodes the provided data [d] to the provided file path,
@@ -38,13 +38,12 @@ func encodeToFile(d any, outputFilePath string) error {
 	}
 	defer f.Close()
 
-	b, err := yaml.Marshal(d)
-	if err != nil {
-		return fmt.Errorf("failed to marshal data as yaml: %w", err)
+	enc := yaml.NewEncoder(f)
+	if err := enc.Encode(d); err != nil {
+		return err
 	}
 
-	_, err = f.Write(b)
-	return err
+	return enc.Close()
 }
 
 // generateTemplateRepository generates a template repository manifest
