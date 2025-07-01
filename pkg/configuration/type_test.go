@@ -3,7 +3,7 @@ package configuration_test
 import (
 	"testing"
 
-	"gopkg.in/yaml.v3"
+	"go.rgst.io/stencil/v2/internal/yaml"
 	"gotest.tools/v3/assert"
 
 	"go.rgst.io/stencil/v2/pkg/configuration"

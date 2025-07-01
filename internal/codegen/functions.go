@@ -23,7 +23,7 @@ import (
 	"strings"
 	"text/template"
 
-	"sigs.k8s.io/yaml"
+	"go.rgst.io/stencil/v2/internal/yaml"
 )
 
 // TplError is a wrapper for an [error] that can be returned by function

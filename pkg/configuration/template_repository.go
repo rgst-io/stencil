@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"gopkg.in/yaml.v3"
+	"go.rgst.io/stencil/v2/internal/yaml"
 )
 
 // TemplateRepositoryManifest is a manifest of a template repository
@@ -103,18 +103,13 @@ type ModuleHook struct {
 // instead as it contains the standard locations for a manifest.
 func LoadTemplateRepositoryManifest(path string) (*TemplateRepositoryManifest, error) {
 	//nolint:gosec // Why: Not user input.
-	f, err := os.Open(path)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
 
 	var s TemplateRepositoryManifest
-	if err := yaml.NewDecoder(f).Decode(&s); err != nil {
-		return nil, err
-	}
-
-	return &s, nil
+	return &s, yaml.Unmarshal(b, &s)
 }
 
 // LoadDefaultTemplateRepositoryManifest reads a template repository

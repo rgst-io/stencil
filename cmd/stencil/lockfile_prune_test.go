@@ -1,13 +1,27 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"testing"
 
+	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/slogext"
+	"go.rgst.io/stencil/v2/pkg/stencil"
 	"gotest.tools/v3/assert"
 )
+
+// mustYamlMarshal marshals the provided data as YAML and returns it as
+// a string. If it fails, this function panics.
+func mustYamlMarshal(d any) string {
+	b, err := yaml.Marshal(d)
+	if err != nil {
+		panic(fmt.Errorf("failed to marshal data as yaml: %w", err))
+	}
+
+	return string(b)
+}
 
 // TestLockfilePrune is a test matrix runner for combos against lockfile prune
 func TestLockfilePrune(t *testing.T) {
@@ -22,37 +36,121 @@ func TestLockfilePrune(t *testing.T) {
 		expectedStencilLock string
 	}{
 		{
-			name:                "TestPruneNoChange",
-			initStencilYaml:     "name: stencil\nmodules:\n  - name: test\n",
-			initStencilLock:     "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n",
-			makeTestFile:        true,
-			expectedStencilLock: "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n",
+			name: "TestPruneNoChange",
+			initStencilYaml: mustYamlMarshal(map[string]any{
+				"name":    "stencil",
+				"modules": []map[string]any{{"name": "test"}},
+			}),
+			initStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
+				},
+				Files: []*stencil.LockfileFileEntry{
+					{Name: "testfile"},
+				},
+			}),
+			makeTestFile: true,
+			expectedStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
+				},
+				Files: []*stencil.LockfileFileEntry{
+					{Name: "testfile"},
+				},
+			}),
 		},
 		{
-			name:                "TestPruneMissingFile",
-			initStencilYaml:     "name: stencil\nmodules:\n  - name: test\n",
-			initStencilLock:     "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n",
-			expectedStencilLock: "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles: []\n",
+			name: "TestPruneMissingFile",
+			initStencilYaml: mustYamlMarshal(map[string]any{
+				"name":    "stencil",
+				"modules": []map[string]any{{"name": "test"}},
+			}),
+			initStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
+				},
+				Files: []*stencil.LockfileFileEntry{
+					{Name: "testfile"},
+				},
+			}),
+			expectedStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
+				},
+				Files: []*stencil.LockfileFileEntry{},
+			}),
 		},
 		{
-			name:                "TestPruneMissingFileNotInPassedList",
-			initStencilYaml:     "name: stencil\nmodules:\n  - name: test\n",
-			initStencilLock:     "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n",
-			pruneArgs:           []string{"--file", "somethingelse"},
-			expectedStencilLock: "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n",
+			name: "TestPruneMissingFileNotInPassedList",
+			initStencilYaml: mustYamlMarshal(map[string]any{
+				"name":    "stencil",
+				"modules": []map[string]any{{"name": "test"}},
+			}),
+			initStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
+				},
+				Files: []*stencil.LockfileFileEntry{
+					{Name: "testfile"},
+				},
+			}),
+			pruneArgs: []string{"--file", "somethingelse"},
+			expectedStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
+				},
+				Files: []*stencil.LockfileFileEntry{
+					{Name: "testfile"},
+				},
+			}),
 		},
 		{
-			name:                "TestPruneMissingFileInPassedList",
-			initStencilYaml:     "name: stencil\nmodules:\n  - name: test\n",
-			initStencilLock:     "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles:\n  - name: testfile\n",
-			pruneArgs:           []string{"--file", "testfile"},
-			expectedStencilLock: "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles: []\n",
+			name: "TestPruneMissingFileInPassedList",
+			initStencilYaml: mustYamlMarshal(map[string]any{
+				"name":    "stencil",
+				"modules": []map[string]any{{"name": "test"}},
+			}),
+			initStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
+				},
+				Files: []*stencil.LockfileFileEntry{
+					{Name: "testfile"},
+				},
+			}),
+			pruneArgs: []string{"--file", "testfile"},
+			expectedStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
+				},
+				Files: []*stencil.LockfileFileEntry{},
+			}),
 		},
 		{
-			name:                "TestPruneMissingModuleNotInPassedList",
-			initStencilYaml:     "name: stencil\n",
-			initStencilLock:     "version: v1.6.2\nmodules:\n    - name: test\n      url: \"\"\n      version: null\nfiles: []\n",
-			expectedStencilLock: "version: v1.6.2\nmodules: []\nfiles: []\n",
+			name: "TestPruneMissingModuleNotInPassedList",
+			initStencilYaml: mustYamlMarshal(map[string]any{
+				"name": "stencil",
+			}),
+			initStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
+				},
+				Files: []*stencil.LockfileFileEntry{},
+			}),
+			expectedStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{},
+				Files:   []*stencil.LockfileFileEntry{},
+			}),
 		},
 	}
 

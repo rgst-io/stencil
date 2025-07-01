@@ -19,6 +19,7 @@ package modules
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"text/template"
@@ -33,8 +34,8 @@ import (
 	"github.com/jaredallard/vcs/resolver"
 	"github.com/pkg/errors"
 	"go.rgst.io/stencil/v2/internal/modules/nativeext"
+	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
-	"gopkg.in/yaml.v3"
 )
 
 // Module is a stencil module that contains template files.
@@ -163,15 +164,20 @@ func (m *Module) getManifest(ctx context.Context) (*configuration.TemplateReposi
 		return nil, errors.Wrap(err, "failed to download fs")
 	}
 
-	mf, err := fs.Open("manifest.yaml")
+	f, err := fs.Open("manifest.yaml")
 	if err != nil {
 		return nil, err
 	}
-	defer mf.Close()
+	defer f.Close()
+
+	b, err := io.ReadAll(f)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read manifest: %w", err)
+	}
 
 	var manifest configuration.TemplateRepositoryManifest
-	if err := yaml.NewDecoder(mf).Decode(&manifest); err != nil {
-		return nil, err
+	if err := yaml.Unmarshal(b, &manifest); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal manifest: %w", err)
 	}
 
 	// ensure that the manifest name is equal to the import path

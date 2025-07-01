@@ -24,7 +24,7 @@ import (
 	"os"
 	"regexp"
 
-	"gopkg.in/yaml.v3"
+	"go.rgst.io/stencil/v2/internal/yaml"
 )
 
 // ValidateNameRegexp is the regex used to validate the project's name
@@ -38,22 +38,19 @@ const ValidateNameRegexp = `^[_a-z][_a-z0-9-]*$`
 // getoutreach/stencil interop.
 func LoadManifest(path string) (*Manifest, error) {
 	//nolint:gosec // Why: This is required for it to work.
-	f, err := os.Open(path)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
 
-	var s *Manifest
-	if err := yaml.NewDecoder(f).Decode(&s); err != nil {
-		return nil, err
+	var s Manifest
+	if err := yaml.Unmarshal(b, &s); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal manifest: %w", err)
 	}
-
 	if !ValidateName(s.Name) {
 		return nil, fmt.Errorf("name field in %q was invalid", path)
 	}
-
-	return s, nil
+	return &s, nil
 }
 
 // LoadDefaultManifest returns a parsed project manifest from a set

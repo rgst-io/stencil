@@ -7,6 +7,7 @@ import (
 
 	"go.rgst.io/stencil/v2/internal/modules"
 	"go.rgst.io/stencil/v2/internal/modules/modulestest"
+	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"gotest.tools/v3/assert"
@@ -44,6 +45,10 @@ func fakeTemplate(t *testing.T, args map[string]any,
 	}
 	if err := f.Close(); err != nil {
 		t.Fatal(err)
+	}
+
+	if args != nil {
+		args = emulateYAMLParsing(t, args).(map[string]any)
 	}
 
 	test.s = NewStencil(&configuration.Manifest{
@@ -92,6 +97,10 @@ func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]any,
 		assert.NilError(t, err)
 	}
 
+	if manifestArgs != nil {
+		manifestArgs = emulateYAMLParsing(t, manifestArgs).(map[string]any)
+	}
+
 	test.s = NewStencil(&configuration.Manifest{
 		Name:      "testing",
 		Arguments: manifestArgs,
@@ -109,6 +118,16 @@ func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]any,
 	test.log = log
 
 	return test
+}
+
+// emulateYAMLParsing takes the provided data, encodes it to yaml and
+// then decodes it. This is done to allow for emulation of real yaml
+// encoding.
+func emulateYAMLParsing(t *testing.T, i any) (o any) {
+	b, err := yaml.Marshal(i)
+	assert.NilError(t, err, "expected marshal to succeed")
+	assert.NilError(t, yaml.Unmarshal(b, &o), "expected unmarshal to succeed")
+	return
 }
 
 func TestTplStencil_Arg(t *testing.T) {
@@ -342,6 +361,81 @@ func TestTplStencil_Arg(t *testing.T) {
 			want:    nil,
 			wantErr: true,
 		},
+		{
+			name: "should return default value when not set and support json schema",
+			fields: fakeTemplate(t, map[string]any{}, map[string]configuration.Argument{
+				"hello": {
+					Schema: map[string]any{
+						"type": "object",
+					},
+				},
+			}),
+			args: args{
+				pth: "hello",
+			},
+			want: map[string]any{},
+		},
+		{
+			name: "should not return map[any]any",
+			fields: fakeTemplate(t, map[string]any{
+				"hello": map[int]string{0: "1"},
+			}, map[string]configuration.Argument{
+				"hello": {
+					Schema: map[string]any{
+						"type": "object",
+					},
+				},
+			}),
+			args: args{
+				pth: "hello",
+			},
+			want: map[string]any{"0": "1"},
+		},
+		{
+			name: "should retain argument default (int)",
+			fields: fakeTemplate(t, map[string]any{}, map[string]configuration.Argument{
+				"number": {
+					Default: 100,
+					Schema: map[string]any{
+						"type": "number",
+					},
+				},
+			}),
+			args: args{
+				pth: "number",
+			},
+			want: 100,
+		},
+		{
+			name: "should retain argument default (float)",
+			fields: fakeTemplate(t, map[string]any{}, map[string]configuration.Argument{
+				"float": {
+					Default: 0.1,
+					Schema: map[string]any{
+						"type": "number",
+					},
+				},
+			}),
+			args: args{
+				pth: "float",
+			},
+			want: 0.1,
+		},
+		{
+			name: "should retain argument default (bool)",
+			fields: fakeTemplate(t, map[string]any{}, map[string]configuration.Argument{
+				"boolean": {
+					Default: true,
+					Schema: map[string]any{
+						"type": "boolean",
+					},
+				},
+			}),
+			args: args{
+				pth: "boolean",
+			},
+			want: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -356,7 +450,7 @@ func TestTplStencil_Arg(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("TplStencil.Arg() = %v, want %v", got, tt.want)
+				t.Errorf("TplStencil.Arg() = %v (%T), want %v (%T)", got, got, tt.want, tt.want)
 			}
 		})
 	}

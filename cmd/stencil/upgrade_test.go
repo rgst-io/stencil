@@ -8,10 +8,10 @@ import (
 	"testing"
 
 	"github.com/jaredallard/vcs/resolver"
+	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"go.rgst.io/stencil/v2/pkg/stencil"
-	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
 )
 

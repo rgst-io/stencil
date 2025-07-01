@@ -22,6 +22,7 @@ package modulestest
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -31,8 +32,8 @@ import (
 	"github.com/jaredallard/vcs/resolver"
 	"github.com/pkg/errors"
 	"go.rgst.io/stencil/v2/internal/modules"
+	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
-	"gopkg.in/yaml.v3"
 )
 
 // addTemplateToFS adds a template to a billy.Filesystem
@@ -73,12 +74,12 @@ func NewModuleFromTemplates(manifest *configuration.TemplateRepositoryManifest,
 	defer mf.Close()
 
 	// write a manifest file so that we can handle arguments
-	enc := yaml.NewEncoder(mf)
-	if err := enc.Encode(manifest); err != nil {
-		return nil, errors.Wrap(err, "failed to encode generated module manifest")
+	b, err := yaml.Marshal(manifest)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal manifest: %w", err)
 	}
-	if err := enc.Close(); err != nil {
-		return nil, errors.Wrap(err, "failed to close generated module manifest")
+	if _, err := mf.Write(b); err != nil {
+		return nil, fmt.Errorf("failed to write manifest: %w", err)
 	}
 
 	// create the module
