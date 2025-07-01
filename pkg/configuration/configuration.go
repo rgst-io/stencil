@@ -24,7 +24,7 @@ import (
 	"os"
 	"regexp"
 
-	"sigs.k8s.io/yaml"
+	"go.rgst.io/stencil/v2/internal/yaml"
 )
 
 // ValidateNameRegexp is the regex used to validate the project's name

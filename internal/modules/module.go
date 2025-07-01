@@ -34,8 +34,8 @@ import (
 	"github.com/jaredallard/vcs/resolver"
 	"github.com/pkg/errors"
 	"go.rgst.io/stencil/v2/internal/modules/nativeext"
+	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
-	"sigs.k8s.io/yaml"
 )
 
 // Module is a stencil module that contains template files.

@@ -6,9 +6,9 @@ import (
 	"path"
 	"testing"
 
+	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"gotest.tools/v3/assert"
-	"sigs.k8s.io/yaml"
 )
 
 // mustYamlMarshal marshals the provided data as YAML and returns it as

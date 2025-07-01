@@ -23,9 +23,9 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v3"
+	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
-	"sigs.k8s.io/yaml"
 )
 
 // encodeToFile encodes the provided data [d] to the provided file path,

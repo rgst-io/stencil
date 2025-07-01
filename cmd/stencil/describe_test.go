@@ -11,9 +11,9 @@ import (
 	"testing"
 
 	"github.com/jaredallard/vcs/resolver"
+	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/stencil"
 	"gotest.tools/v3/assert"
-	"sigs.k8s.io/yaml"
 )
 
 func Test_cleanPath(t *testing.T) {

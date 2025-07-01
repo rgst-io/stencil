@@ -7,10 +7,10 @@ import (
 
 	"go.rgst.io/stencil/v2/internal/modules"
 	"go.rgst.io/stencil/v2/internal/modules/modulestest"
+	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"gotest.tools/v3/assert"
-	"sigs.k8s.io/yaml"
 )
 
 type testTpl struct {
@@ -125,8 +125,8 @@ func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]any,
 // encoding.
 func emulateYAMLParsing(t *testing.T, i any) (o any) {
 	b, err := yaml.Marshal(i)
-	assert.NilError(t, err, "expected encode to succeed")
-	assert.NilError(t, yaml.Unmarshal(b, &o), "expected decode to succeed")
+	assert.NilError(t, err, "expected marshal to succeed")
+	assert.NilError(t, yaml.Unmarshal(b, &o), "expected unmarshal to succeed")
 	return
 }
 
@@ -391,6 +391,51 @@ func TestTplStencil_Arg(t *testing.T) {
 			},
 			want: map[string]any{"0": "1"},
 		},
+		{
+			name: "should retain argument default (int)",
+			fields: fakeTemplate(t, map[string]any{}, map[string]configuration.Argument{
+				"number": {
+					Default: 100,
+					Schema: map[string]any{
+						"type": "number",
+					},
+				},
+			}),
+			args: args{
+				pth: "number",
+			},
+			want: 100,
+		},
+		{
+			name: "should retain argument default (float)",
+			fields: fakeTemplate(t, map[string]any{}, map[string]configuration.Argument{
+				"float": {
+					Default: 0.1,
+					Schema: map[string]any{
+						"type": "number",
+					},
+				},
+			}),
+			args: args{
+				pth: "float",
+			},
+			want: 0.1,
+		},
+		{
+			name: "should retain argument default (bool)",
+			fields: fakeTemplate(t, map[string]any{}, map[string]configuration.Argument{
+				"boolean": {
+					Default: true,
+					Schema: map[string]any{
+						"type": "boolean",
+					},
+				},
+			}),
+			args: args{
+				pth: "boolean",
+			},
+			want: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -405,7 +450,7 @@ func TestTplStencil_Arg(t *testing.T) {
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("TplStencil.Arg() = %v, want %v", got, tt.want)
+				t.Errorf("TplStencil.Arg() = %v (%T), want %v (%T)", got, got, tt.want, tt.want)
 			}
 		})
 	}

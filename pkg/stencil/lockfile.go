@@ -26,7 +26,7 @@ import (
 	"sort"
 
 	"github.com/jaredallard/vcs/resolver"
-	"sigs.k8s.io/yaml"
+	"go.rgst.io/stencil/v2/internal/yaml"
 )
 
 // This block contains constants of the lockfiles

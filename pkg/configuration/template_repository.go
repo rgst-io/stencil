@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"sigs.k8s.io/yaml"
+	"go.rgst.io/stencil/v2/internal/yaml"
 )
 
 // TemplateRepositoryManifest is a manifest of a template repository

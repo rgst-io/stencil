@@ -12,11 +12,11 @@ import (
 	"go.rgst.io/stencil/v2/internal/modules"
 	"go.rgst.io/stencil/v2/internal/modules/modulestest"
 	"go.rgst.io/stencil/v2/internal/version"
+	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"go.rgst.io/stencil/v2/pkg/stencil"
 	"gotest.tools/v3/assert"
-	"sigs.k8s.io/yaml"
 )
 
 func TestBasicE2ERender(t *testing.T) {
