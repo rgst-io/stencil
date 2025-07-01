@@ -11,8 +11,8 @@ import (
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"go.rgst.io/stencil/v2/pkg/stencil"
-	"gopkg.in/yaml.v3"
 	"gotest.tools/v3/assert"
+	"sigs.k8s.io/yaml"
 )
 
 // selectUpgradeCanary returns a file from the provided directory that

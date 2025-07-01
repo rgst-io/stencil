@@ -49,7 +49,7 @@ func main() {
 		fileName := fmt.Sprintf("%s.jsonschema.json", s.FileName)
 
 		r := new(jsonschema.Reflector)
-		r.FieldNameTag = "yaml"
+		r.FieldNameTag = "json"
 
 		// Add comments to the schema.
 		if err := r.AddGoComments("go.rgst.io/stencil/v2", "pkg/configuration"); err != nil {

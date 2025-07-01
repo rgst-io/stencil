@@ -99,7 +99,7 @@ func (s *TplStencil) resolveDefault(pth string, arg *configuration.Argument) (an
 	var v any
 	switch typs {
 	case "map", "object":
-		v = make(map[any]any)
+		v = make(map[string]any)
 	case "list", "array":
 		v = make([]any, 0)
 	case "boolean", "bool":
