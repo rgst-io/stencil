@@ -70,31 +70,31 @@ func LoadDefaultManifest() (*Manifest, error) {
 // what files are included
 type Manifest struct {
 	// Name is the name of the project
-	Name string `json:"name" jsonschema:"required"`
+	Name string `yaml:"name" jsonschema:"required"`
 
 	// Modules are the template modules that this project depends
 	// on and utilizes
-	Modules []*TemplateRepository `json:"modules,omitempty"`
+	Modules []*TemplateRepository `yaml:"modules,omitempty"`
 
 	// Versions is a map of versions of certain tools, this is used by templates
 	// and will likely be replaced with something better in the future.
-	Versions map[string]string `json:"versions,omitempty"`
+	Versions map[string]string `yaml:"versions,omitempty"`
 
 	// Arguments is a map of arbitrary arguments to pass to the generator
-	Arguments map[string]any `json:"arguments"`
+	Arguments map[string]any `yaml:"arguments"`
 
 	// Replacements is a list of module names to replace their URI.
 	//
 	// Expected format:
 	// - local file: path/to/module
 	// - remote file: https://github.com/rgst-io/stencil-base
-	Replacements map[string]string `json:"replacements,omitempty"`
+	Replacements map[string]string `yaml:"replacements,omitempty"`
 }
 
 // TemplateRepository is a repository of template files.
 type TemplateRepository struct {
 	// Name is the name of this module. This should be a valid go import path
-	Name string `json:"name" jsonschema:"required"`
+	Name string `yaml:"name" jsonschema:"required"`
 
 	// Version is a semantic version or branch of the template repository
 	// that should be downloaded if not set then the latest version is used.
@@ -106,7 +106,7 @@ type TemplateRepository struct {
 	// But note that constraints are currently not locked so the version
 	// will change as the module is resolved on subsequent runs.
 	// Eventually, this will be changed to use the lockfile by default.
-	Version string `json:"version,omitempty"`
+	Version string `yaml:"version,omitempty"`
 }
 
 // ValidateName ensures that the name of a project in the manifest

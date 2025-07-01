@@ -8,6 +8,7 @@ import (
 
 	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/slogext"
+	"go.rgst.io/stencil/v2/pkg/stencil"
 	"gotest.tools/v3/assert"
 )
 
@@ -40,23 +41,23 @@ func TestLockfilePrune(t *testing.T) {
 				"name":    "stencil",
 				"modules": []map[string]any{{"name": "test"}},
 			}),
-			initStencilLock: mustYamlMarshal(map[string]any{
-				"version": "v1.6.2",
-				"modules": []map[string]any{
-					{"name": "test", "url": "", "version": nil},
+			initStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
 				},
-				"files": []map[string]any{
-					{"name": "testfile"},
+				Files: []*stencil.LockfileFileEntry{
+					{Name: "testfile"},
 				},
 			}),
 			makeTestFile: true,
-			expectedStencilLock: mustYamlMarshal(map[string]any{
-				"version": "v1.6.2",
-				"modules": []map[string]any{
-					{"name": "test", "url": "", "version": nil},
+			expectedStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
 				},
-				"files": []map[string]any{
-					{"name": "testfile"},
+				Files: []*stencil.LockfileFileEntry{
+					{Name: "testfile"},
 				},
 			}),
 		},
@@ -66,21 +67,21 @@ func TestLockfilePrune(t *testing.T) {
 				"name":    "stencil",
 				"modules": []map[string]any{{"name": "test"}},
 			}),
-			initStencilLock: mustYamlMarshal(map[string]any{
-				"version": "v1.6.2",
-				"modules": []map[string]any{
-					{"name": "test", "url": "", "version": nil},
+			initStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
 				},
-				"files": []map[string]any{
-					{"name": "testfile"},
+				Files: []*stencil.LockfileFileEntry{
+					{Name: "testfile"},
 				},
 			}),
-			expectedStencilLock: mustYamlMarshal(map[string]any{
-				"version": "v1.6.2",
-				"modules": []map[string]any{
-					{"name": "test", "url": "", "version": nil},
+			expectedStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
 				},
-				"files": []any{},
+				Files: []*stencil.LockfileFileEntry{},
 			}),
 		},
 		{
@@ -89,23 +90,23 @@ func TestLockfilePrune(t *testing.T) {
 				"name":    "stencil",
 				"modules": []map[string]any{{"name": "test"}},
 			}),
-			initStencilLock: mustYamlMarshal(map[string]any{
-				"version": "v1.6.2",
-				"modules": []map[string]any{
-					{"name": "test", "url": "", "version": nil},
+			initStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
 				},
-				"files": []map[string]any{
-					{"name": "testfile"},
+				Files: []*stencil.LockfileFileEntry{
+					{Name: "testfile"},
 				},
 			}),
 			pruneArgs: []string{"--file", "somethingelse"},
-			expectedStencilLock: mustYamlMarshal(map[string]any{
-				"version": "v1.6.2",
-				"modules": []map[string]any{
-					{"name": "test", "url": "", "version": nil},
+			expectedStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
 				},
-				"files": []map[string]any{
-					{"name": "testfile"},
+				Files: []*stencil.LockfileFileEntry{
+					{Name: "testfile"},
 				},
 			}),
 		},
@@ -115,22 +116,22 @@ func TestLockfilePrune(t *testing.T) {
 				"name":    "stencil",
 				"modules": []map[string]any{{"name": "test"}},
 			}),
-			initStencilLock: mustYamlMarshal(map[string]any{
-				"version": "v1.6.2",
-				"modules": []map[string]any{
-					{"name": "test", "url": "", "version": nil},
+			initStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
 				},
-				"files": []map[string]any{
-					{"name": "testfile"},
+				Files: []*stencil.LockfileFileEntry{
+					{Name: "testfile"},
 				},
 			}),
 			pruneArgs: []string{"--file", "testfile"},
-			expectedStencilLock: mustYamlMarshal(map[string]any{
-				"version": "v1.6.2",
-				"modules": []map[string]any{
-					{"name": "test", "url": "", "version": nil},
+			expectedStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
 				},
-				"files": []any{},
+				Files: []*stencil.LockfileFileEntry{},
 			}),
 		},
 		{
@@ -138,17 +139,17 @@ func TestLockfilePrune(t *testing.T) {
 			initStencilYaml: mustYamlMarshal(map[string]any{
 				"name": "stencil",
 			}),
-			initStencilLock: mustYamlMarshal(map[string]any{
-				"version": "v1.6.2",
-				"modules": []map[string]any{
-					{"name": "test", "url": "", "version": nil},
+			initStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{
+					{Name: "test", URL: "", Version: nil},
 				},
-				"files": []any{},
+				Files: []*stencil.LockfileFileEntry{},
 			}),
-			expectedStencilLock: mustYamlMarshal(map[string]any{
-				"version": "v1.6.2",
-				"modules": []any{},
-				"files":   []any{},
+			expectedStencilLock: mustYamlMarshal(stencil.Lockfile{
+				Version: "v1.6.2",
+				Modules: []*stencil.LockfileModuleEntry{},
+				Files:   []*stencil.LockfileFileEntry{},
 			}),
 		},
 	}

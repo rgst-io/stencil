@@ -27,73 +27,73 @@ import (
 type TemplateRepositoryManifest struct {
 	// Name is the name of this template repository.
 	// This must match the import path.
-	Name string `json:"name" jsonschema:"required"`
+	Name string `yaml:"name" jsonschema:"required"`
 
 	// Modules are template repositories that this manifest requires
-	Modules []*TemplateRepository `json:"modules,omitempty"`
+	Modules []*TemplateRepository `yaml:"modules,omitempty"`
 
 	// MinStencilVersion is the minimum version of stencil that is required to
 	// render this module.
-	MinStencilVersion string `json:"minStencilVersion,omitempty"`
+	MinStencilVersion string `yaml:"minStencilVersion,omitempty"`
 
 	// Type stores a comma-separated list of template repository types served by the current module.
 	// Use the TemplateRepositoryTypes.Contains method to check.
-	Type TemplateRepositoryTypes `json:"type,omitempty"`
+	Type TemplateRepositoryTypes `yaml:"type,omitempty"`
 
 	// PostRunCommand is a command to be ran after rendering and post-processors
 	// have been ran on the project
-	PostRunCommand []*PostRunCommandSpec `json:"postRunCommand,omitempty"`
+	PostRunCommand []*PostRunCommandSpec `yaml:"postRunCommand,omitempty"`
 
 	// Arguments are a declaration of arguments to the template generator
-	Arguments map[string]Argument `json:"arguments,omitempty"`
+	Arguments map[string]Argument `yaml:"arguments,omitempty"`
 
 	// DirReplacements is a list of directory name replacement templates to render
-	DirReplacements map[string]string `json:"dirReplacements,omitempty"`
+	DirReplacements map[string]string `yaml:"dirReplacements,omitempty"`
 
 	// ModuleHooks contains configuration for module hooks, keyed by their
 	// name.
-	ModuleHooks map[string]ModuleHook `json:"moduleHooks,omitempty"`
+	ModuleHooks map[string]ModuleHook `yaml:"moduleHooks,omitempty"`
 }
 
 // PostRunCommandSpec is the spec of a command to be ran and its
 // friendly name
 type PostRunCommandSpec struct {
 	// Name is the name of the command being ran, used for UX
-	Name string `json:"name,omitempty"`
+	Name string `yaml:"name,omitempty"`
 
 	// Command is the command to be ran, note: this is ran inside
 	// of a bash shell.
-	Command string `json:"command" jsonschema:"required"`
+	Command string `yaml:"command" jsonschema:"required"`
 }
 
 // Argument is a user-input argument that can be passed to
 // templates
 type Argument struct {
 	// Description is a description of this argument.
-	Description string `json:"description"`
+	Description string `yaml:"description"`
 
 	// Required denotes this argument as required.
-	Required bool `json:"required,omitempty"`
+	Required bool `yaml:"required,omitempty"`
 
 	// Default is the default value for this argument if it's not set.
 	// This cannot be set when required is true.
-	Default any `json:"default,omitempty"`
+	Default any `yaml:"default,omitempty"`
 
 	// Schema is a JSON schema, in YAML, for the argument.
-	Schema map[string]any `json:"schema"`
+	Schema map[string]any `yaml:"schema"`
 
 	// From is a reference to an argument in another module, if this is
 	// set, all other fields are ignored and instead the module referenced
 	// field's are used instead. The name of the argument, the key in the map,
 	// must be the same across both modules.
-	From string `json:"from,omitempty"`
+	From string `yaml:"from,omitempty"`
 }
 
 // ModuleHook contains configuration for a module hook.
 type ModuleHook struct {
 	// Schema is a JSON schema. When set this is used to validate all
 	// module hook data as it is inserted.
-	Schema map[string]any `json:"schema,omitempty"`
+	Schema map[string]any `yaml:"schema,omitempty"`
 }
 
 // LoadTemplateRepositoryManifest reads a template repository manifest

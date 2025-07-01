@@ -10,8 +10,8 @@ import (
 	stdyaml "go.yaml.in/yaml/v3"
 )
 
-// Marshal is an alias to [yaml.Marshal].
-var Marshal = yaml.Marshal
+// Marshal is an alias to [stdyaml.Marshal].
+var Marshal = stdyaml.Marshal
 
 // Unmarshal wraps [stdyaml.Unmarshal] but ensures the provided data is
 // compatible with JSON serialization.
