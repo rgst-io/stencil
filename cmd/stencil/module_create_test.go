@@ -43,7 +43,7 @@ func testRunCommand(t *testing.T, cmd *cli.Command, dir string, args ...string) 
 
 func TestCanCreateModule(t *testing.T) {
 	log := slogext.NewTestLogger(t)
-	cmd := NewCreateModuleCommand(log)
+	cmd := NewModuleCreateCommand(log)
 	assert.Assert(t, cmd != nil)
 	assert.NilError(t, testRunCommand(t, cmd, "", "github.com/rgst-io/test-module"))
 
@@ -54,7 +54,7 @@ func TestCanCreateModule(t *testing.T) {
 
 func TestCreateModuleFailsWhenFilesExist(t *testing.T) {
 	log := slogext.NewTestLogger(t)
-	cmd := NewCreateModuleCommand(log)
+	cmd := NewModuleCreateCommand(log)
 	assert.Assert(t, cmd != nil)
 
 	tmpDir := t.TempDir()
@@ -73,7 +73,7 @@ func TestCreateModuleFailsWhenFilesExist(t *testing.T) {
 // of stencil-golang than anything else.
 func TestCanCreateNativeExtension(t *testing.T) {
 	log := slogext.NewTestLogger(t)
-	cmd := NewCreateModuleCommand(log)
+	cmd := NewModuleCreateCommand(log)
 	assert.Assert(t, cmd != nil)
 
 	assert.NilError(t, testRunCommand(t, cmd, "", "--native-extension", "github.com/rgst-io/test-module"))

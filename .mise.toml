@@ -13,6 +13,7 @@ goreleaser = "latest"
 
 [tasks.build]
 description = "Build a binary for the current platform/architecture"
+sources = ['*.go', '**/*.go', '*.tpl', '**/.tpl']
 run = "go build -trimpath -o ./bin/ -v ./cmd/..."
 
 [tasks.changelog]
