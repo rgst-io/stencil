@@ -37,7 +37,7 @@ var argumentTpl []byte
 
 // NewModuleGenArgsDocsCommand returns a [cli.Command] for the module
 // gen-args command.
-func NewModuleGenArgsDocsCommand(log slogext.Logger) *cli.Command {
+func NewModuleGenArgsDocsCommand(_ slogext.Logger) *cli.Command {
 	return &cli.Command{
 		Name:        "gen-args-docs",
 		Aliases:     []string{"generate-args-docs"},
@@ -50,7 +50,7 @@ func NewModuleGenArgsDocsCommand(log slogext.Logger) *cli.Command {
 				Value:       "docs/arguments.md",
 			},
 		},
-		Action: func(ctx context.Context, c *cli.Command) error {
+		Action: func(_ context.Context, c *cli.Command) error {
 			mf, err := configuration.LoadDefaultTemplateRepositoryManifest()
 			if err != nil {
 				return err
@@ -69,7 +69,7 @@ func NewModuleGenArgsDocsCommand(log slogext.Logger) *cli.Command {
 			} else {
 				outDir := filepath.Dir(outFile)
 				if outDir != outFile {
-					if err := os.MkdirAll(outDir, 0o755); err != nil {
+					if err := os.MkdirAll(outDir, 0o750); err != nil {
 						return fmt.Errorf(
 							"failed to create parent directory of output file %s, %s: %w", outFile, outDir, err,
 						)

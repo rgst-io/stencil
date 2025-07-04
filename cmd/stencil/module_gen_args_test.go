@@ -129,6 +129,5 @@ consumes.
 
 Does something with this`
 
-	assert.Equal(t, strings.TrimSpace(string(got)), strings.TrimSpace(string(want)))
-
+	assert.Equal(t, strings.TrimSpace(string(got)), strings.TrimSpace(want))
 }
