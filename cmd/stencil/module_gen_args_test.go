@@ -85,17 +85,17 @@ func TestGenerateArgumentDocs(t *testing.T) {
 
 ## Manifest Arguments
 
-###  ` + "`" + `enum` + "`" + `
+### ` + "`" + `enum` + "`" + `
 
 **Type**: ` + "`" + `string` + "`" + `
 
-###  ` + "`" + `object` + "`" + `
+### ` + "`" + `object` + "`" + `
 
 **Required**
 
 **Type**: ` + "`" + `object` + "`" + `
 
-###  ` + "`" + `oneOf` + "`" + `
+### ` + "`" + `oneOf` + "`" + `
 
 **Schema**:
 
@@ -112,7 +112,7 @@ func TestGenerateArgumentDocs(t *testing.T) {
 }
 ` + "`" + `` + "`" + `` + "`" + `
 
-###  ` + "`" + `string` + "`" + `
+### ` + "`" + `string` + "`" + `
 
 **Type**: ` + "`" + `string` + "`" + `
 
@@ -123,7 +123,7 @@ A string!
 The following arguments are exposed by dependencies that this module
 consumes.
 
-###  ` + "`" + `from` + "`" + `
+### ` + "`" + `from` + "`" + `
 
 **From**: https://github.com/rgst-io/stencil-golang
 

@@ -18,7 +18,7 @@
 {{- continue }}
 {{- end }}
 
-###  `{{ $name }}`
+### `{{ $name }}`
 
 {{- if $val.Required }}
 
@@ -59,7 +59,7 @@ consumes.
 {{- continue }}
 {{- end }}
 
-###  `{{ $name }}`
+### `{{ $name }}`
 
 **From**: https://{{ $val.From }}
 
