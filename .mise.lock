@@ -6,6 +6,7 @@ backend = "core:bun"
 "bun-darwin-aarch64.zip" = "sha256:ab0cd6fc7fc8d1ee4f8166d99b71086d4793c5aee0d0b5c73fdf9b70fa47ded4"
 "bun-linux-aarch64.zip" = "sha256:3c3d006148f37200f967fd8070eefb340468287bacb44524a31cad1ee9d3bb7b"
 "bun-linux-x64-baseline.zip" = "sha256:386ca291c7fa98720d0e94daa1133af811e69fa24352558a403c1b9759e7eb98"
+"bun-linux-x64.zip" = "sha256:a261626367835bb3754a01ae07f884484ed17b0886b01e417b799591fa4d7901"
 
 [tools.git-cliff]
 version = "2.8.0"
