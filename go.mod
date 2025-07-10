@@ -25,7 +25,7 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/urfave/cli/v3 v3.3.8
 	go.yaml.in/yaml/v3 v3.0.4
-	golang.org/x/mod v0.25.0
+	golang.org/x/mod v0.26.0
 	gotest.tools/v3 v3.5.2
 	sigs.k8s.io/yaml v1.5.0
 )
