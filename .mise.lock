@@ -13,17 +13,19 @@ version = "2.8.0"
 backend = "ubi:orhun/git-cliff"
 
 [tools.git-cliff.checksums]
+"git-cliff-2.8.0-x86_64-apple-darwin.tar.gz" = "sha512:bc841df00273f011e3a88c1d92b3bcd92482647c6721a31eb79f341f65b663386b22b53fd67dcf967b83ef6d1032d176ff0aa74d86a36c9f5f42272b4289720e"
 git-cliff-linux-aarch64 = "sha256:f4887b3cd7686fd2559eb8f4c38ec0ac963f118ceb3d2a0a33c5ab04c61e8d81"
 git-cliff-linux-x86_64 = "sha256:8290346a28e6c6f055594ff06bf8bd4d6d6d67ef84b9065d372df6f09e14ec35"
 git-cliff-macos-aarch64 = "sha256:79d22153ee98404f8f70359bc3846552b8a69ec461b5088bffd7a66198a1bb77"
 
 [tools.go]
-version = "1.24.4"
+version = "1.24.5"
 backend = "core:go"
 
 [tools.go.checksums]
-"go1.24.4.linux-amd64.tar.gz" = "sha256:77e5da33bb72aeaef1ba4418b6fe511bc4d041873cbf82e5aa6318740df98717"
-"go1.24.4.linux-arm64.tar.gz" = "sha256:d5501ee5aca0f258d5fe9bfaed401958445014495dc115f202d43d5210b45241"
+"go1.24.5.darwin-arm64.tar.gz" = "sha256:92d30a678f306c327c544758f2d2fa5515aa60abe9dba4ca35fbf9b8bfc53212"
+"go1.24.5.linux-amd64.tar.gz" = "sha256:10ad9e86233e74c0f6590fe5426895de6bf388964210eac34a6d83f38918ecdc"
+"go1.24.5.linux-arm64.tar.gz" = "sha256:0df02e6aeb3d3c06c95ff201d575907c736d6c62cfa4b6934c11203f1d600ffa"
 
 [tools."go:github.com/thenativeweb/get-next-version"]
 version = "latest"
