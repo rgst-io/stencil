@@ -55,6 +55,25 @@ func (f *TplFile) Block(name string) string {
 	return f.f.Block(name)
 }
 
+// BlockI returns the contents of a given block with an indentation nuance that if
+// the block is empty, it will not add a newline to the output.
+//
+//	## <<Stencil::Block(name)>>
+//	## <</Stencil::Block>>
+//
+//	## <<Stencil::Block(name)>>
+//	{{- /* Has no newline if no contents, due to the - at the block prefix */ }}
+//	{{- file.BlockI "name" }}
+//	## <</Stencil::Block>>
+func (f *TplFile) BlockI(name string) string {
+	contents := f.f.Block(name)
+	if contents == "" {
+		return ""
+	}
+
+	return "\n" + contents
+}
+
 // SetPath changes the path of the current file being rendered
 //
 //	{{- file.SetPath "new/path/to/file.txt" }}

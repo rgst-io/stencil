@@ -31,6 +31,12 @@ var generatedBlockTemplate string
 //go:embed testdata/generated-block/fake.txt
 var fakeGeneratedBlockFile string
 
+//go:embed testdata/generated-block-indent/template.txt.tpl
+var generatedBlockIndentTemplate string
+
+//go:embed testdata/generated-block-indent/fake.txt
+var fakeGeneratedBlockIndentFile string
+
 func TestSingleFileRender(t *testing.T) {
 	log := slogext.NewTestLogger(t)
 	fs, err := testmemfs.WithManifest("name: testing\n")
@@ -149,6 +155,35 @@ func TestGeneratedBlock(t *testing.T) {
 	tpl.Render(st, NewValues(t.Context(), sm, nil))
 
 	assert.Equal(t, tpl.Files[0].String(), fakeGeneratedBlockFile, "expected fake to equal rendered output")
+}
+
+func TestGeneratedBlockIndent(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+	tempDir := t.TempDir()
+	fakeFilePath := filepath.Join(tempDir, "generated-block-indent.txt")
+
+	fs, err := testmemfs.WithManifest("name: testing\n")
+	assert.NilError(t, err, "failed to testmemfs.WithManifest")
+	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]any{}}
+	m, err := modulestest.NewWithFS(t.Context(), "testing", fs)
+	assert.NilError(t, err, "failed to NewWithFS")
+
+	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
+	assert.NilError(t, os.WriteFile(fakeFilePath, []byte(fakeGeneratedBlockIndentFile), 0o644),
+		"failed to write generated file")
+
+	tpl, err := NewTemplate(m, "generated-block-indent/template.tpl", 0o644,
+		time.Now(), []byte(generatedBlockIndentTemplate), log, nil)
+	assert.NilError(t, err, "failed to create template")
+
+	tplf, err := NewFile(fakeFilePath, 0o644, time.Now(), fakeBlocksTemplate(t))
+	assert.NilError(t, err, "failed to create file")
+
+	// Add the file (fake) to the template so that the template uses it for blocks
+	tpl.Files = []*File{tplf}
+	tpl.Render(st, NewValues(t.Context(), sm, nil))
+
+	assert.Equal(t, tpl.Files[0].String(), fakeGeneratedBlockIndentFile, "expected fake to equal rendered output")
 }
 
 // TestLibraryTemplate ensures that library templates don't generate

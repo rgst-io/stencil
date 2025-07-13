@@ -1,0 +1,9 @@
+
+###Block(a)
+a-string
+###EndBlock(a)
+###Block(b)
+###EndBlock(b)
+###Block(c)
+wow
+###EndBlock(c)
