@@ -203,11 +203,11 @@ For example, if an application uses the `github.com/stencil/example-module` modu
 
 ```yaml
 replacements:
-	# Replace it with a file path
-	github.com/stencil/example-module: ../example-module
+  # Replace it with a file path
+  github.com/stencil/example-module: ../example-module
 
-	# Replace it with a different URL
-	github.com/stencil/example-module: github.com/myname/example-module
+  # Replace it with a different URL
+  github.com/stencil/example-module: github.com/myname/example-module
 ```
 
 If you want to lock the dependency to a specific version currently replacements don't support setting the version, but instead you'd specify this in the `version` field of the module field of the `stencil.yaml`. For the example above:

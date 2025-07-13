@@ -10,8 +10,7 @@ order: 4
 > [reference documentation](/reference/) or the other quick starts
 > here before proceeding. You've been warned!
 >
-> Also, if you get stuck, take a look at [stencil-golang's native
-> extension](https://github.com/rgst-io/stencil-golang/blob/main/internal/plugin/plugin.go).
+> Also, if you get stuck, take a look at [stencil-golang's native extension](https://github.com/rgst-io/stencil-golang/blob/main/internal/plugin/plugin.go).
 > It's a great example which only fetches license information from the
 > Github API!
 
