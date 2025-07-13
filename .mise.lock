@@ -44,13 +44,13 @@ version = "3.11.0"
 backend = "go:mvdan.cc/sh/v3/cmd/shfmt"
 
 [tools.golangci-lint]
-version = "2.2.1"
+version = "2.2.2"
 backend = "aqua:golangci-lint"
 
 [tools.golangci-lint.checksums]
-"golangci-lint-2.2.1-darwin-arm64.tar.gz" = "sha256:4066c41affc407e59df74b1e17bcc7138f366888f57670f0f4357d582a72fa8e"
-"golangci-lint-2.2.1-linux-amd64.tar.gz" = "sha256:4098436776a4f4bbef25dcad93f56533003d085f9133e4c69ba3145973d211dc"
-"golangci-lint-2.2.1-linux-arm64.tar.gz" = "sha256:7de4280b78315f3ca3d785cce82e663655c457e6889e64807314107936e17dfa"
+"golangci-lint-2.2.2-darwin-arm64.tar.gz" = "sha256:d84d94d042c0d495fd1746f3d18948a75de163b17a14e8de3ef840928dd2df74"
+"golangci-lint-2.2.2-linux-amd64.tar.gz" = "sha256:c27fbde948a87d326feacd21df2f61a9c54dbd2e3bfa185c0a1cd6917a6f964f"
+"golangci-lint-2.2.2-linux-arm64.tar.gz" = "sha256:fce5317bb885db91d4104dfb4dc4fd0574ae266775b62132dcb39ffe322119bb"
 
 [tools.goreleaser]
 version = "2.9.0"
