@@ -35,8 +35,6 @@ jobs:
         with:
           path: ${{ steps.go.outputs.mod_cache_dir }}
           key: ${{ runner.os }}-go-mod-cache-${{ hashFiles('**/go.sum') }}
-      - name: Setup prettier
-        run: bun install
       - run: mise run generate
       - run: mise run fmt
       - name: Check for changes
