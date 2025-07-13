@@ -1,4 +1,3 @@
-
 # Default versions of tools, to update these, set [tools.override]
 [tools]
 dprint = "latest"
@@ -68,6 +67,7 @@ description = "Update the TOC in the README"
 run = ["mdtoc --inplace --max-depth=5 README.md"]
 
 [alias]
+dprint = "ubi:dprint/dprint"
 golangci-lint = "aqua:golangci-lint"
 git-cliff = "ubi:orhun/git-cliff"
 goreleaser = "aqua:goreleaser/goreleaser"
