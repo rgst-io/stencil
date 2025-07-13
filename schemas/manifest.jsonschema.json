@@ -5,14 +5,8 @@
 	"$defs": {
 		"Argument": {
 			"properties": {
-				"description": {
-					"type": "string",
-					"description": "Description is a description of this argument."
-				},
-				"required": {
-					"type": "boolean",
-					"description": "Required denotes this argument as required."
-				},
+				"description": { "type": "string", "description": "Description is a description of this argument." },
+				"required": { "type": "boolean", "description": "Required denotes this argument as required." },
 				"default": {
 					"description": "Default is the default value for this argument if it's not set.\nThis cannot be set when required is true."
 				},
@@ -43,10 +37,7 @@
 		},
 		"PostRunCommandSpec": {
 			"properties": {
-				"name": {
-					"type": "string",
-					"description": "Name is the name of the command being ran, used for UX"
-				},
+				"name": { "type": "string", "description": "Name is the name of the command being ran, used for UX" },
 				"command": {
 					"type": "string",
 					"description": "Command is the command to be ran, note: this is ran inside\nof a bash shell."
