@@ -148,7 +148,8 @@ func TestUpgradeReRunsStencil(t *testing.T) {
 	writeML(t, &configuration.Manifest{
 		Name: "testing",
 		Modules: []*configuration.TemplateRepository{{
-			Name: "github.com/rgst-io/stencil-golang",
+			Name:    "github.com/rgst-io/stencil-golang",
+			Version: "=1.6.2",
 		}},
 		Arguments: map[string]any{
 			"org": "rgst-io",
@@ -179,7 +180,8 @@ func TestUpgradeDoesNotReRunStencilWhenTold(t *testing.T) {
 	writeML(t, &configuration.Manifest{
 		Name: "testing",
 		Modules: []*configuration.TemplateRepository{{
-			Name: "github.com/rgst-io/stencil-golang",
+			Name:    "github.com/rgst-io/stencil-golang",
+			Version: "=1.6.2",
 		}},
 		Arguments: map[string]any{
 			"org": "rgst-io",
