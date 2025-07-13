@@ -1,9 +1,9 @@
 
-###Block(a)
+## <<Stencil::Block(a)>>
 a-string
-###EndBlock(a)
-###Block(b)
-###EndBlock(b)
-###Block(c)
+## <</Stencil::Block>>
+## <<Stencil::Block(b)>>
+## <</Stencil::Block>>
+## <<Stencil::Block(c)>>
 wow
-###EndBlock(c)
+## <</Stencil::Block>>

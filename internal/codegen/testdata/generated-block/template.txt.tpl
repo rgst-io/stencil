@@ -1,5 +1,5 @@
 {{- range $_, $block := (list "a" "b" "c") }}
-###Block({{ $block }})
+## <<Stencil::Block({{ $block }})>>
 {{ file.Block $block }}
-###EndBlock({{ $block }})
+## <</Stencil::Block>>
 {{- end }}

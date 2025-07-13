@@ -1,10 +1,10 @@
 
-###Block(a)
+## <<Stencil::Block(a)>>
 a-string
-###EndBlock(a)
-###Block(b)
+## <</Stencil::Block>>
+## <<Stencil::Block(b)>>
 another-string
-###EndBlock(b)
-###Block(c)
+## <</Stencil::Block>>
+## <<Stencil::Block(c)>>
 wow
-###EndBlock(c)
+## <</Stencil::Block>>
