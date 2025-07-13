@@ -6,7 +6,7 @@
 	"editor.formatOnSave": true,
 	"shellcheck.customArgs": ["-P", "SCRIPTDIR", "-x"],
 	"[markdown]": {
-		"editor.defaultFormatter": "esbenp.prettier-vscode"
+		"editor.defaultFormatter": "dprint.dprint"
 	},
 	"[yaml]": {
 		"editor.defaultFormatter": "redhat.vscode-yaml"
