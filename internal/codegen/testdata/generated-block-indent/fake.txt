@@ -3,7 +3,6 @@
 a-string
 ## <</Stencil::Block>>
 ## <<Stencil::Block(b)>>
-another-string
 ## <</Stencil::Block>>
 ## <<Stencil::Block(c)>>
 wow
