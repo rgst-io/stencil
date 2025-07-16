@@ -211,6 +211,34 @@ func TestValidateStencilVersionBothPropertiesFail(t *testing.T) {
 	assert.ErrorContains(t, err, "minStencilVersion and stencilVersion cannot be declared in the same module")
 }
 
+func TestValidateStencilVersionBadConstraint(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stencil-version-bad-constraint"),
+		},
+	}, false, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(t.Context(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+
+	err = s.validateStencilVersion(mods, "2.0.0")
+	assert.Error(t, err, "improper constraint: invalid")
+}
+
 func TestValidateStencilVersionConstraintValidationFailure(t *testing.T) {
 	log := slogext.NewTestLogger(t)
 
@@ -264,6 +292,34 @@ func TestValidateStencilVersionConstraintValidationSuccess(t *testing.T) {
 	assert.NilError(t, err, "failed to resolve modules")
 
 	assert.NilError(t, s.validateStencilVersion(mods, "2.0.0"))
+}
+
+func TestValidateStencilVersionBadMinVersion(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "bad-min-stencil-version"),
+		},
+	}, false, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(t.Context(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+
+	err = s.validateStencilVersion(mods, "2.0.0")
+	assert.Error(t, err, "invalid semantic version")
 }
 
 func TestValidateStencilVersionMinVersionFailure(t *testing.T) {
