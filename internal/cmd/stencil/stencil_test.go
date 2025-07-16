@@ -8,6 +8,7 @@ import (
 
 	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/v2/internal/modules"
+	"go.rgst.io/stencil/v2/internal/version"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"go.rgst.io/stencil/v2/pkg/stencil"
@@ -265,6 +266,38 @@ func TestValidateStencilVersionConstraintValidationFailure(t *testing.T) {
 
 	err = s.validateStencilVersion(mods, "2.0.0")
 	assert.ErrorContains(t, err, "stencil version 2.0.0 does not match the version constraint (^1.0.0) for github.com/rgst-io/stencil-golang")
+}
+
+// TestValidateStencilVersionTestingVersionAlwaysPasses is largely a
+// regression test. If go-version ever changes (but continues to
+// return a non-semantic version as a default for GitVersion), this is
+// one of the tests that will fail. Others will also fail, but the
+// errors are more cryptic.
+func TestValidateStencilVersionTestingVersionAlwaysPasses(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stencil-version-matches-constraint"),
+		},
+	}, false, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(t.Context(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+
+	assert.NilError(t, s.validateStencilVersion(mods, version.Version.GitVersion))
 }
 
 func TestValidateStencilVersionConstraintValidationSuccess(t *testing.T) {
