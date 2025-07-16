@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Masterminds/semver/v3"
 	"go.rgst.io/stencil/v2/internal/yaml"
 )
 
@@ -40,8 +39,9 @@ type TemplateRepositoryManifest struct {
 	// StencilVersion is the version constraint which describes what
 	// versions of Stencil can render this module. It differs from
 	// MinStencilVersion in that it can, among other things, lock a
-	// module to a certain major version.
-	StencilVersion *semver.Constraints `yaml:"stencilVersion,omitempty"`
+	// module to a certain major version. It conforms to the constraint
+	// syntax as supported by github.com/Masterminds/semver/v3.
+	StencilVersion string `yaml:"stencilVersion,omitempty"`
 
 	// Type stores a comma-separated list of template repository types served by the current module.
 	// Use the TemplateRepositoryTypes.Contains method to check.

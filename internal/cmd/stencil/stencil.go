@@ -259,15 +259,19 @@ func (c *Command) validateStencilVersion(mods []*modules.Module, stencilVersion 
 	for _, m := range mods {
 		c.log.Infof(" -> %s %s", m.Name, printVersion(m.Version))
 
-		if m.Manifest.MinStencilVersion != "" && m.Manifest.StencilVersion != nil {
+		if m.Manifest.MinStencilVersion != "" && m.Manifest.StencilVersion != "" {
 			return fmt.Errorf("minStencilVersion and stencilVersion cannot be declared in the same module (%s)",
 				m.Name)
 		}
 
-		if m.Manifest.StencilVersion != nil {
-			if validated, errs := m.Manifest.StencilVersion.Validate(sgv); !validated {
+		if m.Manifest.StencilVersion != "" {
+			versionConstraint, err := semver.NewConstraint(m.Manifest.StencilVersion)
+			if err != nil {
+				return err
+			}
+			if validated, errs := versionConstraint.Validate(sgv); !validated {
 				return fmt.Errorf("stencil version %s does not match the version constraint (%s) for %s: %w",
-					stencilVersion, m.Manifest.StencilVersion.String(), m.Name, errors.Join(errs...))
+					stencilVersion, m.Manifest.StencilVersion, m.Name, errors.Join(errs...))
 			}
 		}
 
