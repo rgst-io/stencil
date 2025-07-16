@@ -44,8 +44,9 @@ Check out our [installation docs].
 
 ### Prerequisites
 
-**Note**: If you opt to not use `mise`, please install all dependencies
-from `.tool-versions` manually.
+> [!NOTE]
+> If you opt to not use `mise`, please install all dependencies
+> from the `[tools]` section of `.mise.toml` manually.
 
 - [mise](https://github.com/jdx/mise?tab=readme-ov-file#quickstart) -
   Ensure that you add the appropriate activations to your shell
