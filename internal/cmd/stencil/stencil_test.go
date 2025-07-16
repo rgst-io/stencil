@@ -182,3 +182,86 @@ func TestResolveModulesShouldAllowAdds(t *testing.T) {
 	mod := slicesMap(mods, func(m *modules.Module) string { return m.Name })["github.com/rgst-io/stencil-golang"]
 	assert.DeepEqual(t, mod.Version, &resolver.Version{Tag: "v0.5.0", Commit: "3c3213721335c53fd78f4fede1b3704801616615"})
 }
+
+func TestValidateStencilVersionBothPropertiesFail(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "both-stencil-versions"),
+		},
+	}, false, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(t.Context(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+
+	err = s.validateStencilVersion(mods, "2.0.0")
+	assert.ErrorContains(t, err, "minStencilVersion and stencilVersion cannot be declared in the same module")
+}
+
+func TestValidateStencilVersionConstraintValidationFailure(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stencil-too-new"),
+		},
+	}, false, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(t.Context(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+
+	err = s.validateStencilVersion(mods, "2.0.0")
+	assert.ErrorContains(t, err, "stencil version 2.0.0 does not match the version constraint (^1.0.0) for github.com/rgst-io/stencil-golang")
+}
+
+func TestValidateStencilVersionConstraintValidationSuccess(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stencil-version-matches-constraint"),
+		},
+	}, false, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(t.Context(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+
+	assert.NilError(t, s.validateStencilVersion(mods, "2.0.0"))
+}

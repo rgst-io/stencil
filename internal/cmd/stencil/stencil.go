@@ -27,6 +27,7 @@ import (
 	"os"
 	"slices"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/v2/internal/codegen"
 	"go.rgst.io/stencil/v2/internal/modules"
@@ -34,7 +35,6 @@ import (
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"go.rgst.io/stencil/v2/pkg/stencil"
-	"golang.org/x/mod/semver"
 )
 
 // Command is a thin wrapper around the codegen package that implements
@@ -244,6 +244,48 @@ func (c *Command) Upgrade(ctx context.Context, skipRender bool) error {
 	return c.runWithModules(ctx, mods)
 }
 
+// validateStencilVersion ensures that the running Stencil version is
+// compatible with the given Stencil modules.
+func (c *Command) validateStencilVersion(mods []*modules.Module, stencilVersion string) error {
+	// devel is when you're running in tests, it will always fail semver parsing.
+	if stencilVersion == "devel" {
+		return nil
+	}
+	sgv, err := semver.StrictNewVersion(stencilVersion)
+	if err != nil {
+		return err
+	}
+
+	for _, m := range mods {
+		c.log.Infof(" -> %s %s", m.Name, printVersion(m.Version))
+
+		if m.Manifest.MinStencilVersion != "" && m.Manifest.StencilVersion != nil {
+			return fmt.Errorf("minStencilVersion and stencilVersion cannot be declared in the same module (%s)",
+				m.Name)
+		}
+
+		if m.Manifest.StencilVersion != nil {
+			if validated, errs := m.Manifest.StencilVersion.Validate(sgv); !validated {
+				return fmt.Errorf("stencil version %s does not match the version constraint (%s) for %s: %w",
+					stencilVersion, m.Manifest.StencilVersion.String(), m.Name, errors.Join(errs...))
+			}
+		}
+
+		if m.Manifest.MinStencilVersion != "" {
+			msv, err := semver.StrictNewVersion(m.Manifest.MinStencilVersion)
+			if err != nil {
+				return err
+			}
+			if sgv.LessThan(msv) {
+				return fmt.Errorf("stencil version %s is less than the required version %s for %s",
+					stencilVersion, m.Manifest.MinStencilVersion, m.Name)
+			}
+		}
+	}
+
+	return nil
+}
+
 // Run fetches dependencies of the root modules and builds the layered filesystem,
 // after that GenerateFiles is called to actually walk the filesystem and render
 // the templates. This step also does minimal post-processing of the dependencies
@@ -255,16 +297,8 @@ func (c *Command) Run(ctx context.Context) error {
 		return err
 	}
 
-	for _, m := range mods {
-		c.log.Infof(" -> %s %s", m.Name, printVersion(m.Version))
-
-		if m.Manifest.MinStencilVersion != "" {
-			// semver.Compare expects the version to be prefixed with "v"
-			if semver.Compare("v"+version.Version.GitVersion, "v"+m.Manifest.MinStencilVersion) < 0 {
-				return fmt.Errorf("stencil version %s is less than the required version %s for %s",
-					version.Version.GitVersion, m.Manifest.MinStencilVersion, m.Name)
-			}
-		}
+	if err := c.validateStencilVersion(mods, version.Version.GitVersion); err != nil {
+		return err
 	}
 
 	return c.runWithModules(ctx, mods)
