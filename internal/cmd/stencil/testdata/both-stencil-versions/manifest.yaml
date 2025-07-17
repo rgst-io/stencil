@@ -1,0 +1,3 @@
+name: github.com/rgst-io/stencil-golang
+minStencilVersion: 2.0.0
+stencilVersion: ^2.0.0

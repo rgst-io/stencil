@@ -8,6 +8,7 @@ import (
 
 	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/v2/internal/modules"
+	"go.rgst.io/stencil/v2/internal/version"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"go.rgst.io/stencil/v2/pkg/stencil"
@@ -181,4 +182,230 @@ func TestResolveModulesShouldAllowAdds(t *testing.T) {
 
 	mod := slicesMap(mods, func(m *modules.Module) string { return m.Name })["github.com/rgst-io/stencil-golang"]
 	assert.DeepEqual(t, mod.Version, &resolver.Version{Tag: "v0.5.0", Commit: "3c3213721335c53fd78f4fede1b3704801616615"})
+}
+
+func TestValidateStencilVersionBothPropertiesFail(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "both-stencil-versions"),
+		},
+	}, false, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(t.Context(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+
+	err = s.validateStencilVersion(mods, "2.0.0")
+	assert.ErrorContains(t, err, "minStencilVersion and stencilVersion cannot be declared in the same module")
+}
+
+func TestValidateStencilVersionBadConstraint(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stencil-version-bad-constraint"),
+		},
+	}, false, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(t.Context(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+
+	err = s.validateStencilVersion(mods, "2.0.0")
+	assert.Error(t, err, "improper constraint: invalid")
+}
+
+func TestValidateStencilVersionConstraintValidationFailure(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stencil-too-new"),
+		},
+	}, false, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(t.Context(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+
+	err = s.validateStencilVersion(mods, "2.0.0")
+	assert.ErrorContains(t, err, "stencil version 2.0.0 does not match the version constraint (^1.0.0) for github.com/rgst-io/stencil-golang")
+}
+
+// TestValidateStencilVersionTestingVersionAlwaysPasses is largely a
+// regression test. If go-version ever changes (but continues to
+// return a non-semantic version as a default for GitVersion), this is
+// one of the tests that will fail. Others will also fail, but the
+// errors are more cryptic.
+func TestValidateStencilVersionTestingVersionAlwaysPasses(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stencil-version-matches-constraint"),
+		},
+	}, false, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(t.Context(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+
+	assert.NilError(t, s.validateStencilVersion(mods, version.Version.GitVersion))
+}
+
+func TestValidateStencilVersionConstraintValidationSuccess(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stencil-version-matches-constraint"),
+		},
+	}, false, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(t.Context(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+
+	assert.NilError(t, s.validateStencilVersion(mods, "2.0.0"))
+}
+
+func TestValidateStencilVersionBadMinVersion(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "bad-min-stencil-version"),
+		},
+	}, false, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(t.Context(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+
+	err = s.validateStencilVersion(mods, "2.0.0")
+	assert.Error(t, err, "invalid semantic version")
+}
+
+func TestValidateStencilVersionMinVersionFailure(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "min-stencil-too-new"),
+		},
+	}, false, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(t.Context(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+
+	err = s.validateStencilVersion(mods, "2.0.0")
+	assert.Error(t, err, "stencil version 2.0.0 is less than the required version 3.0.0 for github.com/rgst-io/stencil-golang")
+}
+
+func TestValidateStencilVersionMinVersionSuccess(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+
+	s := NewCommand(log, &configuration.Manifest{
+		Modules: []*configuration.TemplateRepository{{
+			Name: "github.com/rgst-io/stencil-golang",
+		}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stencil-version-newer-than-min"),
+		},
+	}, false, false)
+	s.lock = &stencil.Lockfile{
+		Modules: []*stencil.LockfileModuleEntry{{
+			Name: "github.com/rgst-io/stencil-golang",
+			Version: &resolver.Version{
+				Commit: "3c3213721335c53fd78f4fede1b3704801616615",
+				Tag:    "v0.5.0",
+			},
+		}},
+	}
+
+	mods, err := s.resolveModules(t.Context(), false)
+	assert.NilError(t, err, "failed to resolve modules")
+
+	assert.NilError(t, s.validateStencilVersion(mods, "2.1.0"))
 }

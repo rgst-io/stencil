@@ -88,6 +88,10 @@
 					"type": "string",
 					"description": "MinStencilVersion is the minimum version of stencil that is required to\nrender this module."
 				},
+				"stencilVersion": {
+					"type": "string",
+					"description": "StencilVersion is the version constraint which describes what\nversions of Stencil can render this module. It differs from\nMinStencilVersion in that it can, among other things, lock a\nmodule to a certain major version. It conforms to the constraint\nsyntax as supported by github.com/Masterminds/semver/v3."
+				},
 				"type": {
 					"$ref": "#/$defs/TemplateRepositoryTypes",
 					"description": "Type stores a comma-separated list of template repository types served by the current module.\nUse the TemplateRepositoryTypes.Contains method to check."

@@ -36,6 +36,13 @@ type TemplateRepositoryManifest struct {
 	// render this module.
 	MinStencilVersion string `yaml:"minStencilVersion,omitempty"`
 
+	// StencilVersion is the version constraint which describes what
+	// versions of Stencil can render this module. It differs from
+	// MinStencilVersion in that it can, among other things, lock a
+	// module to a certain major version. It conforms to the constraint
+	// syntax as supported by github.com/Masterminds/semver/v3.
+	StencilVersion string `yaml:"stencilVersion,omitempty"`
+
 	// Type stores a comma-separated list of template repository types served by the current module.
 	// Use the TemplateRepositoryTypes.Contains method to check.
 	Type TemplateRepositoryTypes `yaml:"type,omitempty"`
