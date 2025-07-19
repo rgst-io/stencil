@@ -90,10 +90,10 @@ func generateStencilYaml(name string, hasNativeExt bool) *configuration.Manifest
 // create command.
 func NewModuleCreateCommand(log slogext.Logger) *cli.Command {
 	return &cli.Command{
-		Name: "module",
-		Description: "DEPRECATED: Use 'module create' instead'. " +
-			"Creates a module with the provided name in the current directory",
-		ArgsUsage: "create module <name>",
+		Name:        "create",
+		Usage:       "Create a stencil module",
+		Description: "Creates a module with the provided name in the current directory",
+		ArgsUsage:   "create module <name>",
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:  "native-extension",

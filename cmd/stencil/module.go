@@ -28,9 +28,11 @@ import (
 func NewModuleCommand(log slogext.Logger) *cli.Command {
 	return &cli.Command{
 		Name:        "module",
+		Usage:       "Commands for stencil modules",
 		Description: "Commands related to interacting with modules",
 		Commands: []*cli.Command{
 			NewModuleCreateCommand(log),
+			NewModuleTestCommand(log),
 			NewModuleGenArgsDocsCommand(log),
 		},
 	}
