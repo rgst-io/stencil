@@ -6,8 +6,7 @@ order: 3
 
 > [!NOTE]
 > This quick start assumes you're familiar with stencil usage already.
-> If you aren't be sure to go through the [reference
-> documentation](/reference/) or the [quick start](/guide/).
+> If you aren't be sure to go through the [reference documentation](/reference/) or the [quick start](/guide/).
 
 ## Step 1: Create a module
 

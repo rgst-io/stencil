@@ -1,7 +1,7 @@
 {
 	"recommendations": [
+		"dprint.dprint",
 		"editorconfig.editorconfig",
-		"esbenp.prettier-vscode",
 		"golang.go",
 		"timonwong.shellcheck",
 		"redhat.vscode-yaml",

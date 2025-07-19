@@ -5,10 +5,7 @@
 	"$defs": {
 		"Manifest": {
 			"properties": {
-				"name": {
-					"type": "string",
-					"description": "Name is the name of the project"
-				},
+				"name": { "type": "string", "description": "Name is the name of the project" },
 				"modules": {
 					"items": { "$ref": "#/$defs/TemplateRepository" },
 					"type": "array",

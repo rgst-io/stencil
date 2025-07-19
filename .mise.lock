@@ -1,12 +1,10 @@
-[tools.bun]
-version = "1.2.15"
-backend = "core:bun"
+[tools.dprint]
+version = "0.50.1"
+backend = "aqua:dprint/dprint"
 
-[tools.bun.checksums]
-"bun-darwin-aarch64.zip" = "sha256:ab0cd6fc7fc8d1ee4f8166d99b71086d4793c5aee0d0b5c73fdf9b70fa47ded4"
-"bun-linux-aarch64.zip" = "sha256:3c3d006148f37200f967fd8070eefb340468287bacb44524a31cad1ee9d3bb7b"
-"bun-linux-x64-baseline.zip" = "sha256:386ca291c7fa98720d0e94daa1133af811e69fa24352558a403c1b9759e7eb98"
-"bun-linux-x64.zip" = "sha256:a261626367835bb3754a01ae07f884484ed17b0886b01e417b799591fa4d7901"
+[tools.dprint.checksums]
+"dprint-aarch64-apple-darwin.zip" = "sha256:c92e1a8dddd9bc65391468265b2805cb2317e4490fd777bca2dfaf1ef716ac36"
+"dprint-x86_64-unknown-linux-musl.zip" = "sha256:82ddddc881bf8ec0b4c55e3f835a2dc3d81d8fff39aad79e6b5c017e4dff1d5e"
 
 [tools.git-cliff]
 version = "2.8.0"
@@ -25,11 +23,10 @@ backend = "core:go"
 [tools.go.checksums]
 "go1.24.5.darwin-arm64.tar.gz" = "sha256:92d30a678f306c327c544758f2d2fa5515aa60abe9dba4ca35fbf9b8bfc53212"
 "go1.24.5.linux-amd64.tar.gz" = "sha256:10ad9e86233e74c0f6590fe5426895de6bf388964210eac34a6d83f38918ecdc"
-"go1.24.5.linux-arm64.tar.gz" = "sha256:0df02e6aeb3d3c06c95ff201d575907c736d6c62cfa4b6934c11203f1d600ffa"
 
-[tools."go:github.com/thenativeweb/get-next-version"]
-version = "latest"
-backend = "go:github.com/thenativeweb/get-next-version"
+[tools."go:github.com/caarlos0/svu"]
+version = "1.12.0"
+backend = "go:github.com/caarlos0/svu"
 
 [tools."go:golang.org/x/tools/cmd/goimports"]
 version = "0.33.0"
