@@ -19,6 +19,7 @@ package slogext
 
 import (
 	"fmt"
+	"io"
 	"log/slog"
 	"os"
 
@@ -65,10 +66,17 @@ const (
 	FatalLevel Level = charmlog.FatalLevel
 )
 
-// New creates a new logger using the slog package.
+// New creates a new [Logger] using the slog package.
 func New() Logger {
 	handler := charmlog.New(os.Stdout)
 	return &logger{slog.New(handler), handler}
+}
+
+// NewWithHandler creates a new [Logger] using the slog package. Levels
+// do not work since it is not a slog native concept.
+func NewWithHandler(h slog.Handler) Logger {
+	// TODO(jaredallard): Consider exposing a leveler function.
+	return &logger{slog.New(h), charmlog.New(io.Discard)}
 }
 
 // logger is a simple wrapper around the slog.Logger interface. Use

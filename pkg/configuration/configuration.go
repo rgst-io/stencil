@@ -89,6 +89,10 @@ type Manifest struct {
 	// - local file: path/to/module
 	// - remote file: https://github.com/rgst-io/stencil-base
 	Replacements map[string]string `yaml:"replacements,omitempty"`
+
+	// Testing contains configuration when this manifest is being used for
+	// a test (e.g., 'stencil module test')
+	Testing ManifestTesting `yaml:"testing,omitempty"`
 }
 
 // TemplateRepository is a repository of template files.
@@ -107,6 +111,14 @@ type TemplateRepository struct {
 	// will change as the module is resolved on subsequent runs.
 	// Eventually, this will be changed to use the lockfile by default.
 	Version string `yaml:"version,omitempty"`
+}
+
+// ManifestTesting contains testing information for usage when running
+// tests against this stencil manifest.
+type ManifestTesting struct {
+	// Validators is a list of commands to run against the generated
+	// stencil templates.
+	Validators []string `yaml:"validators,omitempty"`
 }
 
 // ValidateName ensures that the name of a project in the manifest

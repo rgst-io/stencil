@@ -41,6 +41,7 @@ func NewModuleGenArgsDocsCommand(_ slogext.Logger) *cli.Command {
 	return &cli.Command{
 		Name:        "gen-args-docs",
 		Aliases:     []string{"generate-args-docs"},
+		Usage:       "Generate documentation for the current stencil module",
 		Description: "Generate documentation for the current stencil module.",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
