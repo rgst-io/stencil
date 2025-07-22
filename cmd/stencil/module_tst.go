@@ -25,6 +25,7 @@ import (
 	"github.com/jaredallard/cmdexec"
 	"github.com/urfave/cli/v3"
 	"go.rgst.io/stencil/v2/internal/cmd/stencil"
+	"go.rgst.io/stencil/v2/internal/slicesext"
 	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
@@ -84,11 +85,17 @@ func runTest(ctx context.Context, log slogext.Logger, dir string, t *Test) error
 	// using a local version of the module that we're trying to test.
 	mf.Name = t.Name
 
-	// TODO(jaredallard): Allow including other modules, but ensure that
-	// we always control the version of the tested module
-	mf.Modules = []*configuration.TemplateRepository{
-		{Name: t.TemplateRepoManifest.Name, Version: "=0.0.0"},
+	modules := slicesext.Map(mf.Modules, func(m *configuration.TemplateRepository) string {
+		return m.Name
+	})
+
+	// Ensure that we control the version of ourself when testing, but
+	// also allow other modules to be imported.
+	modules[t.TemplateRepoManifest.Name] = &configuration.TemplateRepository{
+		Name:    t.TemplateRepoManifest.Name,
+		Version: "=0.0.0", // We replace it below.
 	}
+	mf.Modules = slicesext.FromMap(modules)
 
 	mf.Replacements = map[string]string{
 		t.TemplateRepoManifest.Name: dir,
@@ -103,15 +110,21 @@ func runTest(ctx context.Context, log slogext.Logger, dir string, t *Test) error
 		return fmt.Errorf("failed to write manifest modifications to temp dir: %w", err)
 	}
 
-	// TODO(jaredallard): plumb in logger from newmoduletestcommand
-	cmd := stencil.NewCommand(slogext.NewNullLogger(), mf, false, false)
+	tlog, tlogbuf := slogext.NewCapturedLogger()
+	defer tlogbuf.Reset()
+
+	tlog = tlog.With("test.name", t.Name)
+
+	cmd := stencil.NewCommand(tlog, mf, false, false)
 	if err := cmd.Run(ctx); err != nil {
+		fmt.Print(tlogbuf.String())
 		return err
 	}
 
 	for _, validator := range mf.Testing.Validators {
 		cmd := cmdexec.CommandContext(ctx, "bash", "-euo", "pipefail", "-c", validator)
 		if err := cmd.Run(); err != nil {
+			fmt.Print(tlogbuf.String())
 			return fmt.Errorf("validator failed (%s): %w", cmd.String(), err)
 		}
 	}
@@ -142,7 +155,6 @@ func ModuleTestAction(log slogext.Logger) cli.ActionFunc {
 			}
 		}
 
-		// TODO(jaredallard): maybe use walkdir?
 		dirs, err := os.ReadDir(testDir)
 		if err != nil {
 			return fmt.Errorf("failed to read tests directory: %w", err)

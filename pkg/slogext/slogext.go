@@ -68,7 +68,13 @@ const (
 
 // New creates a new [Logger] using the slog package.
 func New() Logger {
-	handler := charmlog.New(os.Stdout)
+	return NewWithWriter(os.Stdout)
+}
+
+// NewWithWriter creates a new [Logger] using the slog package with a
+// custom writer target.
+func NewWithWriter(w io.Writer) Logger {
+	handler := charmlog.New(w)
 	return &logger{slog.New(handler), handler}
 }
 
