@@ -12,3 +12,9 @@ func TestModuleTestSmokeTest(t *testing.T) {
 
 	assert.NilError(t, testRunCommand(t, cmd, "cmd/stencil/testdata/module_test"), "expected command to not fail")
 }
+
+func TestModuleTestSmokeTestFailure(t *testing.T) {
+	cmd := NewModuleTestCommand(slogext.NewTestLogger(t))
+
+	assert.Error(t, testRunCommand(t, cmd, "cmd/stencil/testdata/module_test_failure"), "tests failed", "expected command to fail")
+}
