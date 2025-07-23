@@ -23,9 +23,9 @@ import (
 	"path/filepath"
 
 	"github.com/jaredallard/cmdexec"
+	"github.com/samber/lo"
 	"github.com/urfave/cli/v3"
 	"go.rgst.io/stencil/v2/internal/cmd/stencil"
-	"go.rgst.io/stencil/v2/internal/slicesext"
 	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
@@ -85,9 +85,11 @@ func runTest(ctx context.Context, log slogext.Logger, dir string, t *Test) error
 	// using a local version of the module that we're trying to test.
 	mf.Name = t.Name
 
-	modules := slicesext.Map(mf.Modules, func(m *configuration.TemplateRepository) string {
-		return m.Name
-	})
+	modules := lo.SliceToMap(mf.Modules,
+		func(m *configuration.TemplateRepository) (string, *configuration.TemplateRepository) {
+			return m.Name, m
+		},
+	)
 
 	// Ensure that we control the version of ourself when testing, but
 	// also allow other modules to be imported.
@@ -95,7 +97,11 @@ func runTest(ctx context.Context, log slogext.Logger, dir string, t *Test) error
 		Name:    t.TemplateRepoManifest.Name,
 		Version: "=0.0.0", // We replace it below.
 	}
-	mf.Modules = slicesext.FromMap(modules)
+	mf.Modules = lo.MapToSlice(modules,
+		func(_ string, m *configuration.TemplateRepository) *configuration.TemplateRepository {
+			return m
+		},
+	)
 
 	mf.Replacements = map[string]string{
 		t.TemplateRepoManifest.Name: dir,

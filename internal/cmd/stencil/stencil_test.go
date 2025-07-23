@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/jaredallard/vcs/resolver"
+	"github.com/samber/lo"
 	"go.rgst.io/stencil/v2/internal/modules"
-	"go.rgst.io/stencil/v2/internal/slicesext"
 	"go.rgst.io/stencil/v2/internal/version"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
@@ -112,7 +112,7 @@ func TestResolveShouldNotUpgradeOtherModulesWhenUpgradingOne(t *testing.T) {
 	assert.NilError(t, err, "failed to resolve modules")
 	assert.Equal(t, len(mods), 2, "expected exactly two modules")
 
-	modsHM := slicesext.Map(mods, func(m *modules.Module) string { return m.Name })
+	modsHM := lo.SliceToMap(mods, func(m *modules.Module) (string, *modules.Module) { return m.Name, m })
 
 	assert.DeepEqual(t, modsHM["github.com/rgst-io/stencil-golang"].Version, &resolver.Version{
 		Commit: "3c3213721335c53fd78f4fede1b3704801616615",
@@ -181,7 +181,7 @@ func TestResolveModulesShouldAllowAdds(t *testing.T) {
 	assert.NilError(t, err, "failed to resolve modules")
 	assert.Equal(t, len(mods), 2, "expected exactly one module")
 
-	mod := slicesext.Map(mods, func(m *modules.Module) string { return m.Name })["github.com/rgst-io/stencil-golang"]
+	mod := lo.SliceToMap(mods, func(m *modules.Module) (string, *modules.Module) { return m.Name, m })["github.com/rgst-io/stencil-golang"]
 	assert.DeepEqual(t, mod.Version, &resolver.Version{Tag: "v0.5.0", Commit: "3c3213721335c53fd78f4fede1b3704801616615"})
 }
 

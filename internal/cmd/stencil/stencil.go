@@ -29,9 +29,9 @@ import (
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/jaredallard/vcs/resolver"
+	"github.com/samber/lo"
 	"go.rgst.io/stencil/v2/internal/codegen"
 	"go.rgst.io/stencil/v2/internal/modules"
-	"go.rgst.io/stencil/v2/internal/slicesext"
 	"go.rgst.io/stencil/v2/internal/version"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
@@ -182,7 +182,9 @@ func (c *Command) resolveModules(ctx context.Context, ignoreLockfile bool) ([]*m
 		}
 	}
 
-	replacementsHM := slicesext.Map(replacements, func(m *modules.Module) string { return m.Name })
+	replacementsHM := lo.SliceToMap(replacements,
+		func(m *modules.Module) (string, *modules.Module) { return m.Name, m },
+	)
 
 	// On first run, we need to resolve the modules. Otherwise, the user
 	// will be expected to run 'stencil upgrade' to update the lockfile.
