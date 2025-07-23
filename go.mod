@@ -23,6 +23,7 @@ require (
 	github.com/princjef/gomarkdoc v1.1.0
 	github.com/puzpuzpuz/xsync/v4 v4.1.0
 	github.com/rogpeppe/go-internal v1.14.1
+	github.com/samber/lo v1.51.0
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/urfave/cli/v3 v3.3.8
 	go.yaml.in/yaml/v3 v3.0.4
@@ -78,7 +79,6 @@ require (
 	github.com/princjef/mageutil v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/samber/lo v1.51.0 // indirect
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
 	github.com/shopspring/decimal v1.4.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
