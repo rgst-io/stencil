@@ -109,8 +109,15 @@ func entrypoint(ctx context.Context, args []string) error {
 		case "windows":
 			return fmt.Errorf("windows is not implemented")
 		default:
+			//nolint:errcheck // Why: Best effort.
+			ghToken, _ := cmdexec.Command("gh", "auth", "token").Output()
+			if len(ghToken) == 0 {
+				ghToken = []byte("")
+			}
+
 			cmd = cmdexec.CommandContext(ctx,
 				"docker", "run", "-it", "--rm", "-v", "./:/app",
+				"-e", "GITHUB_TOKEN="+strings.TrimSpace(string(ghToken)),
 				"--platform", p.String(), "-w", "/app",
 				"--entrypoint", "bash",
 				DockerImage, "-oeu", "pipefail", "-c",
