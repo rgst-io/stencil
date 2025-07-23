@@ -1,0 +1,6 @@
+name: module_test_failure
+arguments:
+  hello:
+    description: "hello!"
+    schema:
+      type: "string"

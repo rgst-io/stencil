@@ -14,26 +14,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-// Description: This file contains code for the module command
+package slogext
 
-package main
+import "bytes"
 
-import (
-	"github.com/urfave/cli/v3"
-	"go.rgst.io/stencil/v2/pkg/slogext"
-)
-
-// NewModuleCommand returns a new [cli.Command] for the
-// module command
-func NewModuleCommand(log slogext.Logger) *cli.Command {
-	return &cli.Command{
-		Name:        "module",
-		Usage:       "Commands for stencil modules",
-		Description: "Commands related to interacting with modules",
-		Commands: []*cli.Command{
-			NewModuleCreateCommand(log),
-			NewModuleTestCommand(log),
-			NewModuleGenArgsDocsCommand(log),
-		},
-	}
+// NewCapturedLogger returns a [Logger] who's output is captured for
+// future usage.
+func NewCapturedLogger() (Logger, *bytes.Buffer) {
+	b := new(bytes.Buffer)
+	return NewWithWriter(b), b
 }

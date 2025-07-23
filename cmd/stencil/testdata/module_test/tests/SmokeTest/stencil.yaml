@@ -1,0 +1,6 @@
+name: stencil_module_test
+arguments:
+  hello: "world"
+testing:
+  validators:
+    - '[[ "$(cat hello.txt)" == "world" ]]'

@@ -2,30 +2,49 @@
 version = "1.2.15"
 backend = "core:bun"
 
-[tools.bun.checksums]
-"bun-darwin-aarch64.zip" = "sha256:ab0cd6fc7fc8d1ee4f8166d99b71086d4793c5aee0d0b5c73fdf9b70fa47ded4"
-"bun-linux-aarch64.zip" = "sha256:3c3d006148f37200f967fd8070eefb340468287bacb44524a31cad1ee9d3bb7b"
-"bun-linux-x64-baseline.zip" = "sha256:386ca291c7fa98720d0e94daa1133af811e69fa24352558a403c1b9759e7eb98"
-"bun-linux-x64.zip" = "sha256:a261626367835bb3754a01ae07f884484ed17b0886b01e417b799591fa4d7901"
+[tools.bun.platforms.linux-arm64]
+checksum = "blake3:d027f3b38fc86da96cc8c95e0480efc15f8bbf04561848c5d86c1d438e948c09"
+size = 36630612
+
+[tools.bun.platforms.linux-x64]
+checksum = "blake3:f6e1e07432597a88f559b3d604c6fb5d34dec7bb0a84502ade2e7e4af3986953"
+size = 37886924
+
+[tools.bun.platforms.macos-arm64]
+checksum = "blake3:26825cf24db84de2da0a0a8d9c376066602e00dbd97acfab0cabe8c0a8f02901"
+size = 21014570
 
 [tools.git-cliff]
 version = "2.8.0"
 backend = "ubi:orhun/git-cliff"
 
-[tools.git-cliff.checksums]
-"git-cliff-2.8.0-x86_64-apple-darwin.tar.gz" = "sha512:bc841df00273f011e3a88c1d92b3bcd92482647c6721a31eb79f341f65b663386b22b53fd67dcf967b83ef6d1032d176ff0aa74d86a36c9f5f42272b4289720e"
-git-cliff-linux-aarch64 = "sha256:f4887b3cd7686fd2559eb8f4c38ec0ac963f118ceb3d2a0a33c5ab04c61e8d81"
-git-cliff-linux-x86_64 = "sha256:8290346a28e6c6f055594ff06bf8bd4d6d6d67ef84b9065d372df6f09e14ec35"
-git-cliff-macos-aarch64 = "sha256:79d22153ee98404f8f70359bc3846552b8a69ec461b5088bffd7a66198a1bb77"
+[tools.git-cliff.platforms.linux-arm64-git-cliff]
+checksum = "blake3:6d7c272bee59db85e12d563718a582301aa53814d2953f5f832cec740c096a6c"
+
+[tools.git-cliff.platforms.linux-x64-git-cliff]
+checksum = "blake3:9d827756b22293791d1333e8f9cf6e2fbf87240e8d457827eb809d7b9bca34ff"
+
+[tools.git-cliff.platforms.macos-arm64-git-cliff]
+checksum = "blake3:4488a034d6103a18932bb274949f273a30116b41b19ec41798a5ac85e45ab393"
 
 [tools.go]
 version = "1.24.5"
 backend = "core:go"
 
-[tools.go.checksums]
-"go1.24.5.darwin-arm64.tar.gz" = "sha256:92d30a678f306c327c544758f2d2fa5515aa60abe9dba4ca35fbf9b8bfc53212"
-"go1.24.5.linux-amd64.tar.gz" = "sha256:10ad9e86233e74c0f6590fe5426895de6bf388964210eac34a6d83f38918ecdc"
-"go1.24.5.linux-arm64.tar.gz" = "sha256:0df02e6aeb3d3c06c95ff201d575907c736d6c62cfa4b6934c11203f1d600ffa"
+[tools.go.platforms.linux-arm64]
+checksum = "sha256:0df02e6aeb3d3c06c95ff201d575907c736d6c62cfa4b6934c11203f1d600ffa"
+size = 74805101
+url = "https://dl.google.com/go/go1.24.5.linux-arm64.tar.gz"
+
+[tools.go.platforms.linux-x64]
+checksum = "sha256:10ad9e86233e74c0f6590fe5426895de6bf388964210eac34a6d83f38918ecdc"
+size = 78563580
+url = "https://dl.google.com/go/go1.24.5.linux-amd64.tar.gz"
+
+[tools.go.platforms.macos-arm64]
+checksum = "sha256:92d30a678f306c327c544758f2d2fa5515aa60abe9dba4ca35fbf9b8bfc53212"
+size = 76284834
+url = "https://dl.google.com/go/go1.24.5.darwin-arm64.tar.gz"
 
 [tools."go:github.com/thenativeweb/get-next-version"]
 version = "latest"
@@ -47,16 +66,36 @@ backend = "go:mvdan.cc/sh/v3/cmd/shfmt"
 version = "2.2.2"
 backend = "aqua:golangci-lint"
 
-[tools.golangci-lint.checksums]
-"golangci-lint-2.2.2-darwin-arm64.tar.gz" = "sha256:d84d94d042c0d495fd1746f3d18948a75de163b17a14e8de3ef840928dd2df74"
-"golangci-lint-2.2.2-linux-amd64.tar.gz" = "sha256:c27fbde948a87d326feacd21df2f61a9c54dbd2e3bfa185c0a1cd6917a6f964f"
-"golangci-lint-2.2.2-linux-arm64.tar.gz" = "sha256:fce5317bb885db91d4104dfb4dc4fd0574ae266775b62132dcb39ffe322119bb"
+[tools.golangci-lint.platforms.linux-arm64]
+checksum = "sha256:fce5317bb885db91d4104dfb4dc4fd0574ae266775b62132dcb39ffe322119bb"
+size = 12933364
+url = "https://github.com/golangci/golangci-lint/releases/download/v2.2.2/golangci-lint-2.2.2-linux-arm64.tar.gz"
+
+[tools.golangci-lint.platforms.linux-x64]
+checksum = "sha256:c27fbde948a87d326feacd21df2f61a9c54dbd2e3bfa185c0a1cd6917a6f964f"
+size = 13980198
+url = "https://github.com/golangci/golangci-lint/releases/download/v2.2.2/golangci-lint-2.2.2-linux-amd64.tar.gz"
+
+[tools.golangci-lint.platforms.macos-arm64]
+checksum = "sha256:d84d94d042c0d495fd1746f3d18948a75de163b17a14e8de3ef840928dd2df74"
+size = 13585670
+url = "https://github.com/golangci/golangci-lint/releases/download/v2.2.2/golangci-lint-2.2.2-darwin-arm64.tar.gz"
 
 [tools.goreleaser]
 version = "2.9.0"
 backend = "aqua:goreleaser/goreleaser"
 
-[tools.goreleaser.checksums]
-"goreleaser_Darwin_all.tar.gz" = "sha256:82953b65c4b64e73b1077827663d97bf8e32592b4fc2cdb55c738bd484260a47"
-"goreleaser_Linux_arm64.tar.gz" = "sha256:574e83f5f0fc97803ff734c9342f8fd446d77e5e7ccac53debf09b4a8dbded80"
-"goreleaser_Linux_x86_64.tar.gz" = "sha256:a066fcd713684abed0d750d7559f1a5d794fa2faa8e8f1ad2eecec8c373668a7"
+[tools.goreleaser.platforms.linux-arm64]
+checksum = "sha256:574e83f5f0fc97803ff734c9342f8fd446d77e5e7ccac53debf09b4a8dbded80"
+size = 23074859
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.9.0/goreleaser_Linux_arm64.tar.gz"
+
+[tools.goreleaser.platforms.linux-x64]
+checksum = "sha256:a066fcd713684abed0d750d7559f1a5d794fa2faa8e8f1ad2eecec8c373668a7"
+size = 25197716
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.9.0/goreleaser_Linux_x86_64.tar.gz"
+
+[tools.goreleaser.platforms.macos-arm64]
+checksum = "sha256:82953b65c4b64e73b1077827663d97bf8e32592b4fc2cdb55c738bd484260a47"
+size = 50970897
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.9.0/goreleaser_Darwin_all.tar.gz"

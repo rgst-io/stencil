@@ -27,12 +27,28 @@
 					"additionalProperties": { "type": "string" },
 					"type": "object",
 					"description": "Replacements is a list of module names to replace their URI.\n\nExpected format:\n- local file: path/to/module\n- remote file: https://github.com/rgst-io/stencil-base"
+				},
+				"testing": {
+					"$ref": "#/$defs/ManifestTesting",
+					"description": "Testing contains configuration when this manifest is being used for\na test (e.g., 'stencil module test')"
 				}
 			},
 			"additionalProperties": false,
 			"type": "object",
 			"required": ["name", "arguments"],
 			"description": "Manifest is a manifest used to describe a project and impact what files are included"
+		},
+		"ManifestTesting": {
+			"properties": {
+				"validators": {
+					"items": { "type": "string" },
+					"type": "array",
+					"description": "Validators is a list of commands to run against the generated\nstencil templates."
+				}
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"description": "ManifestTesting contains testing information for usage when running tests against this stencil manifest."
 		},
 		"TemplateRepository": {
 			"properties": {
