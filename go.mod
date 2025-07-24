@@ -28,7 +28,7 @@ require (
 	github.com/urfave/cli/v3 v3.3.8
 	go.yaml.in/yaml/v3 v3.0.4
 	gotest.tools/v3 v3.5.2
-	sigs.k8s.io/yaml v1.5.0
+	sigs.k8s.io/yaml v1.6.0
 )
 
 require (
