@@ -72,6 +72,11 @@ func TestBasicAdopt(t *testing.T) {
 	assert.Equal(t, *blocks["version"], expb, "expected parseBlocks() to parse version block")
 }
 
+func TestAdoptWithProgrammaticBlock(t *testing.T) {
+	blocks := adoptTestHelper(t, "testdata/adopt/adoptprogrammatic.tpl", "testdata/adopt/adopt1.yaml")
+	assert.Equal(t, len(blocks), 0)
+}
+
 func TestAdoptWithMultiplePres(t *testing.T) {
 	blocks := adoptTestHelper(t, "testdata/adopt/adopt2.tpl", "testdata/adopt/adopt2.yaml")
 	expb := blockInfo{

@@ -208,7 +208,9 @@ func adoptBlocks(r io.ReadSeeker, blocks map[string]*blockInfo, sourceTemplate *
 	tr := bytes.NewReader(sourceTemplate.Contents)
 	templateBlocks, err := parseBlocksInner(tr, sourceTemplate.Path, nil)
 	if err != nil {
-		return nil, err
+		// Failed to parse the source template's blocks -- probably has complicated programmatic blocks, so just ignore
+		sourceTemplate.log.Warnf("Failed to parse source template (%s) blocks in adopt mode: %v", sourceTemplate.Path, err)
+		return blocks, nil
 	}
 
 	if _, err := r.Seek(0, io.SeekStart); err != nil {
