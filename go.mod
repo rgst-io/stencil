@@ -14,7 +14,7 @@ require (
 	github.com/go-git/go-git/v5 v5.16.2
 	github.com/google/go-cmp v0.7.0
 	github.com/hashicorp/go-hclog v1.6.3
-	github.com/hashicorp/go-plugin v1.6.3
+	github.com/hashicorp/go-plugin v1.7.0
 	github.com/jaredallard/archives v1.0.1
 	github.com/jaredallard/cmdexec v1.3.0
 	github.com/jaredallard/vcs v0.5.5
