@@ -1,6 +1,8 @@
 module go.rgst.io/stencil/v2
 
-go 1.24
+go 1.24.0
+
+toolchain go1.24.6
 
 require (
 	github.com/BurntSushi/toml v1.5.0
@@ -17,7 +19,7 @@ require (
 	github.com/hashicorp/go-plugin v1.7.0
 	github.com/jaredallard/archives v1.0.1
 	github.com/jaredallard/cmdexec v1.3.0
-	github.com/jaredallard/vcs v0.5.5
+	github.com/jaredallard/vcs v0.5.6
 	github.com/mitchellh/hashstructure/v2 v2.0.2
 	github.com/pkg/errors v0.9.1
 	github.com/princjef/gomarkdoc v1.1.0
