@@ -2,7 +2,7 @@ module go.rgst.io/stencil/v2
 
 go 1.24.0
 
-toolchain go1.24.6
+toolchain go1.25.0
 
 require (
 	github.com/BurntSushi/toml v1.5.0
