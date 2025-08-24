@@ -128,8 +128,8 @@ github.com/jaredallard/archives v1.0.1 h1:3bh7LxIeKsk1HriIvpG8WtRFYrdu3O44Bo4wxg
 github.com/jaredallard/archives v1.0.1/go.mod h1:JOlx/hhUSK9qcs/wMjz5sbC8R9zDF9pmMLS9iUinGuk=
 github.com/jaredallard/cmdexec v1.3.0 h1:hn+N8gQJUm2j9kUwxA3db9Tl98+ebEOT/PeHWw/HjhM=
 github.com/jaredallard/cmdexec v1.3.0/go.mod h1:vqXk8cMGX2lEVVVlN8r8A/AvioVAysF09L9r1RpsgY4=
-github.com/jaredallard/vcs v0.5.5 h1:JJUTMWwyywot1IdgSf/apDkXbSbtEJZ+ivICCayC7sQ=
-github.com/jaredallard/vcs v0.5.5/go.mod h1:D+6iTE2vyGQabN7ty8Eug+j5Obeexhq56q5oJpr7UWg=
+github.com/jaredallard/vcs v0.5.6 h1:ud1gQgL5awYpu8472GFg+awCfqUxyiTLP+pHdvoQFpo=
+github.com/jaredallard/vcs v0.5.6/go.mod h1:/mpnMH67bBHzAyXCChwcP5EpoSrSqub3trUQNpg3Yxw=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 h1:BQSFePA1RWJOlocH6Fxy8MmwDt+yVQYULKfN0RoTN8A=
 github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99/go.mod h1:1lJo3i6rXxKeerYnT8Nvf0QmHCRC1n8sfWVwXF2Frvo=
 github.com/jhump/protoreflect v1.17.0 h1:qOEr613fac2lOuTgWN4tPAtLL7fUSbuJL5X5XumQh94=
