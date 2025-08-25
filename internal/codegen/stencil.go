@@ -25,6 +25,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -337,7 +338,15 @@ func (s *Stencil) PostRun(ctx context.Context, log slogext.Logger) error {
 // getTemplates takes all modules attached to this stencil
 // struct and returns all templates exposed by it.
 func (s *Stencil) getTemplates(ctx context.Context, log slogext.Logger) ([]*Template, error) {
-	tpls := make([]*Template, 0)
+	// We split regular templates and library templates so that we can
+	// guarantee that library templates are executed before their regular
+	// templates counterparts.
+	//
+	// Note that library templates are still shuffled, like regular
+	// templates are.
+	regTpls := make([]*Template, 0)
+	libTpls := make([]*Template, 0)
+
 	for _, m := range s.modules {
 		log.Debugf("Fetching module %q", m.Name)
 		fs, err := m.GetFS(ctx)
@@ -393,7 +402,12 @@ func (s *Stencil) getTemplates(ctx context.Context, log slogext.Logger) ([]*Temp
 			if err != nil {
 				return errors.Wrapf(err, "failed to create template %q from module %q", path, m.Name)
 			}
-			tpls = append(tpls, tpl)
+
+			if tpl.Library {
+				libTpls = append(libTpls, tpl)
+			} else {
+				regTpls = append(regTpls, tpl)
+			}
 
 			return nil
 		})
@@ -404,14 +418,12 @@ func (s *Stencil) getTemplates(ctx context.Context, log slogext.Logger) ([]*Temp
 
 	log.Debug("Finished discovering templates")
 
-	// Shuffle the templates to prevent accidental file order guarantees
-	// from being relied upon.
-	//nolint:gosec // Why: We don't need that much entropy.
-	rand.Shuffle(len(tpls), func(i, j int) {
-		tpls[i], tpls[j] = tpls[j], tpls[i]
-	})
-
-	return tpls, nil
+	// Shuffle templates to avoid dependency on filesystem ordering.
+	shuffles := [][]*Template{libTpls, regTpls}
+	for _, sli := range shuffles {
+		rand.Shuffle(len(sli), func(i, j int) { sli[i], sli[j] = sli[j], sli[i] })
+	}
+	return slices.Concat(libTpls, regTpls), nil
 }
 
 // Close closes all resources that should be closed when done
