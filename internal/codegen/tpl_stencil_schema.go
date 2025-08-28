@@ -83,8 +83,11 @@ func validateJSONSchema(identifier string, schemaMap map[string]any, data any) e
 	return nil
 }
 
+// recurseError recursively traverses the output unit struct which has both singular and plural error fields,
+// returning a slice of error strings that it's adding onto.
 func recurseError(ou *jsonschema.OutputUnit, errStrs []string) []string {
 	if ou.Error != nil {
+		//nolint:errcheck // Why: Best effort way to get the error.
 		b, _ := ou.Error.MarshalJSON()
 
 		errStr := strings.TrimSuffix(strings.TrimPrefix(string(b), "\""), "\"")
