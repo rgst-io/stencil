@@ -62,16 +62,15 @@ func validateJSONSchema(identifier string, schemaMap map[string]any, data any) e
 			for _, validationErr := range validationError.DetailedOutput().Errors {
 				pth := strings.TrimPrefix(validationErr.InstanceLocation, "/")
 
-				//nolint:errcheck // Why: Best effort way to get the error.
-				b, _ := validationErr.Error.MarshalJSON()
+				errStrs := recurseError(&validationErr, []string{})
 
-				errStr := strings.TrimSuffix(strings.TrimPrefix(string(b), "\""), "\"")
+				//nolint:errcheck // Why: Best effort way to get the error.
 				if pth == "" {
 					// Can't provide detailed field information. Wrapped error
 					// will provide the top-level location.
-					errs = append(errs, fmt.Errorf("%s", errStr))
+					errs = append(errs, fmt.Errorf("%s", strings.Join(errStrs, ", ")))
 				} else {
-					errs = append(errs, fmt.Errorf("%s: %s", pth, errStr))
+					errs = append(errs, fmt.Errorf("%s: %s", pth, strings.Join(errStrs, ", ")))
 				}
 			}
 		} else {
@@ -82,4 +81,18 @@ func validateJSONSchema(identifier string, schemaMap map[string]any, data any) e
 	}
 
 	return nil
+}
+
+func recurseError(ou *jsonschema.OutputUnit, errStrs []string) []string {
+	if ou.Error != nil {
+		b, _ := ou.Error.MarshalJSON()
+
+		errStr := strings.TrimSuffix(strings.TrimPrefix(string(b), "\""), "\"")
+		errStrs = append(errStrs, errStr)
+	} else if len(ou.Errors) > 0 {
+		for _, ne := range ou.Errors {
+			recurseError(&ne, errStrs)
+		}
+	}
+	return errStrs
 }
