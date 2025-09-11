@@ -1,6 +1,7 @@
 package codegen
 
 import (
+	"bytes"
 	"os"
 	"path"
 	"testing"
@@ -268,4 +269,24 @@ func TestTplFile_RemoveAll(t *testing.T) {
 	assert.ErrorContains(t, err, "no such file")
 	_, err = os.Stat("test/test2.go")
 	assert.ErrorContains(t, err, "no such file")
+}
+
+func TestTplFile_SetMode(t *testing.T) {
+	tpl := RenderTemplate(t, nil, nil, `{{- file.SetMode 0o777 }}`)
+	assert.Equal(t, tpl.Files[0].Mode(), os.FileMode(0o777), "expected file mode to be 0o777")
+}
+
+func TestTplFile_SetPath(t *testing.T) {
+	tpl := RenderTemplate(t, nil, nil, `{{- file.SetPath "xyz" }}`)
+	assert.Equal(t, tpl.Files[0].path, "xyz", "expected file path to be xyz")
+}
+
+func TestTplFile_SetContents(t *testing.T) {
+	tpl := RenderTemplate(t, nil, nil, `{{- file.SetContents "xyz" }}`)
+	assert.Assert(t, bytes.Equal(tpl.Files[0].contents, []byte("xyz")), "expected file contents to be xyz")
+}
+
+func TestTplFile_Static(t *testing.T) {
+	tpl := RenderTemplate(t, nil, nil, `{{- file.Static }}`)
+	assert.Equal(t, tpl.Files[0].Skipped, false, "expected file to not be skipped when doesn't exist")
 }
