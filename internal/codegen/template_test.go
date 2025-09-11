@@ -38,94 +38,68 @@ var generatedBlockIndentTemplate string
 var fakeGeneratedBlockIndentFile string
 
 func TestSingleFileRender(t *testing.T) {
-	log := slogext.NewTestLogger(t)
-	fs, err := testmemfs.WithManifest("name: testing\n")
-	assert.NilError(t, err, "failed to testmemfs.WithManifest")
-	m, err := modulestest.NewWithFS(t.Context(), "testing", fs)
-	assert.NilError(t, err, "failed to NewWithFS")
-
-	tpl, err := NewTemplate(m, "virtual-file.tpl", 0o644, time.Now(), []byte("hello world!"), log, nil)
-	assert.NilError(t, err, "failed to create basic template")
-
-	sm := &configuration.Manifest{Name: "testing"}
-
-	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
-	err = tpl.Render(st, NewValues(t.Context(), sm, nil))
-	assert.NilError(t, err, "expected Render() to not fail")
+	tpl := RenderTemplate(t, nil, nil, "hello world!")
+	assert.Equal(t, len(tpl.Files), 1, "expected exactly one file to be rendered")
 	assert.Equal(t, tpl.Files[0].String(), "hello world!", "expected Render() to modify first created file")
 }
 
 func TestMultiFileRender(t *testing.T) {
-	log := slogext.NewTestLogger(t)
-	fs, err := testmemfs.WithManifest("name: testing\narguments:\n  commands:\n    type: list")
-	assert.NilError(t, err, "failed to testmemfs.WithManifest")
-	m, err := modulestest.NewWithFS(t.Context(), "testing", fs)
-	assert.NilError(t, err, "failed to NewWithFS")
-
-	tpl, err := NewTemplate(m, "multi-file.tpl", 0o644,
-		time.Now(), []byte(multiFileTemplate), log, nil)
-	assert.NilError(t, err, "failed to create template")
-
-	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]any{
-		"commands": []string{"hello", "world", "command"},
-	}}
-
-	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
-	err = tpl.Render(st, NewValues(t.Context(), sm, nil))
-	assert.NilError(t, err, "expected Render() to not fail")
+	tpl := RenderTemplate(t,
+		&configuration.Manifest{
+			Arguments: map[string]any{
+				"commands": []string{"hello", "world", "command"},
+			},
+		},
+		&configuration.TemplateRepositoryManifest{
+			Arguments: map[string]configuration.Argument{
+				"commands": {},
+			},
+		}, multiFileTemplate,
+	)
 	assert.Equal(t, len(tpl.Files), 3, "expected Render() to create 3 files")
 
 	for i, f := range tpl.Files {
-		assert.Equal(t, f.String(), "command", "rendered template %d contents differred", i)
+		assert.Equal(t, f.String(), "command", "rendered template %d contents differed", i)
 	}
 }
 
 func TestMultiFileWithInputRender(t *testing.T) {
-	log := slogext.NewTestLogger(t)
-	fs, err := testmemfs.WithManifest("name: testing\narguments:\n  commands:\n    type: list")
-	assert.NilError(t, err, "failed to testmemfs.WithManifest")
-	m, err := modulestest.NewWithFS(t.Context(), "testing", fs)
-	assert.NilError(t, err, "failed to NewWithFS")
+	mf := &configuration.Manifest{
+		Arguments: map[string]any{
+			"commands": []string{"hello", "world", "command"},
+		},
+	}
 
-	tpl, err := NewTemplate(m, "multi-file-input.tpl", 0o644,
-		time.Now(), []byte(multiFileInputTemplate), log, nil)
-	assert.NilError(t, err, "failed to create template")
-
-	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]any{
-		"commands": []string{"hello", "world", "command"},
-	}}
-
-	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
-	err = tpl.Render(st, NewValues(t.Context(), sm, nil))
-	assert.NilError(t, err, "expected Render() to not fail")
+	tpl := RenderTemplate(t,
+		mf,
+		&configuration.TemplateRepositoryManifest{
+			Arguments: map[string]configuration.Argument{
+				"commands": {},
+			},
+		}, multiFileInputTemplate,
+	)
 	assert.Equal(t, len(tpl.Files), 3, "expected Render() to create 3 files")
 
 	for i, f := range tpl.Files {
-		assert.Equal(t, (sm.Arguments["commands"].([]string))[i], f.String(), "rendered template %d contents differred", i)
+		assert.Equal(t, f.String(), mf.Arguments["commands"].([]string)[i], "rendered template %d contents differed", i)
 	}
 }
 
 func TestIncludeArgumentPassthrough(t *testing.T) {
-	log := slogext.NewTestLogger(t)
-	fs, err := testmemfs.WithManifest("name: testing\narguments:\n  commands:\n    type: list")
-	assert.NilError(t, err, "failed to testmemfs.WithManifest")
-	m, err := modulestest.NewWithFS(t.Context(), "testing", fs)
-	assert.NilError(t, err, "failed to NewWithFS")
-
-	tpl, err := NewTemplate(m, "apply-template-passthrough.tpl", 0o644,
-		time.Now(), []byte(includePassthroughTemplate), log, nil)
-	assert.NilError(t, err, "failed to create template")
-
-	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]any{
-		"commands": []string{"hello", "world", "command"},
-	}}
-
-	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
-	err = tpl.Render(st, NewValues(t.Context(), sm, nil))
-	assert.NilError(t, err, "expected Render() to not fail")
+	tpl := RenderTemplate(t,
+		&configuration.Manifest{
+			Arguments: map[string]any{
+				"commands": []string{"hello", "world", "command"},
+			},
+		},
+		&configuration.TemplateRepositoryManifest{
+			Arguments: map[string]configuration.Argument{
+				"commands": {},
+			},
+		}, includePassthroughTemplate,
+	)
 	assert.Equal(t, len(tpl.Files), 1, "expected Render() to create 1 files")
-
-	assert.Equal(t, "testing", tpl.Files[0].String(), "rendered template contents differed")
+	assert.Equal(t, t.Name(), tpl.Files[0].String(), "rendered template contents differed")
 }
 
 func TestGeneratedBlock(t *testing.T) {

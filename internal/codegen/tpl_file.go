@@ -1,4 +1,18 @@
-// Copyright 2022 Outreach Corporation. All Rights Reserved.
+// Copyright (C) 2025 stencil contributors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//         http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// SPDX-License-Identifier: Apache-2.0
 
 // Description: This file implements the file struct passed to
 // templates in Stencil.
@@ -243,5 +257,13 @@ func (f *TplFile) MigrateTo(path string) (out string, err error) {
 		Debug("Deleting original file after migration")
 	f.f.Deleted = true
 
+	return "", nil
+}
+
+// SetMode sets the provided mode on the current output file.
+//
+//	{{- file.SetMode 0o755 }}
+func (f *TplFile) SetMode(mode os.FileMode) (string, error) {
+	f.f.mode = mode
 	return "", nil
 }
