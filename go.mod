@@ -6,7 +6,7 @@ require (
 	github.com/BurntSushi/toml v1.5.0
 	github.com/Masterminds/semver/v3 v3.4.0
 	github.com/Masterminds/sprig/v3 v3.3.0
-	github.com/caarlos0/go-version v0.2.1
+	github.com/caarlos0/go-version v0.2.2
 	github.com/chainguard-dev/git-urls v1.0.2
 	github.com/charmbracelet/log v0.4.2
 	github.com/davecgh/go-spew v1.1.1
