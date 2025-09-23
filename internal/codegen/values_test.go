@@ -8,6 +8,7 @@ import (
 	gogit "github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/v2/internal/modules"
 	"go.rgst.io/stencil/v2/internal/modules/modulestest"
@@ -60,6 +61,7 @@ func TestValues(t *testing.T) {
 		},
 	})
 	assert.DeepEqual(t, &Values{
+		Context: t.Context(),
 		Git: git{
 			Ref:           plumbing.NewBranchReferenceName("main").String(),
 			Commit:        cmt.String(),
@@ -79,7 +81,7 @@ func TestValues(t *testing.T) {
 		Config: config{
 			Name: sm.Name,
 		},
-	}, vals)
+	}, vals, cmpopts.EquateComparable(t.Context()))
 }
 
 func TestGeneratedValues(t *testing.T) {
@@ -88,7 +90,7 @@ func TestGeneratedValues(t *testing.T) {
 	man := &configuration.TemplateRepositoryManifest{
 		Name: "testing",
 	}
-	m, err := modulestest.NewModuleFromTemplates(man, "testdata/values/values.tpl")
+	m, err := modulestest.NewModuleFromTemplates(t, man, "testdata/values/values.tpl")
 	assert.NilError(t, err, "failed to create module")
 
 	st := NewStencil(&configuration.Manifest{

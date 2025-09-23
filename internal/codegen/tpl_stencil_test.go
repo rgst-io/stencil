@@ -25,6 +25,7 @@ func TestTplStencil_ReadBlocks(t *testing.T) {
 	tests := []struct {
 		name    string
 		fields  fields
+		hasFile bool
 		args    args
 		want    map[string]string
 		wantErr error
@@ -34,6 +35,7 @@ func TestTplStencil_ReadBlocks(t *testing.T) {
 			args: args{
 				fpath: "testdata/blocks-test.txt",
 			},
+			hasFile: true,
 			want: map[string]string{
 				"hello-world": "Hello, world!",
 				"e2e":         "content",
@@ -57,7 +59,10 @@ func TestTplStencil_ReadBlocks(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			log := slogext.NewTestLogger(t)
-			s := &TplStencil{log: log}
+			s := &TplStencil{log: log, t: &Template{args: &Values{Context: t.Context()}, Module: &modules.Module{Name: "test"}}}
+			if tt.hasFile {
+				MoveFileToVFS(t, s.t, tt.args.fpath)
+			}
 			got, err := s.ReadBlocks(tt.args.fpath)
 
 			if (tt.wantErr != nil) && !errors.Is(err, tt.wantErr) {
@@ -173,7 +178,7 @@ func TestTplStencil_GetModuleHook(t *testing.T) {
 			s := &TplStencil{
 				t: must(
 					NewTemplate(
-						must(modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{
+						must(modulestest.NewModuleFromTemplates(t, &configuration.TemplateRepositoryManifest{
 							Name: "test",
 						})),
 						"not-a-real-template.tpl",
@@ -238,7 +243,7 @@ func TestGlobals(t *testing.T) {
 			s := &TplStencil{
 				t: must(
 					NewTemplate(
-						must(modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{
+						must(modulestest.NewModuleFromTemplates(t, &configuration.TemplateRepositoryManifest{
 							Name: "test",
 						})),
 						"not-a-real-template.tpl",
@@ -252,6 +257,8 @@ func TestGlobals(t *testing.T) {
 				s:   &Stencil{sharedState: newSharedState()},
 				log: log,
 			}
+			s.t.Module = &modules.Module{Name: "test"}
+			s.t.args = &Values{Context: t.Context()}
 
 			s.SetGlobal(tt.args.name, tt.args.data)
 
@@ -267,7 +274,7 @@ func TestTplStencil_ReadFile(t *testing.T) {
 	s := &TplStencil{
 		t: must(
 			NewTemplate(
-				must(modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{
+				must(modulestest.NewModuleFromTemplates(t, &configuration.TemplateRepositoryManifest{
 					Name: "test",
 				})),
 				"not-a-real-template.tpl",
@@ -282,8 +289,11 @@ func TestTplStencil_ReadFile(t *testing.T) {
 		log: log,
 	}
 
-	actualContents, err := os.ReadFile("testdata/blocks-test.txt")
-	assert.NilError(t, err, "expected os.ReadFile to succeed")
+	s.t.args = NewValues(t.Context(), &configuration.Manifest{
+		Name: t.Name(),
+	}, nil)
+
+	actualContents := MoveFileToVFS(t, s.t, "testdata/blocks-test.txt")
 
 	contents, err := s.ReadFile("testdata/blocks-test.txt")
 	assert.NilError(t, err, "expected ReadFile to succeed when file exists")
@@ -349,7 +359,7 @@ func TestTplStencil_Include(t *testing.T) {
 			st := &Stencil{sharedState: newSharedState()}
 
 			// create module
-			module, err := modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{
+			module, err := modulestest.NewModuleFromTemplates(t, &configuration.TemplateRepositoryManifest{
 				Name: "test",
 			})
 			assert.NilError(t, err, "expected NewModuleFromTemplates to succeed")
@@ -394,8 +404,9 @@ func TestTplStencil_ReadDir(t *testing.T) {
 	log := slogext.NewTestLogger(t)
 	s := &TplStencil{
 		t: must(
-			NewTemplate(
-				must(modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{
+			NewTestTemplate(
+				t,
+				must(modulestest.NewModuleFromTemplates(t, &configuration.TemplateRepositoryManifest{
 					Name: "test",
 				})),
 				"not-a-real-template.tpl",
@@ -417,6 +428,8 @@ func TestTplStencil_ReadDir(t *testing.T) {
 	entries, err = s.ReadDir("/root")
 	assert.Equal(t, true, errors.Is(err, os.ErrNotExist))
 	assert.Equal(t, 0, len(entries))
+
+	MoveDirToVFS(t, s.t, "testdata")
 
 	entries, err = s.ReadDir("testdata")
 	assert.NilError(t, err)

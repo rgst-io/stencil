@@ -26,7 +26,6 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/go-git/go-billy/v5"
-	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/puzpuzpuz/xsync/v4"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/slogext"
@@ -174,7 +173,7 @@ func (s *TplStencil) AddToModuleHook(module, name string, data ...any) (out stri
 //
 //	{{ stencil.ReadFile "myfile.txt" }}
 func (s *TplStencil) ReadFile(name string) (string, error) {
-	f, err := s.exists(name)
+	f, err := s.existsAndMaybeOpen(name, true)
 	if err != nil {
 		return "", err
 	}
@@ -203,11 +202,10 @@ type ReadDirEntry interface {
 //	  {{ end }}
 //	{{ end }}
 func (s *TplStencil) ReadDir(name string) ([]ReadDirEntry, error) {
-	f, err := s.exists(name)
+	_, err := s.existsAndMaybeOpen(name, false)
 	if err != nil {
 		return nil, err
 	}
-	f.Close() // close the file handle, since we don't need it
 
 	entries, err := os.ReadDir(name)
 	if err != nil {
@@ -228,28 +226,27 @@ func (s *TplStencil) ReadDir(name string) ([]ReadDirEntry, error) {
 //	{{ stencil.ReadFile "myfile.txt" }}
 //	{{- end }}
 func (s *TplStencil) Exists(name string) bool {
-	f, err := s.exists(name)
-	if err != nil {
-		return false
-	}
-	f.Close() // close the file handle, since we don't need it
-	return true
+	_, err := s.existsAndMaybeOpen(name, false)
+	return err == nil
 }
 
-// exists returns a billy.File if the file exists, and nil if it doesn't,
+// existsAndMaybeOpen returns a billy.File if the file existsAndMaybeOpen, and nil if it doesn't,
 // also returning an error if one is applicable.
-func (s *TplStencil) exists(name string) (billy.File, error) {
-	cwd, err := os.Getwd()
+func (s *TplStencil) existsAndMaybeOpen(name string, andOpen bool) (billy.File, error) {
+	fs, err := s.t.Module.GetFS(s.t.args.Context)
 	if err != nil {
 		return nil, err
 	}
 
-	bfs := osfs.New(cwd)
-	if _, err := bfs.Stat(name); err != nil {
+	if _, err := fs.Stat(name); err != nil {
 		return nil, err
 	}
 
-	f, err := bfs.Open(name)
+	if !andOpen {
+		return nil, nil
+	}
+
+	f, err := fs.Open(name)
 	if err != nil {
 		return nil, err
 	}
@@ -350,11 +347,10 @@ func (s *TplStencil) ApplyTemplate(name string, dataSli ...any) (string, error) 
 //	  {{- $data }}
 //	{{- end }}
 func (s *TplStencil) ReadBlocks(fpath string) (map[string]string, error) {
-	f, err := s.exists(fpath)
+	_, err := s.existsAndMaybeOpen(fpath, false)
 	if err != nil {
 		return nil, err
 	}
-	f.Close() // close the file handle, since we don't need it
 
 	data, err := parseBlocks(fpath, s.t)
 	if err != nil {

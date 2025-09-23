@@ -6,6 +6,7 @@ import (
 	"path"
 	"testing"
 
+	"go.rgst.io/stencil/v2/internal/modules"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"go.rgst.io/stencil/v2/pkg/stencil"
 	"gotest.tools/v3/assert"
@@ -140,7 +141,7 @@ func TestTplFile_OnceLockHasHistoryOfOtherFile(t *testing.T) {
 func TestTplFile_OnceLockHasHistoryOfFile(t *testing.T) {
 	tplf := TplFile{
 		f:   &File{path: "test.go"},
-		t:   &Template{},
+		t:   &Template{args: &Values{Context: t.Context()}},
 		log: slogext.NewTestLogger(t),
 		lock: &stencil.Lockfile{
 			Files: []*stencil.LockfileFileEntry{
@@ -158,6 +159,7 @@ func TestTplFile_OnceLockHasHistoryOfFile(t *testing.T) {
 func TestTplFile_MigrateToSrcFileExistsNoDestFile(t *testing.T) {
 	tplf := TplFile{
 		f:   &File{path: path.Join(t.TempDir(), "test.go")},
+		t:   &Template{args: &Values{Context: t.Context()}, Module: &modules.Module{Name: "test"}},
 		log: slogext.NewTestLogger(t),
 	}
 
@@ -187,6 +189,7 @@ func TestTplFile_MigrateToSrcFileExistsNoDestFile(t *testing.T) {
 func TestTplFile_MigrateToSrcFileExistsDestFileExists(t *testing.T) {
 	tplf := TplFile{
 		f:   &File{path: path.Join(t.TempDir(), "test.go")},
+		t:   &Template{args: &Values{Context: t.Context()}, Module: &modules.Module{Name: "test"}},
 		log: slogext.NewTestLogger(t),
 	}
 
@@ -217,7 +220,7 @@ func TestTplFile_MigrateToSrcFileExistsDestFileExists(t *testing.T) {
 func TestTplFile_MigrateToSrcFileNoExists(t *testing.T) {
 	tplf := TplFile{
 		f:   &File{path: path.Join(t.TempDir(), "test.go")},
-		t:   &Template{},
+		t:   &Template{args: &Values{Context: t.Context()}, Module: &modules.Module{Name: "test"}},
 		log: slogext.NewTestLogger(t),
 	}
 

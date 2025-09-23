@@ -110,7 +110,7 @@ func TestGeneratedBlock(t *testing.T) {
 	fs, err := testmemfs.WithManifest("name: testing\n")
 	assert.NilError(t, err, "failed to testmemfs.WithManifest")
 	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]any{}}
-	m, err := modulestest.NewWithFS(t.Context(), "testing", fs)
+	m, err := modulestest.NewWithFS(t, "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
 	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
@@ -139,7 +139,7 @@ func TestGeneratedBlockIndent(t *testing.T) {
 	fs, err := testmemfs.WithManifest("name: testing\n")
 	assert.NilError(t, err, "failed to testmemfs.WithManifest")
 	sm := &configuration.Manifest{Name: "testing", Arguments: map[string]any{}}
-	m, err := modulestest.NewWithFS(t.Context(), "testing", fs)
+	m, err := modulestest.NewWithFS(t, "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
 	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
@@ -165,7 +165,7 @@ func TestGeneratedBlockIndent(t *testing.T) {
 func TestLibraryTemplate(t *testing.T) {
 	fs, err := testmemfs.WithManifest("name: testing\n")
 	assert.NilError(t, err, "failed to testmemfs.WithManifest")
-	m, err := modulestest.NewWithFS(t.Context(), "testing", fs)
+	m, err := modulestest.NewWithFS(t, "testing", fs)
 	log := slogext.NewTestLogger(t)
 	assert.NilError(t, err, "failed to NewWithFS")
 
@@ -186,7 +186,7 @@ func TestLibraryTemplate(t *testing.T) {
 func TestLibraryCantAccessFileFunctions(t *testing.T) {
 	fs, err := testmemfs.WithManifest("name: testing\n")
 	assert.NilError(t, err, "failed to testmemfs.WithManifest")
-	m, err := modulestest.NewWithFS(t.Context(), "testing", fs)
+	m, err := modulestest.NewWithFS(t, "testing", fs)
 	log := slogext.NewTestLogger(t)
 	assert.NilError(t, err, "failed to NewWithFS")
 

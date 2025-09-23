@@ -35,7 +35,7 @@ func TestBasicE2ERender(t *testing.T) {
 	f.Write([]byte("{{ .Config.Name }}"))
 	f.Close()
 
-	tp, err := modulestest.NewWithFS(ctx, "testing", fs)
+	tp, err := modulestest.NewWithFS(t, "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 	st := NewStencil(&configuration.Manifest{
 		Name:      "test",
@@ -76,14 +76,14 @@ func TestModuleHookRender(t *testing.T) {
 	m1man := &configuration.TemplateRepositoryManifest{
 		Name: "testing1",
 	}
-	m1, err := modulestest.NewModuleFromTemplates(m1man, "testdata/module-hook/m1.tpl")
+	m1, err := modulestest.NewModuleFromTemplates(t, m1man, "testdata/module-hook/m1.tpl")
 	if err != nil {
 		t.Errorf("failed to create module 1: %v", err)
 	}
 	m2man := &configuration.TemplateRepositoryManifest{
 		Name: "testing2",
 	}
-	m2, err := modulestest.NewModuleFromTemplates(m2man, "testdata/module-hook/m2.tpl")
+	m2, err := modulestest.NewModuleFromTemplates(t, m2man, "testdata/module-hook/m2.tpl")
 	if err != nil {
 		t.Errorf("failed to create module 2: %v", err)
 	}
@@ -115,7 +115,7 @@ func TestDirReplacementRendering(t *testing.T) {
 		},
 		Arguments: map[string]configuration.Argument{"x": {Schema: map[string]any{"type": "string"}}},
 	}
-	m1, err := modulestest.NewModuleFromTemplates(m1man, "testdata/replacement/m1.tpl")
+	m1, err := modulestest.NewModuleFromTemplates(t, m1man, "testdata/replacement/m1.tpl")
 	assert.NilError(t, err, "failed to NewWithFS")
 
 	st := NewStencil(sm, nil, []*modules.Module{m1}, log, false)
@@ -133,7 +133,7 @@ func TestBinaryRender(t *testing.T) {
 	m1man := &configuration.TemplateRepositoryManifest{
 		Name: "testing1",
 	}
-	m1, err := modulestest.NewModuleFromTemplates(m1man, "testdata/binary.nontpl")
+	m1, err := modulestest.NewModuleFromTemplates(t, m1man, "testdata/binary.nontpl")
 	assert.NilError(t, err, "failed to NewWithFS")
 
 	st := NewStencil(sm, nil, []*modules.Module{m1}, log, false)
@@ -165,7 +165,7 @@ func TestBadDirReplacement(t *testing.T) {
 	log := slogext.NewTestLogger(t)
 	sm := &configuration.Manifest{Name: "testing"}
 	m1man := &configuration.TemplateRepositoryManifest{Name: "testing1"}
-	m, err := modulestest.NewModuleFromTemplates(m1man, "testdata/replacement/m1.tpl")
+	m, err := modulestest.NewModuleFromTemplates(t, m1man, "testdata/replacement/m1.tpl")
 	assert.NilError(t, err, "failed to NewModuleFromTemplates")
 
 	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
@@ -198,7 +198,7 @@ two: {{ stencil.GetGlobal "y" }}
 three: {{ stencil.GetGlobal "z" }}`))
 	assert.NilError(t, f.Close(), "failed to close stub template")
 
-	tp, err := modulestest.NewWithFS(ctx, "testing", fs)
+	tp, err := modulestest.NewWithFS(t, "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 	st := NewStencil(&configuration.Manifest{
 		Name:      "test",

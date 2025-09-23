@@ -111,6 +111,9 @@ func (m modulesSlice) ByName(name string) module {
 // stencil template. When updating this struct, ensure that the receiver
 // functions are updated to reflect the new fields.
 type Values struct {
+	// Context is the context being used to render the template
+	Context context.Context
+
 	// Git is information about the current git repository, if there is one
 	Git git
 
@@ -159,7 +162,8 @@ func (v *Values) WithTemplate(name string) *Values {
 // based on the current runtime environment.
 func NewValues(ctx context.Context, sm *configuration.Manifest, mods []*modules.Module) *Values {
 	vals := &Values{
-		Git: git{},
+		Context: ctx,
+		Git:     git{},
 		Runtime: runtimeVals{
 			Generator:        "stencil",
 			GeneratorVersion: version.Version.GitVersion,

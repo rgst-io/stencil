@@ -142,7 +142,7 @@ func TestAdoptWithBadBlock(t *testing.T) {
 func adoptTestHelper(t *testing.T, templateFile, targetFile string) map[string]*blockInfo {
 	fs, err := testmemfs.WithManifest("name: testing\n")
 	assert.NilError(t, err, "failed to testmemfs.WithManifest")
-	m, err := modulestest.NewWithFS(t.Context(), "testing", fs)
+	m, err := modulestest.NewWithFS(t, "testing", fs)
 	log := slogext.NewTestLogger(t)
 	assert.NilError(t, err, "failed to NewWithFS")
 

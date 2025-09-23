@@ -20,6 +20,7 @@
 package codegen
 
 import (
+	"io"
 	"os"
 	"slices"
 	"time"
@@ -217,6 +218,7 @@ func (f *TplFile) Create(path string, mode os.FileMode, modTime time.Time) (out 
 //
 //	{{- file.RemoveAll "path" }}
 func (f *TplFile) RemoveAll(path string) (out string, err error) {
+	// TODO: Move to virtual filesystem
 	if err := os.RemoveAll(path); err != nil {
 		return "", err
 	}
@@ -230,7 +232,11 @@ func (f *TplFile) RemoveAll(path string) (out string, err error) {
 //
 //	{{- file.MigrateTo "new/path/to/file.txt" }}
 func (f *TplFile) MigrateTo(path string) (out string, err error) {
-	if _, err := osfs.Default.Stat(f.f.path); err != nil {
+	fs, err := f.t.Module.GetFS(f.t.args.Context)
+	if err != nil {
+		return "", err
+	}
+	if _, err := fs.Stat(f.f.path); err != nil {
 		f.log.With("template", f.t.Path, "path", f.f.path).
 			Debug("Skipping MigrateTo because the file doesn't exist")
 		return f.Skip("MigrateTo file input doesn't exist")
@@ -238,12 +244,17 @@ func (f *TplFile) MigrateTo(path string) (out string, err error) {
 
 	f.log.With("path", f.f.path).With("to", path).
 		Debug("Migrating file to new path")
-	contents, err := os.ReadFile(f.f.path)
+	of, err := fs.OpenFile(f.f.path, os.O_RDONLY, 0o644)
+	if err != nil {
+		return "", err
+	}
+	defer of.Close()
+	contents, err := io.ReadAll(of)
 	if err != nil {
 		return "", err
 	}
 
-	fn, err := osfs.Default.Create(path)
+	fn, err := fs.Create(path)
 	if err != nil {
 		return "", err
 	}

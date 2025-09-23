@@ -61,8 +61,12 @@ var v2BlockPattern = regexp.MustCompile(`^\s*(//|##|--|<!--)\s{0,1}<<(/?)Stencil
 // parseBlocks reads the blocks from an existing file, potentially adopting blocks based on the source template,
 // if so specified
 func parseBlocks(filePath string, sourceTemplate *Template) (map[string]*blockInfo, error) {
-	//nolint:gosec // Why: By design and acceptable.
-	f, err := os.Open(filePath)
+	fs, err := sourceTemplate.Module.GetFS(sourceTemplate.args.Context)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to get fs for source template %q", sourceTemplate.Path)
+	}
+
+	f, err := fs.Open(filePath)
 	if errors.Is(err, os.ErrNotExist) {
 		return make(map[string]*blockInfo), nil
 	} else if err != nil {

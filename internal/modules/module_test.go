@@ -215,7 +215,7 @@ func TestBranchAlwaysUsedOverDependency(t *testing.T) {
 			},
 		},
 	}
-	mDep, err := modulestest.NewModuleFromTemplates(man)
+	mDep, err := modulestest.NewModuleFromTemplates(t, man)
 	assert.NilError(t, err, "failed to create dep module")
 
 	// Resolve a fake project that requires a branch of a dependency that the in-memory module also requires
@@ -263,7 +263,7 @@ func TestShouldResolveInMemoryModule(t *testing.T) {
 			{Name: "test-dep"},
 		},
 	}
-	m, err := modulestest.NewModuleFromTemplates(man)
+	m, err := modulestest.NewModuleFromTemplates(t, man)
 	assert.NilError(t, err, "failed to create module")
 
 	// this relies on the top-level to ensure that re-resolving still picks
@@ -274,7 +274,7 @@ func TestShouldResolveInMemoryModule(t *testing.T) {
 			{Name: "test"},
 		},
 	}
-	mDep, err := modulestest.NewModuleFromTemplates(man)
+	mDep, err := modulestest.NewModuleFromTemplates(t, man)
 	assert.NilError(t, err, "failed to create dep module")
 
 	mods, err := modules.FetchModules(ctx, &modules.ModuleResolveOptions{
@@ -333,7 +333,7 @@ func TestShouldErrorOnTwoDifferentBranches(t *testing.T) {
 func TestSimpleDirReplacement(t *testing.T) {
 	fs, err := testmemfs.WithManifest("name: testing\ndirReplacements:\n  a: 'b'\n")
 	assert.NilError(t, err, "failed to testmemfs.WithManifest")
-	m, err := modulestest.NewWithFS(t.Context(), "testing", fs)
+	m, err := modulestest.NewWithFS(t, "testing", fs)
 	assert.NilError(t, err, "failed to NewWithFS")
 
 	m.StoreDirReplacements(map[string]string{"a": "b"})

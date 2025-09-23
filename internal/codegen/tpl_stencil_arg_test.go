@@ -30,7 +30,7 @@ func fakeTemplate(t *testing.T, args map[string]any,
 		Name:      "test",
 		Arguments: requestArgs,
 	}
-	m, err := modulestest.NewModuleFromTemplates(man)
+	m, err := modulestest.NewModuleFromTemplates(t, man)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -89,7 +89,7 @@ func fakeTemplateMultipleModules(t *testing.T, manifestArgs map[string]any,
 		}
 
 		var err error
-		mods[i], err = modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{
+		mods[i], err = modulestest.NewModuleFromTemplates(t, &configuration.TemplateRepositoryManifest{
 			Name:      fmt.Sprintf("test-%d", i),
 			Arguments: args[i],
 			Modules:   deps,

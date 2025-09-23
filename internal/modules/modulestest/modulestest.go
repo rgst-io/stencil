@@ -21,11 +21,11 @@
 package modulestest
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"testing"
 
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/memfs"
@@ -58,7 +58,7 @@ func addTemplateToFS(fs billy.Filesystem, tpl string) error {
 
 // NewModuleFromTemplates creates a module with the provided template(s)
 // being the only file(s) in the module.
-func NewModuleFromTemplates(manifest *configuration.TemplateRepositoryManifest,
+func NewModuleFromTemplates(t *testing.T, manifest *configuration.TemplateRepositoryManifest,
 	templates ...string) (*modules.Module, error) {
 	fs := memfs.New()
 	for _, tpl := range templates {
@@ -83,11 +83,12 @@ func NewModuleFromTemplates(manifest *configuration.TemplateRepositoryManifest,
 	}
 
 	// create the module
-	return NewWithFS(context.Background(), manifest.Name, fs)
+	return NewWithFS(t, manifest.Name, fs)
 }
 
 // NewWithFS creates a module with the specified file system.
-func NewWithFS(ctx context.Context, name string, fs billy.Filesystem) (*modules.Module, error) {
+func NewWithFS(t *testing.T, name string, fs billy.Filesystem) (*modules.Module, error) {
+	ctx := t.Context()
 	return modules.New(ctx, "vfs://"+name, modules.NewModuleOpts{
 		ImportPath: name,
 		Version:    &resolver.Version{Virtual: "vfs"},

@@ -110,13 +110,13 @@ func TestTplModule_Tpl(t *testing.T) {
 			st := &Stencil{sharedState: newSharedState(), log: log}
 
 			// create calling module
-			callerModule, err := modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{
+			callerModule, err := modulestest.NewModuleFromTemplates(t, &configuration.TemplateRepositoryManifest{
 				Name: "caller",
 			})
 			assert.NilError(t, err, "expected NewModuleFromTemplates to succeed")
 
 			// create function template for module
-			functionModule, err := modulestest.NewModuleFromTemplates(&configuration.TemplateRepositoryManifest{
+			functionModule, err := modulestest.NewModuleFromTemplates(t, &configuration.TemplateRepositoryManifest{
 				Name: "function",
 			})
 			assert.NilError(t, err, "expected NewModuleFromTemplates to succeed")
