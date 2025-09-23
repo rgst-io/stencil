@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"go.rgst.io/stencil/v2/internal/modules"
 	"go.rgst.io/stencil/v2/internal/modules/modulestest"
 	"go.rgst.io/stencil/v2/internal/testing/testmemfs"
 	"go.rgst.io/stencil/v2/pkg/slogext"
@@ -12,7 +13,7 @@ import (
 )
 
 func fakeBlocksTemplate(t *testing.T) *Template {
-	return &Template{log: slogext.NewTestLogger(t)}
+	return &Template{log: slogext.NewTestLogger(t), Module: &modules.Module{Name: "test"}, args: &Values{Context: t.Context()}}
 }
 
 func TestParseBlocks(t *testing.T) {
@@ -143,6 +144,7 @@ func adoptTestHelper(t *testing.T, templateFile, targetFile string) map[string]*
 	fs, err := testmemfs.WithManifest("name: testing\n")
 	assert.NilError(t, err, "failed to testmemfs.WithManifest")
 	m, err := modulestest.NewWithFS(t, "testing", fs)
+
 	log := slogext.NewTestLogger(t)
 	assert.NilError(t, err, "failed to NewWithFS")
 
@@ -151,7 +153,11 @@ func adoptTestHelper(t *testing.T, templateFile, targetFile string) map[string]*
 	tpl, err := NewTemplate(m, templateFile, 0o644, time.Now(), conts, log, &NewTemplateOpts{
 		Adopt: true,
 	})
+	tpl.args = &Values{Context: t.Context()}
 	assert.NilError(t, err, "failed to NewTemplate")
+
+	MoveFileToVFS(t, tpl, templateFile)
+	MoveFileToVFS(t, tpl, targetFile)
 
 	blocks, err := parseBlocks(targetFile, tpl)
 	assert.NilError(t, err, "expected parseBlocks() not to fail")
