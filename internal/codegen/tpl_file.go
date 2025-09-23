@@ -227,8 +227,15 @@ func (f *TplFile) RemoveAll(path string) (out string, err error) {
 
 // MigrateTo migrates the current file to a new path.  If the old file doesn't exist, it is
 // treated as a `file.Skip`.  If the old file still exists, then it is moved to the new
-// path (via a create and write, then delete of the old path, not a filesystem move).  If
-// the MigrateTo target file already exists, it is overwritten.
+// path (via a filesystem move, so that it will create the underlying directory if needed).
+// If the MigrateTo target file already exists, it is overwritten.
+//
+// This method works around the race condition where the MigrateTo file may render before
+// or after the new template file is rendered (in the new location).  If MigrateTo runs
+// first, the file is moved, then re-rendered later as you'd expect.  If the new template
+// file runs first, the file is created in the new location, then MigrateTo runs and
+// deletes it and migrates the old file on top of it, then another pass of stencil will
+// re-run the template in the new location that'll catch any updates.
 //
 //	{{- file.MigrateTo "new/path/to/file.txt" }}
 func (f *TplFile) MigrateTo(path string) (out string, err error) {

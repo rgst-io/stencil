@@ -217,6 +217,44 @@ func TestTplFile_MigrateToSrcFileExistsDestFileExists(t *testing.T) {
 	assert.Equal(t, string(contentsNewNew), string(contents))
 }
 
+func TestTplFile_MigrateToBothExistDiffTemplateHappyDirection(t *testing.T) {
+	qts := []quickTemplate{
+		{
+			Filename:             "old.go",
+			TemplateContents:     `{{- file.MigrateTo "new.go" }}`,
+			ExistingFileContents: "## <<Stencil::Block(custom)>>\nold\n## <</Stencil::Block>>",
+		}, {
+			Filename:         "new.go",
+			TemplateContents: "## <<Stencil::Block(custom)>>\n{{ file.Block \"custom\" }}\n## <</Stencil::Block>>",
+		},
+	}
+
+	tpls := RenderTemplates(t, nil, nil, qts...)
+	assert.Equal(t, len(tpls), 2, "expected 2 templates to be rendered")
+	assert.Equal(t, true, tpls[0].Files[0].Deleted, "expected old to be deleted")
+	assert.Equal(t, tpls[1].Files[0].String(), "## <<Stencil::Block(custom)>>\nold\n## <</Stencil::Block>>",
+		"expected old to be migrated to new with old contents")
+}
+
+func TestTplFile_MigrateToBothExistDiffTemplateSadDirection(t *testing.T) {
+	qts := []quickTemplate{
+		{
+			Filename:         "new.go",
+			TemplateContents: "## <<Stencil::Block(custom)>>\n{{ file.Block \"custom\" }}\n## <</Stencil::Block>>",
+		}, {
+			Filename:             "old.go",
+			TemplateContents:     `{{- file.MigrateTo "new.go" }}`,
+			ExistingFileContents: "## <<Stencil::Block(custom)>>\nold\n## <</Stencil::Block>>",
+		},
+	}
+
+	tpls := RenderTemplates(t, nil, nil, qts...)
+	assert.Equal(t, len(tpls), 2, "expected 2 templates to be rendered")
+	assert.Equal(t, true, tpls[1].Files[0].Deleted, "expected old to be deleted")
+	assert.Equal(t, tpls[0].Files[0].String(), "## <<Stencil::Block(custom)>>\nold\n## <</Stencil::Block>>",
+		"expected old to be migrated to new with old contents")
+}
+
 func TestTplFile_MigrateToSrcFileNoExists(t *testing.T) {
 	tplf := TplFile{
 		f:   &File{path: path.Join(t.TempDir(), "test.go")},
