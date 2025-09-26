@@ -26,7 +26,6 @@ import (
 	"slices"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-git/go-billy/v5/osfs"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"go.rgst.io/stencil/v2/pkg/stencil"
@@ -287,7 +286,7 @@ func (f *TplFile) MigrateTo(path string) (out string, err error) {
 //
 // **Example `new.go.tpl`:**
 //
-//	{{ file.MigrateFrom "old.go" }}
+//	{{ file.MigrateFrom "old.go" -}}
 //	package main
 //
 //	import "fmt"
@@ -310,21 +309,29 @@ func (f *TplFile) MigrateTo(path string) (out string, err error) {
 //
 // Result: The block content from old.go is preserved in new.go
 func (f *TplFile) MigrateFrom(path string) (out string, err error) {
-	blocks, err := parseBlocks(path, f.t)
-	if err != nil {
-		return "", fmt.Errorf("MigrateFrom: failed to parse blocks from %s: %w", path, err)
+	// Only load blocks from the old file if the new file doesn't exist
+	if _, err := osfs.Default.Stat(f.f.path); err != nil {
+		blocks, err := parseBlocks(path, f.t)
+		if err != nil {
+			return "", fmt.Errorf("MigrateFrom: failed to parse blocks from %s: %w", path, err)
+		}
+
+		f.f.blocks = blocks
+	} else {
+		f.log.Debug("MigrateFrom: not loading blocks due to destination file existing")
 	}
-	spew.Dump(path, blocks)
 
-	f.f.blocks = blocks
+	// If the old file exists, delete it
+	if _, err := osfs.Default.Stat(path); err == nil {
+		f.log.Debug("MigrateFrom: marking old file as deleted", "file.name", path)
+		oldf, err := NewFile(path, 0o600, time.Now(), f.t)
+		if err != nil {
+			return "", err
+		}
+		oldf.Deleted = true
 
-	oldf, err := NewFile(path, 0o600, time.Now(), f.t)
-	if err != nil {
-		return "", err
+		f.t.extraFiles = append(f.t.extraFiles, oldf)
 	}
-	oldf.Deleted = true
-
-	f.t.extraFiles = append(f.t.extraFiles, oldf)
 
 	return "", nil
 }

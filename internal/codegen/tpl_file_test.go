@@ -299,7 +299,7 @@ func TestTplFile_MigrateFrom_ShouldPersistBlocks(t *testing.T) {
 		},
 		{
 			Filename: "new.go",
-			TemplateContents: `{{- file.MigrateFrom "old.go" }}` +
+			TemplateContents: `{{ file.MigrateFrom "old.go" -}}` +
 				"## <<Stencil::Block(custom)>>\n{{ file.Block \"custom\" }}\n## <</Stencil::Block>>",
 		},
 	}
@@ -318,6 +318,95 @@ func TestTplFile_MigrateFrom_ShouldPersistBlocks(t *testing.T) {
 				"expected old to be migrated to new with old contents")
 		default:
 			t.Errorf("expected old.go & new.go, got: %s", f.Name())
+		}
+	}
+}
+
+func TestTplFile_MigrateFrom_ShouldUseNewOverOldBlocks(t *testing.T) {
+	qts := []quickTemplate{
+		{
+			Filename:             "old.go",
+			ExistingFileContents: "## <<Stencil::Block(custom)>>\nold\n## <</Stencil::Block>>",
+		},
+		{
+			Filename:             "new.go",
+			ExistingFileContents: "## <<Stencil::Block(custom)>>\nnew\n## <</Stencil::Block>>",
+		},
+		{
+			Filename: "new.go",
+			TemplateContents: `{{ file.MigrateFrom "old.go" -}}` +
+				"## <<Stencil::Block(custom)>>\n{{ file.Block \"custom\" }}\n## <</Stencil::Block>>",
+		},
+	}
+
+	tpls := RenderTemplates(t, nil, nil, qts...)
+
+	assert.Equal(t, len(tpls), 1, "expected 1 templates to be rendered")
+	assert.Equal(t, len(tpls[0].Files), 2, "expected 2 files to be created")
+
+	for _, f := range tpls[0].Files {
+		switch f.Name() {
+		case "old.go":
+			assert.Equal(t, f.Deleted, true, "expected old file (old.go) to be deleted")
+		case "new.go":
+			assert.Equal(t, f.String(), "## <<Stencil::Block(custom)>>\nnew\n## <</Stencil::Block>>",
+				"expected new file blocks to be used over old")
+		default:
+			t.Errorf("expected old.go & new.go, got: %s", f.Name())
+		}
+	}
+}
+
+func TestTplFile_MigrateFrom_ShouldNotDeleteOldIfNotExist(t *testing.T) {
+	qts := []quickTemplate{
+		{
+			Filename:             "new.go",
+			ExistingFileContents: "## <<Stencil::Block(custom)>>\nnew\n## <</Stencil::Block>>",
+		},
+		{
+			Filename: "new.go",
+			TemplateContents: `{{ file.MigrateFrom "old.go" -}}` +
+				"## <<Stencil::Block(custom)>>\n{{ file.Block \"custom\" }}\n## <</Stencil::Block>>",
+		},
+	}
+
+	tpls := RenderTemplates(t, nil, nil, qts...)
+
+	assert.Equal(t, len(tpls), 1, "expected 1 templates to be rendered")
+	assert.Equal(t, len(tpls[0].Files), 1, "expected 2 files to be created")
+
+	for _, f := range tpls[0].Files {
+		switch f.Name() {
+		case "new.go":
+			assert.Equal(t, f.String(), "## <<Stencil::Block(custom)>>\nnew\n## <</Stencil::Block>>",
+				"expected new file blocks to be used over old")
+		default:
+			t.Errorf("expected new.go, got: %s", f.Name())
+		}
+	}
+}
+
+func TestTplFile_MigrateFrom_ShouldNoopIfNewAndOldNoExist(t *testing.T) {
+	qts := []quickTemplate{
+		{
+			Filename: "new.go",
+			TemplateContents: `{{ file.MigrateFrom "old.go" -}}` +
+				"## <<Stencil::Block(custom)>>\n{{ file.Block \"custom\" }}\n## <</Stencil::Block>>",
+		},
+	}
+
+	tpls := RenderTemplates(t, nil, nil, qts...)
+
+	assert.Equal(t, len(tpls), 1, "expected 1 templates to be rendered")
+	assert.Equal(t, len(tpls[0].Files), 1, "expected 2 files to be created")
+
+	for _, f := range tpls[0].Files {
+		switch f.Name() {
+		case "new.go":
+			assert.Equal(t, f.String(), "## <<Stencil::Block(custom)>>\n\n## <</Stencil::Block>>",
+				"expected new file blocks to be used over old")
+		default:
+			t.Errorf("expected new.go, got: %s", f.Name())
 		}
 	}
 }
