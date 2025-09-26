@@ -20,6 +20,7 @@
 package codegen
 
 import (
+	"os"
 	"testing"
 	"time"
 
@@ -67,4 +68,61 @@ func RenderTemplate(
 	assert.NilError(t, tpl.Render(st, NewValues(t.Context(), mf, []*modules.Module{m})), "expected render to not fail")
 
 	return tpl
+}
+
+type quickTemplate struct {
+	Filename string
+	// TemplateContents is the contents of the template. If not set, only
+	// ExistingFileContents will be written to Filename, if
+	// ExistingFileContents is also set.
+	TemplateContents     string
+	ExistingFileContents string
+}
+
+func RenderTemplates(
+	t *testing.T,
+	mf *configuration.Manifest,
+	trmf *configuration.TemplateRepositoryManifest,
+	contents ...quickTemplate,
+) []*Template {
+	log := slogext.NewTestLogger(t)
+
+	if mf == nil {
+		mf = &configuration.Manifest{}
+	}
+	if mf.Name == "" {
+		mf.Name = t.Name()
+	}
+
+	if trmf == nil {
+		trmf = &configuration.TemplateRepositoryManifest{}
+	}
+	if trmf.Name == "" {
+		trmf.Name = t.Name() + "Module"
+	}
+
+	m, err := modulestest.NewModuleFromTemplates(trmf)
+	assert.NilError(t, err, "expected module creation to not fail")
+
+	st := NewStencil(mf, nil, []*modules.Module{m}, log, false)
+	tpls := make([]*Template, 0, len(contents))
+
+	tmpDir := t.TempDir()
+	t.Chdir(tmpDir)
+
+	for _, qt := range contents {
+		if qt.ExistingFileContents != "" {
+			t.Logf("Wrote to %s", qt.Filename)
+			assert.NilError(t, os.WriteFile(qt.Filename, []byte(qt.ExistingFileContents), 0o600), "expected WriteFile to work")
+		}
+
+		if qt.TemplateContents != "" {
+			tpl, err := NewTemplate(m, qt.Filename+".tpl", 0o755, time.Now(), []byte(qt.TemplateContents), log, &NewTemplateOpts{})
+			assert.NilError(t, err, "expected template creation to not fail")
+			assert.NilError(t, tpl.Render(st, NewValues(t.Context(), mf, []*modules.Module{m})), "expected render to not fail")
+			tpls = append(tpls, tpl)
+		}
+	}
+
+	return tpls
 }
