@@ -20,10 +20,13 @@
 package codegen
 
 import (
+	"fmt"
+	"io"
 	"os"
 	"slices"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-git/go-billy/v5/osfs"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 	"go.rgst.io/stencil/v2/pkg/stencil"
@@ -230,6 +233,7 @@ func (f *TplFile) RemoveAll(path string) (out string, err error) {
 //
 //	{{- file.MigrateTo "new/path/to/file.txt" }}
 func (f *TplFile) MigrateTo(path string) (out string, err error) {
+	f.log.Warn("MigrateTo has been replaced by MigrateFrom. MigrateTo does not always work, please migrate")
 	if _, err := osfs.Default.Stat(f.f.path); err != nil {
 		f.log.With("template", f.t.Path, "path", f.f.path).
 			Debug("Skipping MigrateTo because the file doesn't exist")
@@ -238,24 +242,89 @@ func (f *TplFile) MigrateTo(path string) (out string, err error) {
 
 	f.log.With("path", f.f.path).With("to", path).
 		Debug("Migrating file to new path")
-	contents, err := os.ReadFile(f.f.path)
+	of, err := os.Open(f.f.path)
 	if err != nil {
 		return "", err
 	}
+	defer of.Close()
 
-	fn, err := osfs.Default.Create(path)
+	nf, err := osfs.Default.Create(path)
 	if err != nil {
 		return "", err
 	}
-	defer fn.Close()
+	defer nf.Close()
 
-	if _, err := fn.Write(contents); err != nil {
+	if _, err := io.Copy(nf, of); err != nil {
 		return "", err
 	}
 
 	f.log.With("path", f.f.path).
 		Debug("Deleting original file after migration")
 	f.f.Deleted = true
+
+	return "", nil
+}
+
+// MigrateFrom parses blocks from the provided file as if they
+// originated from this template. This is useful when you want to move a
+// file, but keep its contents. This should be called before any other
+// functions are called inside of the file.
+//
+// Note: Only blocks are persisted. Unlike [MigrateTo] the file is not
+// actually copied to disk.
+//
+// **Example `old.go`:**
+//
+//	package main
+//
+//	import "fmt"
+//
+//	## <<Stencil::Block(main-function)>>
+//	func main() {
+//	    fmt.Println("Hello from migrated code!")
+//	}
+//	## <</Stencil::Block>>
+//
+// **Example `new.go.tpl`:**
+//
+//	{{ file.MigrateFrom "old.go" }}
+//	package main
+//
+//	import "fmt"
+//
+//	## <<Stencil::Block(main-function)>>
+//	{{ file.Block "main-function" }}
+//	## <</Stencil::Block>>
+//
+// **Example `new.go`:**
+//
+//	package main
+//
+//	import "fmt"
+//
+//	## <<Stencil::Block(main-function)>>
+//	func main() {
+//	    fmt.Println("Hello from migrated code!")
+//	}
+//	## <</Stencil::Block>>
+//
+// Result: The block content from old.go is preserved in new.go
+func (f *TplFile) MigrateFrom(path string) (out string, err error) {
+	blocks, err := parseBlocks(path, f.t)
+	if err != nil {
+		return "", fmt.Errorf("MigrateFrom: failed to parse blocks from %s: %w", path, err)
+	}
+	spew.Dump(path, blocks)
+
+	f.f.blocks = blocks
+
+	oldf, err := NewFile(path, 0o600, time.Now(), f.t)
+	if err != nil {
+		return "", err
+	}
+	oldf.Deleted = true
+
+	f.t.extraFiles = append(f.t.extraFiles, oldf)
 
 	return "", nil
 }

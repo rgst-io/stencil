@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# mise description="Run tests with coverage reporting enabled"
+#MISE description="Run tests with coverage reporting enabled"
 set -euo pipefail
 
 # TEST_TAGS are Go build tags to apply to the test run. This is meant
