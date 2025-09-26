@@ -322,7 +322,7 @@ func TestTplFile_MigrateFrom_ShouldPersistBlocks(t *testing.T) {
 	}
 }
 
-func TestTplFile_MigrateFrom_ShouldUseNewOverOldBlocks(t *testing.T) {
+func TestTplFile_MigrateFrom_ShouldUseOldOverNewBlocks(t *testing.T) {
 	qts := []quickTemplate{
 		{
 			Filename:             "old.go",
@@ -349,7 +349,7 @@ func TestTplFile_MigrateFrom_ShouldUseNewOverOldBlocks(t *testing.T) {
 		case "old.go":
 			assert.Equal(t, f.Deleted, true, "expected old file (old.go) to be deleted")
 		case "new.go":
-			assert.Equal(t, f.String(), "## <<Stencil::Block(custom)>>\nnew\n## <</Stencil::Block>>",
+			assert.Equal(t, f.String(), "## <<Stencil::Block(custom)>>\nold\n## <</Stencil::Block>>",
 				"expected new file blocks to be used over old")
 		default:
 			t.Errorf("expected old.go & new.go, got: %s", f.Name())

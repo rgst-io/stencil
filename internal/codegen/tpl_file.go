@@ -269,6 +269,8 @@ func (f *TplFile) MigrateTo(path string) (out string, err error) {
 // file, but keep its contents. This should be called before any other
 // functions are called inside of the file.
 //
+// This function only takes effect if the old file (path) exists.
+//
 // Note: Only blocks are persisted. Unlike [MigrateTo] the file is not
 // actually copied to disk.
 //
@@ -309,30 +311,23 @@ func (f *TplFile) MigrateTo(path string) (out string, err error) {
 //
 // Result: The block content from old.go is preserved in new.go
 func (f *TplFile) MigrateFrom(path string) (out string, err error) {
-	// Only load blocks from the old file if the new file doesn't exist
-	if _, err := osfs.Default.Stat(f.f.path); err != nil {
-		blocks, err := parseBlocks(path, f.t)
-		if err != nil {
-			return "", fmt.Errorf("MigrateFrom: failed to parse blocks from %s: %w", path, err)
-		}
-
-		f.f.blocks = blocks
-	} else {
-		f.log.Debug("MigrateFrom: not loading blocks due to destination file existing")
+	if _, err := osfs.Default.Stat(path); err != nil {
+		return "", nil
 	}
 
-	// If the old file exists, delete it
-	if _, err := osfs.Default.Stat(path); err == nil {
-		f.log.Debug("MigrateFrom: marking old file as deleted", "file.name", path)
-		oldf, err := NewFile(path, 0o600, time.Now(), f.t)
-		if err != nil {
-			return "", err
-		}
-		oldf.Deleted = true
-
-		f.t.extraFiles = append(f.t.extraFiles, oldf)
+	blocks, err := parseBlocks(path, f.t)
+	if err != nil {
+		return "", fmt.Errorf("MigrateFrom: failed to parse blocks from %s: %w", path, err)
 	}
+	f.f.blocks = blocks
 
+	oldf, err := NewFile(path, 0o600, time.Now(), f.t)
+	if err != nil {
+		return "", err
+	}
+	oldf.Deleted = true
+
+	f.t.extraFiles = append(f.t.extraFiles, oldf)
 	return "", nil
 }
 

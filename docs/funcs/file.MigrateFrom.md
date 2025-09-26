@@ -11,6 +11,8 @@ from this template. This is useful when you want to move a file, but
 keep its contents. This should be called before any other functions are
 called inside of the file.
 
+This function only takes effect if the old file (path) exists.
+
 Note: Only blocks are persisted. Unlike [MigrateTo] the file is not
 actually copied to disk.
 
