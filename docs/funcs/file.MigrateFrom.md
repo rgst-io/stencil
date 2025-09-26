@@ -31,7 +31,7 @@ func main() {
 **Example `new.go.tpl`:**
 
 ```go
-{{ file.MigrateFrom "old.go" }}
+{{ file.MigrateFrom "old.go" -}}
 package main
 
 import "fmt"
