@@ -63,29 +63,13 @@ notarize:
         key_id: "{{.Env.MACOS_NOTARY_KEY_ID}}"
         key: "{{.Env.MACOS_NOTARY_KEY}}"
 
-brews:
-  - commit_author:
-      name: GitHub Actions
-      email: 41898282+github-actions[bot]@users.noreply.github.com
-    homepage: https://stencil.rgst.io
-    license: Apache-2.0
-    description: "A modern living-template engine for evolving repositories"
-    dependencies:
-      - name: git
-        os: mac
-    conflicts:
-      - stencil
-    repository:
-      owner: rgst-io
-      name: homebrew-tap
-      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN}}"
 nfpms:
   - id: packages
     homepage: https://stencil.rgst.io
     description: |-
       A modern living-template engine for evolving repositories.
     maintainer: Jared Allard <jared@rgst.io>
-    license: MIT
+    license: Apache-2.0
     vendor: rgst
     bindir: /usr/bin
     section: utils
