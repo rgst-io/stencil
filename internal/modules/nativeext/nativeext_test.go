@@ -33,12 +33,17 @@ func TestCanImportNativeExtension(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 
+	// Set an empty token so that we don't try to use it for fetching the
+	// license data. Github Actions tokens don't have access to read
+	// licenses.
+	t.Setenv("GITHUB_TOKEN", "")
+
 	ext, err := nativeext.NewHost(slogext.NewTestLogger(t))
 	assert.NilError(t, err, "expected NewHost to not fail")
 	defer ext.Close()
 
 	ver, err := resolver.NewResolver().Resolve(ctx, "https://github.com/rgst-io/stencil-golang", &resolver.Criteria{
-		Constraint: "=2.0.0",
+		Constraint: "=2.0.1",
 	})
 	assert.NilError(t, err, "failed to resolve version")
 
