@@ -1,0 +1,98 @@
+[[tools.dprint]]
+version = "0.50.2"
+backend = "ubi:dprint/dprint"
+
+[tools.dprint.platforms.linux-arm64-dprint]
+checksum = "blake3:cffc00fbeb82c503bb027159c309a6b11dd80c69fb64639c124a32b10f09b869"
+
+[tools.dprint.platforms.linux-x64-dprint]
+checksum = "blake3:575d859f5eecf9c7bf71b237ac72caf5f0e60b3540359b739f47a436cb9cc690"
+
+[[tools.go]]
+version = "1.25.3"
+backend = "core:go"
+
+[tools.go.platforms.linux-arm64]
+checksum = "sha256:1d42ebc84999b5e2069f5e31b67d6fc5d67308adad3e178d5a2ee2c9ff2001f5"
+size = 57269692
+url = "https://dl.google.com/go/go1.25.3.linux-arm64.tar.gz"
+
+[tools.go.platforms.linux-x64]
+checksum = "sha256:0335f314b6e7bfe08c3d0cfaa7c19db961b7b99fb20be62b0a826c992ad14e0f"
+size = 59767979
+url = "https://dl.google.com/go/go1.25.3.linux-amd64.tar.gz"
+
+[[tools."go:golang.org/x/tools/cmd/goimports"]]
+version = "latest"
+backend = "go:golang.org/x/tools/cmd/goimports"
+
+[[tools.golangci-lint]]
+version = "2.6.0"
+backend = "aqua:golangci-lint"
+
+[tools.golangci-lint.platforms.linux-arm64]
+checksum = "sha256:40c94e3f919ee64681797c278abd5e4ce36c52dae4a535e7f088980d1633375a"
+size = 13157010
+url = "https://github.com/golangci/golangci-lint/releases/download/v2.6.0/golangci-lint-2.6.0-linux-arm64.tar.gz"
+
+[tools.golangci-lint.platforms.linux-x64]
+checksum = "sha256:4eeff6a6b8c3d3b5b8e7ba2773f765fe1000979c1ccf50941b25ea13b7c7c1cb"
+size = 14404512
+url = "https://github.com/golangci/golangci-lint/releases/download/v2.6.0/golangci-lint-2.6.0-linux-amd64.tar.gz"
+
+[[tools.goreleaser]]
+version = "2.12.7"
+backend = "aqua:goreleaser/goreleaser"
+
+[tools.goreleaser.platforms.linux-arm64]
+checksum = "sha256:7948d8ce09cce3d3a2fff9202eae47d2223958e508f849b340345583bb2c0e1f"
+size = 23584650
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.12.7/goreleaser_Linux_arm64.tar.gz"
+
+[tools.goreleaser.platforms.linux-x64]
+checksum = "sha256:de95c5d1e728e18753c3ddcf02974d63d6432f0a7355a5afa6813971a95a01b8"
+size = 26131951
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.12.7/goreleaser_Linux_x86_64.tar.gz"
+
+[tools.goreleaser.platforms.macos-arm64]
+checksum = "sha256:9ebf84c40c8d69c85567283ce371e1bbce4ec6fc87105d323476354afccc0d1d"
+size = 52482494
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.12.7/goreleaser_Darwin_all.tar.gz"
+
+[[tools.gotestsum]]
+version = "1.13.0"
+backend = "aqua:gotestyourself/gotestsum"
+
+[tools.gotestsum.platforms.linux-arm64]
+checksum = "sha256:7644a4c5cd1bb978d56245aeab25a586ac5ac62adebed20a399548867c13499d"
+size = 2395244
+url = "https://github.com/gotestyourself/gotestsum/releases/download/v1.13.0/gotestsum_1.13.0_linux_arm64.tar.gz"
+
+[tools.gotestsum.platforms.linux-x64]
+checksum = "sha256:11ccddeaf708ef228889f9fe2f68291a75b27013ddfc3b18156e094f5f40e8ee"
+size = 2622918
+url = "https://github.com/gotestyourself/gotestsum/releases/download/v1.13.0/gotestsum_1.13.0_linux_amd64.tar.gz"
+
+[tools.gotestsum.platforms.macos-arm64]
+checksum = "sha256:509cb27aef747f48faf9bce424f59dcf79572c905204b990ee935bbfcc7fa0e9"
+size = 2472317
+url = "https://github.com/gotestyourself/gotestsum/releases/download/v1.13.0/gotestsum_1.13.0_darwin_arm64.tar.gz"
+
+[[tools.shfmt]]
+version = "3.12.0"
+backend = "aqua:mvdan/sh"
+
+[tools.shfmt.platforms.linux-arm64]
+checksum = "sha256:5f3fe3fa6a9f766e6a182ba79a94bef8afedafc57db0b1ad32b0f67fae971ba4"
+size = 2883768
+url = "https://github.com/mvdan/sh/releases/download/v3.12.0/shfmt_v3.12.0_linux_arm64"
+
+[tools.shfmt.platforms.linux-x64]
+checksum = "sha256:d9fbb2a9c33d13f47e7618cf362a914d029d02a6df124064fff04fd688a745ea"
+size = 2916536
+url = "https://github.com/mvdan/sh/releases/download/v3.12.0/shfmt_v3.12.0_linux_amd64"
+
+[tools.shfmt.platforms.macos-arm64]
+checksum = "sha256:d903802e0ce3ecbc82b98512f55ba370b0d37a93f3f78de394f5b657052b33dd"
+size = 2891858
+url = "https://github.com/mvdan/sh/releases/download/v3.12.0/shfmt_v3.12.0_darwin_arm64"
