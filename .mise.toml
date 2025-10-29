@@ -1,25 +1,22 @@
-
 # Default versions of tools, to update these, set [tools.override]
 [tools]
-bun = "latest"
-git-cliff = "latest"
+dprint = "latest"
 golang = "1.25.3"
 golangci-lint = "2.6.0"
 goreleaser = "latest"
-"go:gotest.tools/gotestsum" = "1.13.0"
+gotestsum = "1.13.0"
 "go:golang.org/x/tools/cmd/goimports" = "latest"
-"go:mvdan.cc/sh/v3/cmd/shfmt" = "latest"
-"go:github.com/thenativeweb/get-next-version" = "latest"
+shfmt = "latest"
 
 [tasks.build]
 description = "Build a binary for the current platform/architecture"
-sources = ['*.go', '**/*.go', '*.tpl', '**/.tpl']
 run = "go build -trimpath -o ./bin/ -v ./cmd/..."
 
 [tasks.changelog]
 description = "Generate a changelog for the current version"
 outputs = ["CHANGELOG.md"]
 run = ["git-cliff --config .cliff.toml --output CHANGELOG.md"]
+tools.git-cliff = "latest"
 
 [tasks.fmt]
 alias = "format"
@@ -29,7 +26,7 @@ run = [
 	"gofmt -s -w .",
 	"goimports -w .",
 	"shfmt -w .",
-	"bun node_modules/.bin/prettier --write '**/*.{json,yaml,yml,md,jsonschema.json}'",
+	"dprint fmt '**/*.{json,yaml,yml,md,jsonschema.json}'",
 ]
 
 [tasks.lint]
@@ -41,6 +38,7 @@ description = """Get the version number that would be released if a release was 
 Pass --rc to get the next release candidate version.
 """
 run = ["./.github/scripts/get-next-version.sh"]
+tools.svu = "latest"
 
 [tasks.test]
 description = "Run tests"
@@ -69,6 +67,7 @@ description = "Update the TOC in the README"
 run = ["mdtoc --inplace --max-depth=5 README.md"]
 
 [alias]
+dprint = "ubi:dprint/dprint"
 golangci-lint = "aqua:golangci-lint"
 git-cliff = "ubi:orhun/git-cliff"
 goreleaser = "aqua:goreleaser/goreleaser"

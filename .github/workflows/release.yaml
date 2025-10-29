@@ -85,7 +85,7 @@ jobs:
           BUILD_RC: ${{ github.event.inputs.rc }}
           VERSION_OVERRIDE: ${{ github.event.inputs.version }}
         run: |-
-          echo "version=$(./.github/scripts/get-next-version.sh)" >> "$GITHUB_OUTPUT"
+          echo "version=$(mise run next-version)" >> "$GITHUB_OUTPUT"
       - name: Create Tag
         run: |-
           git tag -a "${{ steps.next_version.outputs.version }}" -m "Release ${{ steps.next_version.outputs.version }}"

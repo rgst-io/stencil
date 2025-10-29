@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -13,17 +14,23 @@ import (
 	"gotest.tools/v3/assert"
 )
 
+// repoRoot is the root to the repository. This is set once.
+var repoRoot = func() string {
+	// Change into the repo root.
+	// GOMOD: <module path>/go.mod
+	b, err := cmdexec.Command("git", "rev-parse", "--show-toplevel").Output()
+	if err != nil {
+		panic(fmt.Errorf("failed to determine git repository root: %w", err))
+	}
+
+	return strings.TrimSpace(string(b))
+}()
+
 // prepareTestRun sets up the environment for running a stencil command.
 //
 // dir is the directory to change into before running the command. If
 // dir is an empty string, a temporary directory will be created.
 func prepareTestRun(t *testing.T, dir string) {
-	// Change into the repo root.
-	// GOMOD: <module path>/go.mod
-	b, err := cmdexec.Command("go", "env", "GOMOD").Output()
-	assert.NilError(t, err)
-	repoRoot := strings.TrimSuffix(strings.TrimSpace(string(b)), "/go.mod")
-
 	t.Chdir(repoRoot)
 
 	// Use a temporary directory for the test if one is not provided.

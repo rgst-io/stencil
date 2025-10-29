@@ -3,9 +3,9 @@
     <img src=".github/images/stencil.png" alt="stencil" width="300" />
   </a>
 
-  <p><em>A modern living-template engine for evolving repositories.</em></p>
+<p><em>A modern living-template engine for evolving repositories.</em></p>
 
-  <a href="https://github.com/rgst-io/stencil/releases">
+<a href="https://github.com/rgst-io/stencil/releases">
     <img alt="Latest Version" src="https://img.shields.io/github/v/release/rgst-io/stencil?style=for-the-badge">
   </a>
   <a href="https://github.com/rgst-io/stencil/blob/main/LICENSE">
@@ -34,6 +34,7 @@ information!
   - [Releasing](#releasing)
   - [Building docs](#building-docs)
 - [License](#license)
+
 <!-- /toc -->
 
 ## Install

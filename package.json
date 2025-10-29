@@ -1,8 +1,0 @@
-{
-	"//": "Used for prettier",
-	"name": "@rgst-io/stencil",
-	"devDependencies": {
-		"prettier": "^3.5.1"
-	},
-	"private": true
-}

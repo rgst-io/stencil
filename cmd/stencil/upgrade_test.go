@@ -85,9 +85,9 @@ func TestCanUpgradeModules(t *testing.T) {
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
 			Version: &resolver.Version{
-				// https://github.com/rgst-io/stencil-golang/releases/tag/v0.3.1
-				Tag:    "v0.3.1",
-				Commit: "6f031a70bea1bb06fe57db48abcea52a287eae7f",
+				// https://github.com/rgst-io/stencil-golang/releases/tag/v2.0.0
+				Tag:    "v2.0.0",
+				Commit: "0acc11ac471442c44d8f75a366239cd23c95ecc7",
 			},
 		}},
 	}, tmpDir)
@@ -104,7 +104,7 @@ func TestCanUpgradeModules(t *testing.T) {
 	lf, err := stencil.LoadLockfile(tmpDir)
 	assert.NilError(t, err, "expected LoadLockfile() to not error")
 	assert.Equal(t, len(lf.Modules), 1, "expected exactly one module in lockfile")
-	assert.Check(t, lf.Modules[0].Version.Tag != "v0.3.1", "expected module to be upgraded")
+	assert.Check(t, lf.Modules[0].Version.Tag != "v2.0.0", "expected module to be upgraded")
 }
 
 // TestUpgradeIncludesNewModules tests that the upgrade command can install
@@ -149,7 +149,7 @@ func TestUpgradeReRunsStencil(t *testing.T) {
 		Name: "testing",
 		Modules: []*configuration.TemplateRepository{{
 			Name:    "github.com/rgst-io/stencil-golang",
-			Version: "=1.6.2",
+			Version: "=2.0.1",
 		}},
 		Arguments: map[string]any{
 			"org": "rgst-io",
@@ -181,7 +181,7 @@ func TestUpgradeDoesNotReRunStencilWhenTold(t *testing.T) {
 		Name: "testing",
 		Modules: []*configuration.TemplateRepository{{
 			Name:    "github.com/rgst-io/stencil-golang",
-			Version: "=1.6.2",
+			Version: "=2.0.0",
 		}},
 		Arguments: map[string]any{
 			"org": "rgst-io",
