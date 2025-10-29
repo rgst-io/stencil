@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/jaredallard/cmdexec"
 	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/v2/internal/modules/nativeext"
 	"go.rgst.io/stencil/v2/pkg/slogext"
@@ -33,11 +34,6 @@ func TestCanImportNativeExtension(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 
-	// Set an empty token so that we don't try to use it for fetching the
-	// license data. Github Actions tokens don't have access to read
-	// licenses.
-	t.Setenv("GITHUB_TOKEN", "")
-
 	ext, err := nativeext.NewHost(slogext.NewTestLogger(t))
 	assert.NilError(t, err, "expected NewHost to not fail")
 	defer ext.Close()
@@ -46,6 +42,16 @@ func TestCanImportNativeExtension(t *testing.T) {
 		Constraint: "=2.0.1",
 	})
 	assert.NilError(t, err, "failed to resolve version")
+
+	// Set an empty token so that we don't try to use it for fetching the
+	// license data. Github Actions tokens don't have access to read
+	// licenses.
+	t.Setenv("GITHUB_TOKEN", "")
+	cmdexec.UseMockExecutor(t, cmdexec.NewMockExecutor(&cmdexec.MockCommand{
+		Name:   "gh",
+		Args:   []string{"auth", "token"},
+		Stdout: []byte("xyz"),
+	}))
 
 	err = ext.RegisterExtension(ctx, "https://github.com/rgst-io/stencil-golang", "github.com/rgst-io/stencil-golang", ver)
 	assert.NilError(t, err, "failed to register extension")
