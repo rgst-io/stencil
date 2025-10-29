@@ -2,6 +2,14 @@
 version = "1.3.1"
 backend = "core:bun"
 
+[tools.bun.platforms.linux-arm64]
+checksum = "blake3:d6b47e5d5d89c03220af4d864bbbdea5ecca12e7bb326ecb542ac5394ef0967c"
+size = 38034553
+
+[tools.bun.platforms.linux-x64]
+checksum = "blake3:a4bc824cf6779a832fe1a10dd83d94f7d3311f0ca4707666c287a01e281def7e"
+size = 39510697
+
 [tools.bun.platforms.macos-arm64]
 checksum = "blake3:1643fe56ae2f8adc8229a82672484113c01c82b5fe15b3e498610fc050831ffd"
 size = 22437956
@@ -76,6 +84,16 @@ url = "https://github.com/golangci/golangci-lint/releases/download/v2.6.0/golang
 [[tools.goreleaser]]
 version = "2.12.7"
 backend = "aqua:goreleaser/goreleaser"
+
+[tools.goreleaser.platforms.linux-arm64]
+checksum = "sha256:7948d8ce09cce3d3a2fff9202eae47d2223958e508f849b340345583bb2c0e1f"
+size = 23584650
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.12.7/goreleaser_Linux_arm64.tar.gz"
+
+[tools.goreleaser.platforms.linux-x64]
+checksum = "sha256:de95c5d1e728e18753c3ddcf02974d63d6432f0a7355a5afa6813971a95a01b8"
+size = 26131951
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.12.7/goreleaser_Linux_x86_64.tar.gz"
 
 [tools.goreleaser.platforms.macos-arm64]
 checksum = "sha256:9ebf84c40c8d69c85567283ce371e1bbce4ec6fc87105d323476354afccc0d1d"
