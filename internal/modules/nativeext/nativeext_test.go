@@ -38,7 +38,7 @@ func TestCanImportNativeExtension(t *testing.T) {
 	defer ext.Close()
 
 	ver, err := resolver.NewResolver().Resolve(ctx, "https://github.com/rgst-io/stencil-golang", &resolver.Criteria{
-		Constraint: "=1.1.0",
+		Constraint: "=2.0.0",
 	})
 	assert.NilError(t, err, "failed to resolve version")
 
