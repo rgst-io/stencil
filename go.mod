@@ -25,7 +25,7 @@ require (
 	github.com/rogpeppe/go-internal v1.14.1
 	github.com/samber/lo v1.52.0
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
-	github.com/urfave/cli/v3 v3.6.0
+	github.com/urfave/cli/v3 v3.6.1
 	go.yaml.in/yaml/v3 v3.0.4
 	gotest.tools/v3 v3.5.2
 	sigs.k8s.io/yaml v1.6.0
