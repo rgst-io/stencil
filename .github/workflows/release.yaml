@@ -41,7 +41,7 @@ jobs:
           owner: ${{ github.repository_owner }}
           repositories: homebrew-tap
       ## <</Stencil::Block>>
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           fetch-tags: true
