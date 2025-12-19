@@ -53,6 +53,7 @@ export default defineConfig({
 		['meta', { property: 'og:title', content: 'Stencil' }],
 		['meta', { property: 'og:image', content: 'https://stencil.rgst.io/logo.png' }],
 		['meta', { property: 'og:description', content: 'A modern living-template engine for evolving code repositories' }],
+		['meta', { name: 'twitter:card', content: 'summary_large_image' }],
 		['link', { rel: 'apple-touch-icon', sizes: '57x57', href: '/apple-icon-57x57.png' }],
 		['link', { rel: 'apple-touch-icon', sizes: '60x60', href: '/apple-icon-60x60.png' }],
 		['link', { rel: 'apple-touch-icon', sizes: '72x72', href: '/apple-icon-72x72.png' }],
