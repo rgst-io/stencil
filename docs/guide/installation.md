@@ -15,7 +15,7 @@ Stencil may also be compiled from source wherever the Go toolchain can run; e.g.
 
 ### Homebrew (macOS)
 
-Stencil is installable via the [official Homebrew formulae](https://formulae.brew.sh/formula/stencil#default)
+Stencil is installable via the [official Homebrew formula](https://formulae.brew.sh/formula/stencil#default)
 
 ```bash
 brew install stencil
