@@ -4,11 +4,11 @@
 	"type": "module",
 	"devDependencies": {
 		"vitepress": "^1.6.4",
-		"vitepress-sidebar": "^1.33.0"
+		"vitepress-sidebar": "^1.33.1"
 	},
 	"scripts": {
 		"docs:dev": "vitepress dev",
-		"docs:build": "vitepress build && cp logo.png .vitepress/dist && mkdir -p .vitepress/dist/static && cp ../schemas/* .vitepress/dist/static",
+		"docs:build": "vitepress build && cp static/* .vitepress/dist && mkdir -p .vitepress/dist/static && cp ../schemas/* .vitepress/dist/static",
 		"docs:preview": "vitepress preview"
 	}
 }

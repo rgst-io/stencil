@@ -23,7 +23,7 @@ hero:
 
 features:
   - icon: 📝
-    title: <a href="/about">Development Lifecycle Management</a>
+    title: <a href="/about/problem-statement">Development Lifecycle Management</a>
     details: Treat your generated files as APIs by persisting changes in customizable "blocks" to allow rendering more than once
   - icon: 🧱
     title: <a href="/reference/modules">Modular</a>
