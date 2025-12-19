@@ -15,14 +15,10 @@ Stencil may also be compiled from source wherever the Go toolchain can run; e.g.
 
 ### Homebrew (macOS)
 
-We provide a brew cask for stencil, this is the recommended way to
-install `stencil` on macOS as upgrades will be automatically handled for
-you.
-
-Our macOS binaries are also notarized.
+Stencil is installable via the [official Homebrew formula](https://formulae.brew.sh/formula/stencil#default)
 
 ```bash
-brew install rgst-io/tap/stencil
+brew install stencil
 ```
 
 ### APT (Linux [Debian & Ubuntu])
