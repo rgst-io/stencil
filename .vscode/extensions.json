@@ -4,7 +4,6 @@
 		"editorconfig.editorconfig",
 		"golang.go",
 		"timonwong.shellcheck",
-		"redhat.vscode-yaml",
-		"foxundermoon.shell-format"
+		"redhat.vscode-yaml"
 	]
 }
