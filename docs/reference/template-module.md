@@ -41,7 +41,7 @@ functions callable by the current module. They cannot call `file`
 methods as they do not ever generate files.
 
 To create a library template, create a file with the `.library.tpl`
-extension.
+extension. The shorthand format of `.lib.tpl` is also allowed.
 
 ### `manifest.yaml`
 

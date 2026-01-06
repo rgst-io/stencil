@@ -23,12 +23,19 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
 	"go.rgst.io/stencil/v2/internal/modules"
 	"go.rgst.io/stencil/v2/pkg/slogext"
 )
+
+// libraryExts are extensions that make a template a library
+var libraryExts = []string{
+	".library",
+	".lib",
+}
 
 // Template is a file that has been processed by stencil
 type Template struct {
@@ -94,11 +101,11 @@ type NewTemplateOpts struct {
 
 // NewTemplate creates a new Template with the current file being the same name
 // with the extension .tpl being removed. If the provided template has
-// the extension .library.tpl, then the Library field is set to true.
+// an extension in [libraryExts], Library is set to true.
 func NewTemplate(m *modules.Module, fpath string, mode os.FileMode,
 	modTime time.Time, contents []byte, log slogext.Logger, opts *NewTemplateOpts) (*Template, error) {
 	var library bool
-	if filepath.Ext(strings.TrimSuffix(fpath, ".tpl")) == ".library" {
+	if slices.Contains(libraryExts, filepath.Ext(strings.TrimSuffix(fpath, ".tpl"))) {
 		library = true
 	}
 
