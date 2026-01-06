@@ -24,6 +24,15 @@
 			"required": ["description", "schema"],
 			"description": "Argument is a user-input argument that can be passed to templates"
 		},
+		"DeliminatorsConfig": {
+			"properties": {
+				"left": { "type": "string", "description": "Left is the left option for the deliminator, default: {{" },
+				"right": { "type": "string", "description": "Right is the right option for the deliminator, default: }}" }
+			},
+			"additionalProperties": false,
+			"type": "object",
+			"description": "DeliminatorsConfig is the configuration for configuring text/template deliminators, see:"
+		},
 		"ModuleHook": {
 			"properties": {
 				"schema": {
@@ -106,6 +115,10 @@
 					"additionalProperties": { "$ref": "#/$defs/ModuleHook" },
 					"type": "object",
 					"description": "ModuleHooks contains configuration for module hooks, keyed by their\nname."
+				},
+				"deliminators": {
+					"$ref": "#/$defs/DeliminatorsConfig",
+					"description": "Deliminators are the deliminators to use for the Go template. For\nmore information, see:\n\n https://pkg.go.dev/text/template#Template.Delims"
 				}
 			},
 			"additionalProperties": false,
