@@ -49,7 +49,7 @@ type TplStencil struct {
 // This is incredibly useful for allowing other modules to write
 // to files that your module owns. Think of them as extension points
 // for your module. The value returned by this function is always a
-// []any, aka a list.
+// `[]any`, aka a list.
 //
 //	{{- /* This returns a []any */}}
 //	{{ $hook := stencil.GetModuleHook "myModuleHook" }}

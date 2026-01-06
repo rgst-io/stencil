@@ -17,7 +17,15 @@ order: {{ order }}
 	{{- else if eq .Kind "autolink" -}}
 		{{- .Text -}}
 	{{- else if eq .Kind "link" -}}
-		{{- link (escape .Text) .URL -}}
+		{{- if hasPrefix "TplStencil." .Text -}}
+			{{- $text := regexReplaceAll "TplStencil\\.(.*)" .Text "stencil.${1}" -}}
+			{{- $url := regexReplaceAll "TplStencil\\.(.*)" .Text "stencil.${1}.html" -}}
+			{{- link (escape $text) $url -}}
+		{{- else if eq .Text "Values" -}}
+			{{- link (escape .Text) "../reference/values.html" -}}
+		{{- else -}}
+			{{- link (escape .Text) .URL -}}
+		{{- end -}}
 	{{- end -}}
 {{- end -}}
 {{- end }}
