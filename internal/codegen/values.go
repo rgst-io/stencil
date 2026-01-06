@@ -127,8 +127,8 @@ type Values struct {
 	Template stencilTemplate
 
 	// Data is only available when a template is being rendered through
-	// stencil.Include. It contains the data passed through said
-	// call.
+	// stencil.Include or module.Call. It contains the data passed through
+	// said call.
 	Data any
 }
 

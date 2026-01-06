@@ -1,5 +1,5 @@
 ---
-order: 2
+order: 20
 ---
 
 # Stencil Manifest
