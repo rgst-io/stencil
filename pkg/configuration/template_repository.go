@@ -60,6 +60,24 @@ type TemplateRepositoryManifest struct {
 	// ModuleHooks contains configuration for module hooks, keyed by their
 	// name.
 	ModuleHooks map[string]ModuleHook `yaml:"moduleHooks,omitempty"`
+
+	// Deliminators are the deliminators to use for the Go template. For
+	// more information, see:
+	//
+	//  https://pkg.go.dev/text/template#Template.Delims
+	Deliminators DeliminatorsConfig `yaml:"deliminators,omitempty"`
+}
+
+// DeliminatorsConfig is the configuration for configuring text/template
+// deliminators, see:
+//
+//	https://pkg.go.dev/text/template#Template.Delims
+type DeliminatorsConfig struct {
+	// Left is the left option for the deliminator, default: {{
+	Left string `yaml:"left,omitempty"`
+
+	// Right is the right option for the deliminator, default: }}
+	Right string `yaml:"right,omitempty"`
 }
 
 // PostRunCommandSpec is the spec of a command to be ran and its

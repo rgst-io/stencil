@@ -234,3 +234,22 @@ three: {{ stencil.GetGlobal "z" }}`))
 		},
 	})
 }
+
+func TestCanUseDeliminators(t *testing.T) {
+	log := slogext.NewTestLogger(t)
+	sm := &configuration.Manifest{Name: t.Name()}
+	m1man := &configuration.TemplateRepositoryManifest{
+		Name:         t.Name(),
+		Deliminators: configuration.DeliminatorsConfig{Left: "[[", Right: "]]"},
+	}
+
+	m, err := modulestest.NewModuleFromTemplates(m1man, "testdata/deliminators/test.tpl")
+	assert.NilError(t, err, "failed to NewModuleFromTemplates")
+
+	st := NewStencil(sm, nil, []*modules.Module{m}, log, false)
+	tpls, err := st.Render(t.Context(), log)
+	assert.NilError(t, err, "expected stencil.Render to not fail")
+	assert.Equal(t, len(tpls), 1, "expected templates returned to be 1")
+	assert.Equal(t, len(tpls[0].Files), 1, "expected tpl[0] files returned to be 1")
+	assert.Equal(t, tpls[0].Files[0].String(), "stencil")
+}

@@ -1,0 +1,4 @@
+name: github.com/rgst-io/stencil-module
+deliminators:
+  left: "[["
+  right: "]]"

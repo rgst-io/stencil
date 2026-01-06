@@ -137,6 +137,10 @@ func New(ctx context.Context, uri string, opts NewModuleOpts) (*Module, error) {
 	}
 	m.Manifest = mani
 
+	if m.Manifest.Deliminators.Left != "" && m.Manifest.Deliminators.Right != "" {
+		m.t = m.t.Delims(m.Manifest.Deliminators.Left, m.Manifest.Deliminators.Right)
+	}
+
 	return &m, nil
 }
 

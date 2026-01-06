@@ -358,3 +358,20 @@ func TestShouldErrorOnNonExistentRepo(t *testing.T) {
 	//nolint:lll // Why: Error message is long.
 	assert.Error(t, err, "failed to resolve module 'github.com/rgst-io/i-am-not-a-real-repo': failed to get remote branches: exec failed (exit status 128): remote: Repository not found.\nfatal: repository 'https://github.com/rgst-io/i-am-not-a-real-repo/' not found\n\n\nThis error could be due to invalid credentials. Ensure your git configuration is correct.", "expected GetModulesForProject() to error")
 }
+
+func TestCanSetDeliminators(t *testing.T) {
+	sm := &configuration.Manifest{
+		Name:    "test-project",
+		Modules: []*configuration.TemplateRepository{{Name: "github.com/rgst-io/stencil-module"}},
+		Replacements: map[string]string{
+			"github.com/rgst-io/stencil-module": "file://testdata/deliminators",
+		},
+	}
+
+	mods, err := modules.FetchModules(t.Context(), &modules.ModuleResolveOptions{Manifest: sm, Log: newLogger(t)})
+	assert.NilError(t, err, "expected GetModulesForProject() to not error")
+	assert.Equal(t, len(mods), 1, "expected exactly one module to be returned")
+
+	assert.Equal(t, mods[0].Manifest.Deliminators.Left, "[[")
+	assert.Equal(t, mods[0].Manifest.Deliminators.Right, "]]")
+}
