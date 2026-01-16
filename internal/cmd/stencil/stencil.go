@@ -86,9 +86,15 @@ func printVersion(v *resolver.Version) string {
 	return v.Commit
 }
 
+type NewCommandOpt struct {
+	DryRun      bool
+	Adopt       bool
+	SkipPostRun bool
+	FailIgnored bool
+}
+
 // NewCommand creates a new stencil command
-func NewCommand(log slogext.Logger, s *configuration.Manifest,
-	dryRun, adopt, skipPostRun, failIgnored bool) *Command {
+func NewCommand(log slogext.Logger, s *configuration.Manifest, opts *NewCommandOpt) *Command {
 	l, err := stencil.LoadLockfile("")
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		log.WithError(err).Warn("failed to load lockfile")
@@ -98,10 +104,10 @@ func NewCommand(log slogext.Logger, s *configuration.Manifest,
 		lock:        l,
 		manifest:    s,
 		log:         log,
-		dryRun:      dryRun,
-		adopt:       adopt,
-		skipPostRun: skipPostRun,
-		failIgnored: failIgnored,
+		dryRun:      opts.DryRun,
+		adopt:       opts.Adopt,
+		skipPostRun: opts.SkipPostRun,
+		failIgnored: opts.FailIgnored,
 	}
 }
 
