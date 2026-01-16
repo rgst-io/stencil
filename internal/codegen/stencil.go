@@ -125,7 +125,7 @@ func (s *Stencil) RegisterInprocExtensions(name string, ext apiv1.Implementation
 	s.ext.RegisterInprocExtension(name, ext)
 }
 
-// GenerateLockfile generates a stencil.Lockfile based
+// GenerateLockfile generates a [stencil.Lockfile] based
 // on a list of templates.
 func (s *Stencil) GenerateLockfile(tpls []*Template) *stencil.Lockfile {
 	l := &stencil.Lockfile{

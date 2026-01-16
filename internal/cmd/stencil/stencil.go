@@ -46,6 +46,9 @@ type Command struct {
 	// lock is the current stencil lockfile at command creation time
 	lock *stencil.Lockfile
 
+	// ignore is [stencil.Ignore] for this execution
+	ignore *stencil.Ignore
+
 	// manifest is the project manifest that is being used for this
 	// template render
 	manifest *configuration.Manifest
@@ -59,6 +62,15 @@ type Command struct {
 	// adopt denotes if we should use heuristics to detect code that should go
 	// into blocks to assist with first-time adoption of templates
 	adopt bool
+
+	// failIgnored returns a non-zero exit code, but does not terminate
+	// the render/writing of files, if a file was ignored via
+	// .stencilignore.
+	failIgnored bool
+	ignored     bool
+
+	// skipPostRun skips post run commands
+	skipPostRun bool
 }
 
 // printVersion is a command line friendly version of
@@ -75,18 +87,21 @@ func printVersion(v *resolver.Version) string {
 }
 
 // NewCommand creates a new stencil command
-func NewCommand(log slogext.Logger, s *configuration.Manifest, dryRun, adopt bool) *Command {
+func NewCommand(log slogext.Logger, s *configuration.Manifest,
+	dryRun, adopt, skipPostRun, failIgnored bool) *Command {
 	l, err := stencil.LoadLockfile("")
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		log.WithError(err).Warn("failed to load lockfile")
 	}
 
 	return &Command{
-		lock:     l,
-		manifest: s,
-		log:      log,
-		dryRun:   dryRun,
-		adopt:    adopt,
+		lock:        l,
+		manifest:    s,
+		log:         log,
+		dryRun:      dryRun,
+		adopt:       adopt,
+		skipPostRun: skipPostRun,
+		failIgnored: failIgnored,
 	}
 }
 
@@ -298,6 +313,12 @@ func (c *Command) validateStencilVersion(mods []*modules.Module, stencilVersion 
 // the templates. This step also does minimal post-processing of the dependencies
 // manifests
 func (c *Command) Run(ctx context.Context) error {
+	ignore, err := stencil.LoadIgnore("")
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("failed to load stencil ignore: %w", err)
+	}
+	c.ignore = ignore
+
 	c.log.Info("Fetching dependencies")
 	mods, err := c.resolveModules(ctx, false)
 	if err != nil {
@@ -308,7 +329,15 @@ func (c *Command) Run(ctx context.Context) error {
 		return err
 	}
 
-	return c.runWithModules(ctx, mods)
+	if err := c.runWithModules(ctx, mods); err != nil {
+		return err
+	}
+
+	if c.failIgnored && c.ignored {
+		return fmt.Errorf("files were ignored via .stencilignore")
+	}
+
+	return nil
 }
 
 // runWithModules runs the stencil command with the given modules
@@ -337,7 +366,10 @@ func (c *Command) runWithModules(ctx context.Context, mods []*modules.Module) er
 		return nil
 	}
 
-	return st.PostRun(ctx, c.log)
+	if !c.skipPostRun {
+		return st.PostRun(ctx, c.log)
+	}
+	return nil
 }
 
 // writeFiles writes the files to disk
@@ -345,6 +377,21 @@ func (c *Command) writeFiles(st *codegen.Stencil, tpls []*codegen.Template) erro
 	c.log.Infof("Writing template(s) to disk")
 	for _, tpl := range tpls {
 		for i := range tpl.Files {
+			fileName := tpl.Files[i].Name()
+			if c.ignore != nil && c.ignore.Include(fileName) {
+				logFn := c.log.Warnf
+				if c.failIgnored {
+					logFn = c.log.Errorf
+				}
+
+				logFn("  -> Skipped %s", fileName, "reason", "matched .stencilignore")
+				if c.failIgnored {
+					c.ignored = true
+				}
+
+				continue
+			}
+
 			if err := tpl.Files[i].Write(c.log, c.dryRun); err != nil {
 				return err
 			}

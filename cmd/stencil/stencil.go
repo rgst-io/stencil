@@ -66,7 +66,9 @@ func NewStencilAction(log slogext.Logger) cli.ActionFunc {
 			return fmt.Errorf("failed to parse stencil.yaml: %w", err)
 		}
 
-		return stencil.NewCommand(log, manifest, c.Bool("dry-run"), c.Bool("adopt")).Run(ctx)
+		return stencil.NewCommand(log, manifest,
+			c.Bool("dry-run"), c.Bool("adopt"), c.Bool("skip-post-run"), c.Bool("fail-ignored"),
+		).Run(ctx)
 	}
 }
 
@@ -92,6 +94,14 @@ func NewStencil(log slogext.Logger) *cli.Command {
 			&cli.BoolFlag{
 				Name:  "adopt",
 				Usage: "Uses heuristics to detect code that should go into blocks to assist with first-time adoption of templates",
+			},
+			&cli.BoolFlag{
+				Name:  "skip-post-run",
+				Usage: "Skips running post-run commands",
+			},
+			&cli.BoolFlag{
+				Name:  "fail-ignored",
+				Usage: "Fails if there are ignored files via .stencilignore",
 			},
 		},
 		EnableShellCompletion: true,
