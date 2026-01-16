@@ -16,7 +16,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/hashicorp/go-hclog v1.6.3
 	github.com/hashicorp/go-plugin v1.7.0
-	github.com/jaredallard/archives v1.0.1
+	github.com/jaredallard/archives v1.0.2
 	github.com/jaredallard/cmdexec v1.3.0
 	github.com/jaredallard/vcs v1.0.1
 	github.com/mitchellh/hashstructure/v2 v2.0.2
@@ -66,7 +66,7 @@ require (
 	github.com/jamespfennell/xz v0.1.2 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.4.0 // indirect
-	github.com/klauspost/compress v1.18.2 // indirect
+	github.com/klauspost/compress v1.18.3 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
