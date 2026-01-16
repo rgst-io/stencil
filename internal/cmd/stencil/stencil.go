@@ -67,7 +67,10 @@ type Command struct {
 	// the render/writing of files, if a file was ignored via
 	// .stencilignore.
 	failIgnored bool
-	ignored     bool
+
+	// ignored is set to 'true' when files were ignored, this is used by
+	// failIgnored to determine if the run should be failed.
+	ignored bool
 
 	// skipPostRun skips post run commands
 	skipPostRun bool
