@@ -66,7 +66,7 @@ func NewStencilAction(log slogext.Logger) cli.ActionFunc {
 			return fmt.Errorf("failed to parse stencil.yaml: %w", err)
 		}
 
-		return stencil.NewCommand(log, manifest, &stencil.NewCommandOpt{
+		return stencil.NewCommand(log, manifest, &stencil.NewCommandOpts{
 			DryRun:      c.Bool("dry-run"),
 			Adopt:       c.Bool("adopt"),
 			SkipPostRun: c.Bool("skip-post-run"),
