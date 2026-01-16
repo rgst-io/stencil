@@ -121,7 +121,7 @@ func runTest(ctx context.Context, log slogext.Logger, dir string, t *Test) error
 
 	tlog = tlog.With("test.name", t.Name)
 
-	cmd := stencil.NewCommand(tlog, mf, false, false)
+	cmd := stencil.NewCommand(tlog, mf, &stencil.NewCommandOpts{})
 	if err := cmd.Run(ctx); err != nil {
 		fmt.Print(tlogbuf.String())
 		return err

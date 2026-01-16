@@ -98,7 +98,8 @@ func LoadLockfile(path string) (*Lockfile, error) {
 	return &lock, yaml.Unmarshal(b, &lock)
 }
 
-// MergeMissingInfoFromOlderLockfile merges missing files and modules from the older lockfile into the current one, for use with file.Once.
+// MergeMissingInfoFromOlderLockfile merges missing files and modules
+// from the older lockfile into the current one, for use with file.Once.
 func (lf *Lockfile) MergeMissingInfoFromOlderLockfile(older *Lockfile) {
 	for _, f := range older.Files {
 		if !slices.ContainsFunc(lf.Files, func(fe *LockfileFileEntry) bool {
@@ -119,7 +120,8 @@ func (lf *Lockfile) MergeMissingInfoFromOlderLockfile(older *Lockfile) {
 	lf.Sort()
 }
 
-// Sort maintains the alphabetic sort of files/modules to ensure deterministic output
+// Sort maintains the alphabetic sort of files/modules to ensure
+// deterministic output
 func (lf *Lockfile) Sort() {
 	sort.SliceStable(lf.Files, func(i, j int) bool {
 		return lf.Files[i].Name < lf.Files[j].Name

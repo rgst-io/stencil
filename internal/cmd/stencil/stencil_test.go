@@ -28,7 +28,7 @@ func TestResolveModulesShouldUseModulesFromLockfile(t *testing.T) {
 		Modules: []*configuration.TemplateRepository{{
 			Name: "github.com/rgst-io/stencil-golang",
 		}},
-	}, false, false)
+	}, &NewCommandOpts{})
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -55,7 +55,7 @@ func TestResolveModulesShouldUpgradeWhenExplicitlyAsked(t *testing.T) {
 			Name:    "github.com/rgst-io/stencil-golang",
 			Version: "v0.5.0", // 3c3213721335c53fd78f4fede1b3704801616615
 		}},
-	}, false, false)
+	}, &NewCommandOpts{})
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -91,7 +91,7 @@ func TestResolveShouldNotUpgradeOtherModulesWhenUpgradingOne(t *testing.T) {
 				Name: "github.com/rgst-io/stencil-module",
 			},
 		},
-	}, false, false)
+	}, &NewCommandOpts{})
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -135,7 +135,7 @@ func TestResolveModulesShouldUpdateReplacements(t *testing.T) {
 		Replacements: map[string]string{
 			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stub-module"),
 		},
-	}, false, false)
+	}, &NewCommandOpts{})
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -166,7 +166,7 @@ func TestResolveModulesShouldAllowAdds(t *testing.T) {
 				Name: "github.com/rgst-io/stencil-module",
 			},
 		},
-	}, false, false)
+	}, &NewCommandOpts{})
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-module",
@@ -195,7 +195,7 @@ func TestValidateStencilVersionBothPropertiesFail(t *testing.T) {
 		Replacements: map[string]string{
 			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "both-stencil-versions"),
 		},
-	}, false, false)
+	}, &NewCommandOpts{})
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -223,7 +223,7 @@ func TestValidateStencilVersionBadConstraint(t *testing.T) {
 		Replacements: map[string]string{
 			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stencil-version-bad-constraint"),
 		},
-	}, false, false)
+	}, &NewCommandOpts{})
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -251,7 +251,7 @@ func TestValidateStencilVersionConstraintValidationFailure(t *testing.T) {
 		Replacements: map[string]string{
 			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stencil-too-new"),
 		},
-	}, false, false)
+	}, &NewCommandOpts{})
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -284,7 +284,7 @@ func TestValidateStencilVersionTestingVersionAlwaysPasses(t *testing.T) {
 		Replacements: map[string]string{
 			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stencil-version-matches-constraint"),
 		},
-	}, false, false)
+	}, &NewCommandOpts{})
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -311,7 +311,7 @@ func TestValidateStencilVersionConstraintValidationSuccess(t *testing.T) {
 		Replacements: map[string]string{
 			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stencil-version-matches-constraint"),
 		},
-	}, false, false)
+	}, &NewCommandOpts{})
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -338,7 +338,7 @@ func TestValidateStencilVersionBadMinVersion(t *testing.T) {
 		Replacements: map[string]string{
 			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "bad-min-stencil-version"),
 		},
-	}, false, false)
+	}, &NewCommandOpts{})
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -366,7 +366,7 @@ func TestValidateStencilVersionMinVersionFailure(t *testing.T) {
 		Replacements: map[string]string{
 			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "min-stencil-too-new"),
 		},
-	}, false, false)
+	}, &NewCommandOpts{})
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
@@ -394,7 +394,7 @@ func TestValidateStencilVersionMinVersionSuccess(t *testing.T) {
 		Replacements: map[string]string{
 			"github.com/rgst-io/stencil-golang": filepath.Join("testdata", "stencil-version-newer-than-min"),
 		},
-	}, false, false)
+	}, &NewCommandOpts{})
 	s.lock = &stencil.Lockfile{
 		Modules: []*stencil.LockfileModuleEntry{{
 			Name: "github.com/rgst-io/stencil-golang",
