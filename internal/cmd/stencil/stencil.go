@@ -86,7 +86,7 @@ func printVersion(v *resolver.Version) string {
 	return v.Commit
 }
 
-// NewCommandOpt are options for [NewCommand].
+// NewCommandOpts are options for [NewCommand].
 type NewCommandOpts struct {
 	DryRun      bool
 	Adopt       bool
