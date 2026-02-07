@@ -1,7 +1,7 @@
 # Default versions of tools, to update these, set [tools.override]
 [tools]
 dprint = "latest"
-golang = "1.25.6"
+golang = "1.25.7"
 golangci-lint = "2.8.0"
 goreleaser = "latest"
 gotestsum = "1.13.0"
