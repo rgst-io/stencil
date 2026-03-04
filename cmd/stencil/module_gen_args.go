@@ -25,9 +25,9 @@ import (
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
+	"github.com/jaredallard/slogext"
 	"github.com/urfave/cli/v3"
 	"go.rgst.io/stencil/v2/pkg/configuration"
-	"go.rgst.io/stencil/v2/pkg/slogext"
 
 	_ "embed"
 )

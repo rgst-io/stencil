@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/jaredallard/slogext"
 	"github.com/jaredallard/vcs/resolver"
 	"github.com/samber/lo"
 	"go.rgst.io/stencil/v2/internal/modules"
 	"go.rgst.io/stencil/v2/internal/version"
 	"go.rgst.io/stencil/v2/pkg/configuration"
-	"go.rgst.io/stencil/v2/pkg/slogext"
 	"go.rgst.io/stencil/v2/pkg/stencil"
 	"gotest.tools/v3/assert"
 )

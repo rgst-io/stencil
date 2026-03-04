@@ -17,8 +17,8 @@
 package main
 
 import (
+	"github.com/jaredallard/slogext"
 	"github.com/urfave/cli/v3"
-	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
 // NewLockfileCommand returns a new urfave/cli.Command for the

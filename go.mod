@@ -8,7 +8,6 @@ require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/caarlos0/go-version v0.2.2
 	github.com/chainguard-dev/git-urls v1.0.2
-	github.com/charmbracelet/log v0.4.2
 	github.com/davecgh/go-spew v1.1.1
 	github.com/denormal/go-gitignore v0.0.0-20180930084346-ae8ad1d07817
 	github.com/go-git/go-billy/v5 v5.8.0
@@ -18,6 +17,7 @@ require (
 	github.com/hashicorp/go-plugin v1.7.0
 	github.com/jaredallard/archives v1.0.2
 	github.com/jaredallard/cmdexec v1.4.0
+	github.com/jaredallard/slogext v1.0.0
 	github.com/jaredallard/vcs v1.0.1
 	github.com/mitchellh/hashstructure/v2 v2.0.2
 	github.com/pkg/errors v0.9.1
@@ -41,6 +41,7 @@ require (
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/charmbracelet/colorprofile v0.4.2 // indirect
 	github.com/charmbracelet/lipgloss v1.1.0 // indirect
+	github.com/charmbracelet/log v0.4.2 // indirect
 	github.com/charmbracelet/x/ansi v0.11.6 // indirect
 	github.com/charmbracelet/x/cellbuf v0.0.15 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect

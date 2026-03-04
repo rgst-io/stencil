@@ -28,11 +28,11 @@ import (
 	_ "embed"
 
 	"github.com/Masterminds/sprig/v3"
+	"github.com/jaredallard/slogext"
 	"github.com/pkg/errors"
 	"github.com/princjef/gomarkdoc"
 	"github.com/princjef/gomarkdoc/lang"
 	"github.com/princjef/gomarkdoc/logger"
-	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
 //go:embed function.md.tpl

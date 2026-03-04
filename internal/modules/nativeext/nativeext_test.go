@@ -5,9 +5,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/jaredallard/slogext"
 	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/v2/internal/modules/nativeext"
-	"go.rgst.io/stencil/v2/pkg/slogext"
 	"gotest.tools/v3/assert"
 )
 

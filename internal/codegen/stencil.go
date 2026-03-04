@@ -31,13 +31,13 @@ import (
 
 	"github.com/go-git/go-billy/v5/util"
 	"github.com/jaredallard/cmdexec"
+	"github.com/jaredallard/slogext"
 	"github.com/pkg/errors"
 	"go.rgst.io/stencil/v2/internal/modules"
 	"go.rgst.io/stencil/v2/internal/modules/nativeext"
 	"go.rgst.io/stencil/v2/internal/version"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"go.rgst.io/stencil/v2/pkg/extensions/apiv1"
-	"go.rgst.io/stencil/v2/pkg/slogext"
 	"go.rgst.io/stencil/v2/pkg/stencil"
 )
 

@@ -19,8 +19,8 @@
 package main
 
 import (
+	"github.com/jaredallard/slogext"
 	"github.com/urfave/cli/v3"
-	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
 // NewModuleCommand returns a new [cli.Command] for the

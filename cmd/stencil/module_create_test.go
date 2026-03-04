@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/jaredallard/cmdexec"
+	"github.com/jaredallard/slogext"
 	"github.com/urfave/cli/v3"
 	"go.rgst.io/stencil/v2/pkg/configuration"
-	"go.rgst.io/stencil/v2/pkg/slogext"
 	"gotest.tools/v3/assert"
 )
 

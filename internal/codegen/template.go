@@ -27,8 +27,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jaredallard/slogext"
 	"go.rgst.io/stencil/v2/internal/modules"
-	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
 // libraryExts are extensions that make a template a library

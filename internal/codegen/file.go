@@ -21,8 +21,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/jaredallard/slogext"
 	"github.com/pkg/errors"
-	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
 // _ ensures that we implement the os.FileInfo interface

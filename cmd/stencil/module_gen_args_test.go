@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/jaredallard/slogext"
 	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
-	"go.rgst.io/stencil/v2/pkg/slogext"
 	"gotest.tools/v3/assert"
 )
 
