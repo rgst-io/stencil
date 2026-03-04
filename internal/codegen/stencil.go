@@ -383,6 +383,11 @@ func (s *Stencil) getTemplates(ctx context.Context, log slogext.Logger) ([]*Temp
 				return err
 			}
 
+			// Skip directories.
+			if inf.IsDir() {
+				return nil
+			}
+
 			isTemplate := filepath.Ext(path) == ".tpl"
 
 			f, err := fs.Open(path)
