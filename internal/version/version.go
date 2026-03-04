@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // Package version contains the current version of the stencil CLI.
-package version
+package version //nolint:revive // Why: Acceptable overlap w/ stdlib.
 
 import (
 	// Used for the ASCII art.

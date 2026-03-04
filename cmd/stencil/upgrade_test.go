@@ -191,11 +191,11 @@ func TestUpgradeDoesNotReRunStencilWhenTold(t *testing.T) {
 	}, tmpDir)
 
 	// Run the upgrade
-	assert.NilError(t, testRunCommand(t, cmd, tmpDir), "expected upgrade to not error")
+	assert.NilError(t, testRunCommand(t, cmd, tmpDir, "--skip-post-run"), "expected upgrade to not error")
 
 	file := selectUpgradeCanary(t, tmpDir)
 	assert.NilError(t, os.Remove(file))
-	assert.NilError(t, testRunCommand(t, cmd, tmpDir, "--skip-render-no-changes"), "expected upgrade to not error")
+	assert.NilError(t, testRunCommand(t, cmd, tmpDir, "--skip-post-run", "--skip-render-no-changes"), "expected upgrade to not error")
 
 	_, err := os.Stat(file)
 	assert.ErrorIs(t, err, os.ErrNotExist, "expected file %s to not exist", file)

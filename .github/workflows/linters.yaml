@@ -35,6 +35,7 @@ jobs:
         with:
           path: ${{ steps.go.outputs.mod_cache_dir }}
           key: ${{ runner.os }}-go-mod-cache-${{ hashFiles('**/go.sum') }}
+      - run: mise lock
       - run: mise run generate
       - run: mise run fmt
       - name: Check for changes
