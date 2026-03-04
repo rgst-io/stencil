@@ -42,7 +42,10 @@ import (
 )
 
 // NewStencil creates a new, fully initialized Stencil renderer function
-func NewStencil(m *configuration.Manifest, lock *stencil.Lockfile, mods []*modules.Module, log slogext.Logger, adopt bool) *Stencil {
+func NewStencil(
+	m *configuration.Manifest, lock *stencil.Lockfile,
+	mods []*modules.Module, log slogext.Logger, adopt bool,
+) *Stencil {
 	ext, err := nativeext.NewHost(log)
 	if err != nil {
 		// TODO(jaredallard): We need to change the signature of this
@@ -118,9 +121,10 @@ func (s *Stencil) RegisterExtensions(ctx context.Context) error {
 	return nil
 }
 
-// RegisterInprocExtensions registers the input ext extension directly. This API is used in
-// unit tests to render modules with templates that invoke native extensions: input 'ext' can be
-// either an actual extension or a mock one (feeding fake data into the template).
+// RegisterInprocExtensions registers the input ext extension directly.
+// This API is used in unit tests to render modules with templates that
+// invoke native extensions: input 'ext' can be either an actual
+// extension or a mock one (feeding fake data into the template).
 func (s *Stencil) RegisterInprocExtensions(name string, ext apiv1.Implementation) {
 	s.ext.RegisterInprocExtension(name, ext)
 }
@@ -240,9 +244,11 @@ func (s *Stencil) Render(ctx context.Context, log slogext.Logger) ([]*Template, 
 	return tpls, nil
 }
 
-// calcDirReplacements calculates all of the final rendered paths for dirReplacements for each module
-// It needs to be in stencil because it uses rendering, which needs the Values object from codegen,
-// so we poke the rendered replacements into the module object for applying later in various ways.
+// calcDirReplacements calculates all of the final rendered paths for
+// dirReplacements for each module It needs to be in stencil because it
+// uses rendering, which needs the Values object from codegen, so we
+// poke the rendered replacements into the module object for applying
+// later in various ways.
 func (s *Stencil) calcDirReplacements(vals *Values) error {
 	for _, m := range s.modules {
 		reps := map[string]string{}
@@ -259,7 +265,8 @@ func (s *Stencil) calcDirReplacements(vals *Values) error {
 	return nil
 }
 
-// renderDirReplacement breaks out the actual rendering for calcDirReplacements to make it unit testable
+// renderDirReplacement breaks out the actual rendering for
+// calcDirReplacements to make it unit testable
 func (s *Stencil) renderDirReplacement(template string, m *modules.Module, vals *Values) (string, error) {
 	rt, err := NewTemplate(m, "dirReplace", 0o000, time.Time{}, []byte(template), s.log, nil)
 	if err != nil {
@@ -354,8 +361,10 @@ func (s *Stencil) getTemplates(ctx context.Context, log slogext.Logger) ([]*Temp
 			return nil, errors.Wrapf(err, "failed to read module filesystem %q", m.Name)
 		}
 
-		// Note: This error should never really fire since we already fetched the FS above
-		// that being said, we handle it here. Skip native extensions as they cannot have templates.
+		// Note: This error should never really fire since we already
+		// fetched the FS above that being said, we handle it here. Skip
+		// native extensions as they cannot have templates, unless they're
+		// also of type templates.
 		if !m.Manifest.Type.Contains(configuration.TemplateRepositoryTypeTemplates) {
 			log.Debugf("Skipping template discovery for module %q, not a template module (type %s)", m.Name, m.Manifest.Type)
 			continue
@@ -369,19 +378,12 @@ func (s *Stencil) getTemplates(ctx context.Context, log slogext.Logger) ([]*Temp
 			return nil, errors.Wrap(err, "failed to chroot module filesystem to templates/ (does it exist?)")
 		}
 
-		err = util.Walk(fs, "", func(path string, inf os.FileInfo, err error) error {
+		if err := util.Walk(fs, "", func(path string, inf os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
 
-			// add binary check here
-
-			// Skip files without a .tpl extension
 			isTemplate := filepath.Ext(path) == ".tpl"
-			isBinary := filepath.Ext(path) == ".nontpl"
-			if !isTemplate && !isBinary {
-				return nil
-			}
 
 			f, err := fs.Open(path)
 			if err != nil {
@@ -397,7 +399,7 @@ func (s *Stencil) getTemplates(ctx context.Context, log slogext.Logger) ([]*Temp
 			log.Debugf("Discovered template %q", path)
 			tpl, err := NewTemplate(m, path, inf.Mode(), inf.ModTime(), tplContents, log, &NewTemplateOpts{
 				Adopt:  s.adoptMode,
-				Binary: isBinary,
+				Binary: !isTemplate,
 			})
 			if err != nil {
 				return errors.Wrapf(err, "failed to create template %q from module %q", path, m.Name)
@@ -410,8 +412,7 @@ func (s *Stencil) getTemplates(ctx context.Context, log slogext.Logger) ([]*Temp
 			}
 
 			return nil
-		})
-		if err != nil {
+		}); err != nil {
 			return nil, err
 		}
 	}
