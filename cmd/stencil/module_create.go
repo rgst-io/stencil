@@ -21,11 +21,11 @@ import (
 	"path"
 	"strings"
 
+	"github.com/jaredallard/slogext"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v3"
 	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
-	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
 // encodeToFile encodes the provided data [d] to the provided file path,

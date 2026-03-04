@@ -18,10 +18,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/jaredallard/slogext"
 	"github.com/urfave/cli/v3"
 	"go.rgst.io/stencil/v2/internal/cmd/stencil"
 	"go.rgst.io/stencil/v2/pkg/configuration"
-	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
 // NewUpgradeCommand returns a new urfave/cli.Command for the upgrade

@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"go.rgst.io/stencil/v2/pkg/slogext"
+	"github.com/jaredallard/slogext"
 	"gotest.tools/v3/assert"
 )
 

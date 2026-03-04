@@ -6,7 +6,7 @@ import (
 	"path"
 	"testing"
 
-	"go.rgst.io/stencil/v2/pkg/slogext"
+	"github.com/jaredallard/slogext"
 	"go.rgst.io/stencil/v2/pkg/stencil"
 	"gotest.tools/v3/assert"
 )

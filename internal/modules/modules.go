@@ -28,9 +28,9 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/jaredallard/slogext"
 	"github.com/jaredallard/vcs/resolver"
 	"go.rgst.io/stencil/v2/pkg/configuration"
-	"go.rgst.io/stencil/v2/pkg/slogext"
 )
 
 // resolvedModule is used to keep track of a module during the resolution
