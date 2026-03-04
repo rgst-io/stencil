@@ -67,9 +67,9 @@ description = "Update the TOC in the README"
 run = ["mdtoc --inplace --max-depth=5 README.md"]
 
 [tool_alias]
-dprint = "ubi:dprint/dprint"
+dprint = "github:dprint/dprint"
 golangci-lint = "aqua:golangci-lint"
-git-cliff = "ubi:orhun/git-cliff"
+git-cliff = "github:orhun/git-cliff"
 goreleaser = "aqua:goreleaser/goreleaser"
 
 [settings]

@@ -1,6 +1,11 @@
 [[tools.dprint]]
 version = "0.52.0"
-backend = "ubi:dprint/dprint"
+backend = "github:dprint/dprint"
+"platforms.linux-arm64" = { checksum = "sha256:8a4675df3db6498d1fef37c1da508fa28dbdd9e87cd3c8ac15f5f763d2fec863", url = "https://github.com/dprint/dprint/releases/download/0.52.0/dprint-aarch64-unknown-linux-gnu.zip", url_api = "https://api.github.com/repos/dprint/dprint/releases/assets/361608826"}
+"platforms.linux-x64" = { checksum = "sha256:3172f1564e4984ab0b511d5872b128ac91429a9e32a2db95977f3611a524d224", url = "https://github.com/dprint/dprint/releases/download/0.52.0/dprint-x86_64-unknown-linux-gnu.zip", url_api = "https://api.github.com/repos/dprint/dprint/releases/assets/361608820"}
+"platforms.macos-arm64" = { checksum = "sha256:bb3a5be1444fcfaf2f405cbf8af7da809d055705a2ca17bd2e7edff6f2959354", url = "https://github.com/dprint/dprint/releases/download/0.52.0/dprint-aarch64-apple-darwin.zip", url_api = "https://api.github.com/repos/dprint/dprint/releases/assets/361608824"}
+"platforms.macos-x64" = { checksum = "sha256:aa42a8ce7f84393c601f16bfd57e2425ccfa3b68f06d62162aa73888fd38bc75", url = "https://github.com/dprint/dprint/releases/download/0.52.0/dprint-x86_64-apple-darwin.zip", url_api = "https://api.github.com/repos/dprint/dprint/releases/assets/361608827"}
+"platforms.windows-x64" = { checksum = "sha256:bbb22a19022e104b27f28426bb984fee3733294b67b3c6bbb3a8ebed1e0c1cb2", url = "https://github.com/dprint/dprint/releases/download/0.52.0/dprint-x86_64-pc-windows-msvc.zip", url_api = "https://api.github.com/repos/dprint/dprint/releases/assets/361608825"}
 
 [[tools.go]]
 version = "1.26.0"
@@ -10,10 +15,6 @@ backend = "core:go"
 "platforms.macos-arm64" = { checksum = "sha256:b1640525dfe68f066d56f200bef7bf4dce955a1a893bd061de6754c211431023", url = "https://dl.google.com/go/go1.26.0.darwin-arm64.tar.gz"}
 "platforms.macos-x64" = { checksum = "sha256:1ca28b7703cbea05a65b2a1d92d6b308610ef92f8824578a0874f2e60c9d5a22", url = "https://dl.google.com/go/go1.26.0.darwin-amd64.tar.gz"}
 "platforms.windows-x64" = { checksum = "sha256:9bbe0fc64236b2b51f6255c05c4232532b8ecc0e6d2e00950bd3021d8a4d07d4", url = "https://dl.google.com/go/go1.26.0.windows-amd64.zip"}
-
-[[tools."go:golang.org/x/tools/cmd/goimports"]]
-version = "latest"
-backend = "go:golang.org/x/tools/cmd/goimports"
 
 [[tools."go:golang.org/x/tools/cmd/goimports"]]
 version = "0.42.0"
