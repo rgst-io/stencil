@@ -279,7 +279,7 @@ func (c *Command) validateStencilVersion(mods []*modules.Module, stencilVersion 
 	if stencilVersion == "devel" {
 		return nil
 	}
-	sgv, err := semver.StrictNewVersion(stencilVersion)
+	sgv, err := semver.NewVersion(stencilVersion)
 	if err != nil {
 		return err
 	}
@@ -304,7 +304,7 @@ func (c *Command) validateStencilVersion(mods []*modules.Module, stencilVersion 
 		}
 
 		if m.Manifest.MinStencilVersion != "" {
-			msv, err := semver.StrictNewVersion(m.Manifest.MinStencilVersion)
+			msv, err := semver.NewVersion(m.Manifest.MinStencilVersion)
 			if err != nil {
 				return err
 			}
