@@ -17,7 +17,7 @@ require (
 	github.com/hashicorp/go-plugin v1.7.0
 	github.com/jaredallard/archives v1.0.2
 	github.com/jaredallard/cmdexec v1.4.0
-	github.com/jaredallard/slogext v1.0.0
+	github.com/jaredallard/slogext v1.0.1
 	github.com/jaredallard/vcs v1.0.1
 	github.com/mitchellh/hashstructure/v2 v2.0.2
 	github.com/pkg/errors v0.9.1
