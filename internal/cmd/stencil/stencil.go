@@ -388,13 +388,13 @@ func (c *Command) writeFiles(st *codegen.Stencil, tpls []*codegen.Template) erro
 	for _, tpl := range tpls {
 		for i := range tpl.Files {
 			fileName := tpl.Files[i].Name()
-			if c.ignore != nil && c.ignore.Include(fileName) {
-				logFn := c.log.Warnf
+			if c.ignore != nil && c.ignore.Ignore(fileName) {
+				logFn := c.log.Warn
 				if c.failIgnored {
-					logFn = c.log.Errorf
+					logFn = c.log.Error
 				}
 
-				logFn("  -> Skipped %s", fileName, "reason", "matched .stencilignore")
+				logFn(fmt.Sprintf("  -> Skipped %s", fileName), "reason", "matched .stencilignore")
 				if c.failIgnored {
 					c.ignored = true
 				}
