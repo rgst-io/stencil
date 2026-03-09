@@ -395,6 +395,7 @@ func (c *Command) writeFiles(st *codegen.Stencil, tpls []*codegen.Template) erro
 		for i := range tpl.Files {
 			fileName := tpl.Files[i].Name()
 			if c.ignore != nil {
+				//nolint:errcheck // Why: We treat error as not matching.
 				if matches, _ := c.ignore.Matches(fileName); matches {
 					logFn := c.log.Warn
 					if c.failIgnored {
