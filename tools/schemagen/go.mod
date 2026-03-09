@@ -1,12 +1,12 @@
 module go.rgst.io/stencil/v2/tools/schemagen
 
-go 1.25
+go 1.25.0
 
 replace go.rgst.io/stencil/v2 => ../..
 
 require (
 	github.com/invopop/jsonschema v0.13.0
-	go.rgst.io/stencil/v2 v2.0.0-00010101000000-000000000000
+	go.rgst.io/stencil/v2 v2.14.2
 )
 
 require (
