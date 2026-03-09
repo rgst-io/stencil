@@ -232,6 +232,12 @@ func (c *Command) Upgrade(ctx context.Context, skipRender bool) error {
 		return nil
 	}
 
+	ignore, err := stencil.LoadIgnore("")
+	if err != nil && !errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("failed to load stencil ignore: %w", err)
+	}
+	c.ignore = ignore
+
 	c.log.Info("Checking for upgrades")
 	mods, err := c.resolveModules(ctx, true)
 	if err != nil {
@@ -388,18 +394,21 @@ func (c *Command) writeFiles(st *codegen.Stencil, tpls []*codegen.Template) erro
 	for _, tpl := range tpls {
 		for i := range tpl.Files {
 			fileName := tpl.Files[i].Name()
-			if c.ignore != nil && c.ignore.Ignore(fileName) {
-				logFn := c.log.Warn
-				if c.failIgnored {
-					logFn = c.log.Error
-				}
+			if c.ignore != nil {
+				//nolint:errcheck // Why: We treat error as not matching.
+				if matches, _ := c.ignore.Matches(fileName); matches {
+					logFn := c.log.Warn
+					if c.failIgnored {
+						logFn = c.log.Error
+					}
 
-				logFn(fmt.Sprintf("  -> Skipped %s", fileName), "reason", "matched .stencilignore")
-				if c.failIgnored {
-					c.ignored = true
-				}
+					logFn(fmt.Sprintf("  -> Skipped %s", fileName), "reason", "matched .stencilignore")
+					if c.failIgnored {
+						c.ignored = true
+					}
 
-				continue
+					continue
+				}
 			}
 
 			if err := tpl.Files[i].Write(c.log, c.dryRun); err != nil {
