@@ -1,9 +1,9 @@
 package stencil
 
 import (
-	"path/filepath"
+	"fmt"
 
-	gitignore "github.com/denormal/go-gitignore"
+	"github.com/codeglyph/go-dotignore/v2"
 )
 
 const (
@@ -19,14 +19,20 @@ const (
 // from their corresponding templates. Stencil itself will warn when
 // files are ignored and, optional exit with a non-zero exit code.
 type Ignore struct {
-	gitignore.GitIgnore
+	*dotignore.PatternMatcher
 }
 
-// LoadIgnore creates a new [Ignore].
+// LoadIgnore creates a new [Ignore] from the provided path. If path is
+// empty, [StencilIgnoreName] is used.
 func LoadIgnore(path string) (*Ignore, error) {
-	gi, err := gitignore.NewFromFile(filepath.Join(path, StencilIgnoreName))
-	if err != nil {
-		return nil, err
+	if path == "" {
+		path = StencilIgnoreName
 	}
-	return &Ignore{gi}, nil
+
+	pm, err := dotignore.NewPatternMatcherFromFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open stencilignore %q: %w", path, err)
+	}
+
+	return &Ignore{pm}, nil
 }
