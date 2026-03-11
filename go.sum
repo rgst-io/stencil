@@ -136,8 +136,8 @@ github.com/jamespfennell/xz v0.1.2 h1:iCw5kScLfGCceOKgQaGuj5RilAAlV4iiwauYntak2o
 github.com/jamespfennell/xz v0.1.2/go.mod h1:DhpWvZY1xDkK/6BREFl3c3R/fZh7IBdYq2m7xh4uLl0=
 github.com/jaredallard/archives v1.0.3 h1:jswF56jy8TU3GTB3YAN8J+U6+mdaqmUgnRp/dR0LWd8=
 github.com/jaredallard/archives v1.0.3/go.mod h1:YNeTYtBW7CG/gzS+kQwwowE1Kf4f2vRPoTGLxuIZYo4=
-github.com/jaredallard/cmdexec v1.4.0 h1:p0fwDjaXZrAQaB8GXvN/wA3sdq8Gg96IfmA0sOxIN6E=
-github.com/jaredallard/cmdexec v1.4.0/go.mod h1:vqXk8cMGX2lEVVVlN8r8A/AvioVAysF09L9r1RpsgY4=
+github.com/jaredallard/cmdexec v1.4.1 h1:mU0ZM1N3yk3cKQPfe183S3PtnGjvYHGroSzjwzq3zIQ=
+github.com/jaredallard/cmdexec v1.4.1/go.mod h1:vqXk8cMGX2lEVVVlN8r8A/AvioVAysF09L9r1RpsgY4=
 github.com/jaredallard/slogext v1.0.1 h1:cTvzTjkkIbWODfuEMWS8ch0UtMQeVWMspFVXR2/QYek=
 github.com/jaredallard/slogext v1.0.1/go.mod h1:1KJ0SzDx5qoVK7e0JsGB3a9E3A0NGUPKqIBmTqaZrDg=
 github.com/jaredallard/vcs v1.0.1 h1:/aUxMXjyhxdErR7gNClCK8qGF0wLUyzFcjeaVRCjDuc=
