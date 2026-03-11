@@ -101,7 +101,7 @@ publishers:
 winget:
   - name: stencil
     publisher: rgst-io
-    license: MIT
+    license: Apache-2.0
     homepage: https://stencil.rgst.io
     short_description: A modern living-template engine for evolving repositories
     repository:
