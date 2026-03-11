@@ -14,6 +14,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+// Package yaml implements a thin wrapper around YAML parsing
+// specifically with support for JSON schema parsing.
 package yaml
 
 import (
