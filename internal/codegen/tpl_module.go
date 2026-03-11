@@ -50,9 +50,6 @@ var exportChecks = make(map[string]struct{})
 type executorScope string
 
 var (
-	// executorScopeUnset is unset (default)
-	executorScopeUnset executorScope = ""
-
 	// executorScopeCaller is scoped to the caller
 	executorScopeCaller executorScope = "caller"
 
