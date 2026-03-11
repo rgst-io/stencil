@@ -17,6 +17,7 @@ func TestTplModule_Tpl(t *testing.T) {
 	tests := []struct {
 		name                string
 		functionTemplate    string
+		callingTemplateName string
 		callingTemplate     string
 		want                string
 		renderStage         renderStage
@@ -26,12 +27,7 @@ func TestTplModule_Tpl(t *testing.T) {
 		{
 			name:            "should error on non-existent template",
 			callingTemplate: `{{- module.Call "caller.HelloWorld" }}`,
-			wantErrContains: `function "HelloWorld" in module "caller" was not registered`,
-		},
-		{
-			name:            "should error on invalid function name",
-			callingTemplate: `{{- module.Call "blah" }}`,
-			wantErrContains: `expected format module.function, got "blah"`,
+			wantErrContains: `function "HelloWorld" in module "caller" was not exported`,
 		},
 		{
 			name: "should support calling exported function",
@@ -91,7 +87,7 @@ func TestTplModule_Tpl(t *testing.T) {
 			wantFuncErrContains: "already exported",
 		},
 		{
-			name: "use context from module being called",
+			name: "use context from function",
 			functionTemplate: `{{- stencil.SetGlobal "a" "func" -}}
 		{{- define "HelloWorld" -}}
 		{{ return (stencil.GetGlobal "a") }}
@@ -100,6 +96,17 @@ func TestTplModule_Tpl(t *testing.T) {
 			callingTemplate: `{{- stencil.SetGlobal "a" "caller" -}}
 		{{ module.Call "function.HelloWorld" }}`,
 			want: "func",
+		},
+		{
+			name: "use context from caller",
+			functionTemplate: `{{- stencil.SetGlobal "a" "func" -}}
+		{{- define "HelloWorld" -}}
+		{{ return (stencil.GetGlobal "a") }}
+		{{- end -}}
+		{{- module.Export "HelloWorld" "caller" -}}`,
+			callingTemplate: `{{- stencil.SetGlobal "a" "caller" -}}
+		{{ module.Call "function.HelloWorld" }}`,
+			want: "caller",
 		},
 	}
 	for _, tt := range tests {
