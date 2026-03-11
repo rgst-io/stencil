@@ -9,6 +9,8 @@ order: {{ order }}
 	{{- if eq .Kind "text" -}}
     {{- if contains "**NOTE**:" .Text -}}
       > {{ wrap 72 .Text | replace "**NOTE**:" "[!NOTE]\n>" }}
+    {{- else if contains "**WARNING**:" .Text -}}
+      > {{ wrap 72 .Text | replace "**WARNING**:" "[!WARNING]\n>" }}
     {{- else }}
 		  {{- wrap 72 .Text -}}
     {{- end }}

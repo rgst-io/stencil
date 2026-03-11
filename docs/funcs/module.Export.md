@@ -13,6 +13,12 @@ name must start with a capital letter. Function names are also only
 eligible to be exported once, if a function is exported twice the second
 call will be a runtime error.
 
+The second argument to "module.Export" controls what "stencil", "file"
+and other template-scoped functions target. Valid options are "caller"
+or "function":
+
+Note: The default of "function" will be changed to "caller" in v3.
+
 Example:
 
 ```go
@@ -21,4 +27,10 @@ Example:
 {{- end }}
 
 {{ module.Export "HelloWorld" }}
+```
+
+Or:
+
+```go
+{{ module.Export "HelloWorld" "caller" }}
 ```

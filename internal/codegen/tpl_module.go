@@ -43,6 +43,23 @@ type TplModule struct {
 // duplicate exports.
 var exportChecks = make(map[string]struct{})
 
+// executorScope is used by [TplModule.Export] to determine if the
+// function should receive the calling template's scope or use the
+// function's template's scope. See [TplModule.Export] for more
+// information.
+type executorScope string
+
+var (
+	// executorScopeUnset is unset (default)
+	executorScopeUnset executorScope = ""
+
+	// executorScopeCaller is scoped to the caller
+	executorScopeCaller executorScope = "caller"
+
+	// executorScopeFunction is scoped to the function
+	executorScopeFunction executorScope = "function"
+)
+
 // Export registers a function to allow it to be called by other
 // templates.
 //
@@ -51,6 +68,17 @@ var exportChecks = make(map[string]struct{})
 // also only eligible to be exported once, if a function is exported
 // twice the second call will be a runtime error.
 //
+// The second argument to "module.Export" controls what "stencil",
+// "file" and other template-scoped functions target. Valid options are
+// "caller" or "function":
+//
+//   - caller: stencil, file and other functions target the caller's
+//     template.
+//   - function (default): stencil, file and other functions target the
+//     function's template.
+//
+// Note: The default of "function" will be changed to "caller" in v3.
+//
 // Example:
 //
 //	{{- define "HelloWorld" }}
@@ -58,7 +86,11 @@ var exportChecks = make(map[string]struct{})
 //	{{- end }}
 //
 //	{{ module.Export "HelloWorld" }}
-func (tm *TplModule) Export(name string) (string, error) {
+//
+// Or:
+//
+//	{{ module.Export "HelloWorld" "caller" }}
+func (tm *TplModule) Export(name string, scopeSli ...executorScope) (string, error) {
 	// We only allow functions to be exported before the final pass.
 	if tm.s.renderStage == renderStageFinal {
 		// In the final pass, though, check to make sure there's not dupes
@@ -71,6 +103,29 @@ func (tm *TplModule) Export(name string) (string, error) {
 		return "", nil
 	}
 
+	var scope executorScope
+	switch len(scopeSli) {
+	case 1:
+		scope = scopeSli[0]
+	case 0:
+		tm.log.With(
+			"module", tm.t.Module.Name,
+			"template", tm.t.Path,
+		).Warn("module.Export scope default will change to 'caller' in v3")
+		scope = executorScopeFunction
+	default:
+		return "", fmt.Errorf("got %d arguments, expected max 2", len(scopeSli))
+	}
+
+	switch scope {
+	case executorScopeCaller, executorScopeFunction:
+	default:
+		return "", fmt.Errorf(
+			"unknown value for scope: %s (expected %s or %s)", scope,
+			executorScopeCaller, executorScopeFunction,
+		)
+	}
+
 	if !tm.t.Library {
 		return "", fmt.Errorf("only library templates can export functions")
 	}
@@ -81,9 +136,8 @@ func (tm *TplModule) Export(name string) (string, error) {
 
 	moduleName := tm.t.Module.Name
 	key := tm.s.sharedState.key(moduleName, name)
-	ef := exportedFunction{
-		Template: tm.t,
-	}
+
+	ef := exportedFunction{Template: tm.t, Scope: scope}
 	tm.s.sharedState.Functions.Store(key, ef)
 	tm.log.Debug("Exported function", "module.name", moduleName, "function.name", name)
 
@@ -118,6 +172,10 @@ func (tm *TplModule) Export(name string) (string, error) {
 //	// module-b
 //	{{ module.Call "github.com/rgst-io/module-a.HelloWorld" "Jared" }}
 //	// Output: Hello, Jared
+//
+// **WARNING**: Functions cannot call other functions due to a race
+// condition in how templates are rendered, this will be fixed in v3 of
+// stencil.
 func (tm *TplModule) Call(name string, args ...any) (any, error) {
 	// Allows args to not be set.
 	if len(args) > 1 {
@@ -130,30 +188,46 @@ func (tm *TplModule) Call(name string, args ...any) (any, error) {
 		return nil, nil
 	}
 
+	// Currently the export/call system has race conditions, so we do not
+	// allow calling functions in templates. Eventually, this will be
+	// fixed and allowed.
+	if tm.t.Library {
+		return "", fmt.Errorf("library templates cannot call functions")
+	}
+
 	// Get the module name and function name by splitting the name by the
 	// last period.
+	var moduleName, functionName string
 	lastPeriodIdx := strings.LastIndex(name, ".")
 	if lastPeriodIdx == -1 {
-		return nil, fmt.Errorf("expected format module.function, got %q", name)
+		moduleName = tm.t.Module.Name
+		functionName = name
+	} else {
+		moduleName, functionName = name[:lastPeriodIdx], name[lastPeriodIdx+1:]
 	}
-	moduleName, functionName := name[:lastPeriodIdx], name[lastPeriodIdx+1:]
 
 	key := tm.s.sharedState.key(moduleName, functionName)
 	ef, ok := tm.s.sharedState.Functions.Load(key)
 	if !ok {
-		return nil, fmt.Errorf("function %q in module %q was not registered", functionName, moduleName)
+		return nil, fmt.Errorf("function %q in module %q was not exported", functionName, moduleName)
 	}
 
-	// Find the module's template that we requested.
+	// Get the module that we requested. If the module name is the same as
+	// the current one, we do not need to look it up since it's attached
+	// to the template render context.
 	var module *modules.Module
-	for _, m := range tm.s.modules {
-		if m.Name == moduleName {
-			module = m
-			break
+	if moduleName == tm.t.Module.Name {
+		module = tm.t.Module
+	} else {
+		for _, m := range tm.s.modules {
+			if m.Name == moduleName {
+				module = m
+				break
+			}
 		}
-	}
-	if module == nil {
-		return nil, fmt.Errorf("module %s was not found on stencil (this is a possible bug)", moduleName)
+		if module == nil {
+			return nil, fmt.Errorf("module %s was not found on stencil (this is a possible bug)", moduleName)
+		}
 	}
 
 	// Create a copy of the current values so we can set the data on it
@@ -174,7 +248,12 @@ func (tm *TplModule) Call(name string, args ...any) (any, error) {
 		return nil, err
 	}
 
-	tmpTpl.Funcs(NewFuncMap(tm.s, ef.Template, tm.log))
+	tplScope := ef.Template
+	if ef.Scope == executorScopeCaller {
+		tplScope = tm.t
+	}
+
+	tmpTpl.Funcs(NewFuncMap(tm.s, tplScope, tm.log))
 	tmpTpl.Funcs(map[string]any{
 		// return captures a value from the executed function template and
 		// returns it to the calling template.

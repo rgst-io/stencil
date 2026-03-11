@@ -34,3 +34,8 @@ Example:
 {{ module.Call "github.com/rgst-io/module-a.HelloWorld" "Jared" }}
 // Output: Hello, Jared
 ```
+
+> [!WARNING]
+> Functions cannot call other functions due to a race
+> condition in how templates are rendered, this will be fixed in v3 of
+> stencil.

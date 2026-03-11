@@ -59,6 +59,7 @@ type global struct {
 // exportedFunction stores data about a function that has been exported with
 // module.Export for later retrieval/usage at module.Call-time.
 type exportedFunction struct {
+	Scope    executorScope
 	Template *Template
 }
 
