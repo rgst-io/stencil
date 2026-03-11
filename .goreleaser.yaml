@@ -110,7 +110,7 @@ winget:
       token: "{{ .Env.WINGET_GITHUB_TOKEN }}"
       branch: "stencil-{{.Version}}"
       pull_request:
-        enabled: false # Disabled until we add the package first
+        enabled: true
         base:
           owner: microsoft
           name: winget-pkgs
