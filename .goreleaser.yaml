@@ -97,4 +97,26 @@ publishers:
       - "FURY_PUSH_TOKEN={{ .Env.FURY_PUSH_TOKEN }}"
     cmd: ./.github/scripts/fury-upload.sh {{ .ArtifactName }}
     disable: '{{ if (isEnvSet "FURY_PUSH_TOKEN") }}false{{ else }}true{{ end }}'
+
+winget:
+  - name: stencil
+    publisher: rgst-io
+    license: MIT
+    homepage: https://stencil.rgst.io
+    short_description: A modern living-template engine for evolving repositories
+    repository:
+      owner: rgst-io
+      name: winget-pkgs
+      branch: "stencil-{{.Version}}"
+      pull_request:
+        enabled: false # Disabled until we add the package first
+        base:
+          owner: microsoft
+          name: winget-pkgs
+          branch: master
+
+archives:
+  - format_overrides:
+      - goos: windows
+        formats: [zip]
 ## <</Stencil::Block>>
