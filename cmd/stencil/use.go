@@ -73,7 +73,7 @@ func useModule(filePathOrModulePath string) error {
 		moduleName = tmf.Name
 	} else {
 		moduleName = filePathOrModulePath
-		if strings.HasPrefix("/", moduleName) {
+		if strings.HasPrefix(moduleName, "/") {
 			return fmt.Errorf("module name cannot start with a / unless using a replacement")
 		}
 
