@@ -10,7 +10,7 @@
 header = """"""
 body = """
 {%- macro remote_url() -%}
-  https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}
+  https://github.com/rgst-io/stencil
 {%- endmacro -%}
 
 {% macro print_commit(commit) -%}
@@ -53,7 +53,6 @@ body = """
 		{% raw %}\n{% endraw %}\
 {% endfor %}\n
 
-{%- if github -%}
 {% if github.contributors | filter(attribute="is_first_time", value=true) | length != 0 %}
   ## New Contributors{% raw %}\n{% endraw -%}
 {%- endif %}\
@@ -63,7 +62,6 @@ body = """
       [#{{ contributor.pr_number }}]({{ self::remote_url() }}/pull/{{ contributor.pr_number }}) \
     {%- endif %}
 {%- endfor -%}
-{%- endif -%}
 """ # template for the changelog body
 # https://keats.github.io/tera/docs/#introduction
 # template for the changelog footer

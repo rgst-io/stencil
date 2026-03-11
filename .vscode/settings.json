@@ -1,7 +1,11 @@
 {
-	"go.lintTool": "golangci-lint",
+	"go.lintTool": "golangci-lint-v2",
 	"go.formatTool": "goimports",
 	"go.useLanguageServer": true,
+	"go.alternateTools": {
+		"golangci-lint-v2": "golangci-lint",
+		"goimports": "golangci-lint fmt"
+	},
 	"files.trimTrailingWhitespace": true,
 	"editor.formatOnSave": true,
 	"shellcheck.customArgs": ["-P", "SCRIPTDIR", "-x"],

@@ -1,3 +1,6 @@
+[tool_alias]
+dprint = "github:dprint/dprint"
+
 # Default versions of tools, to update these, set [tools.override]
 [tools]
 dprint = "latest"
@@ -5,7 +8,6 @@ golang = "1.26.1"
 golangci-lint = "2.11.3"
 goreleaser = "latest"
 gotestsum = "1.13.0"
-"go:golang.org/x/tools/cmd/goimports" = "latest"
 shfmt = "latest"
 
 [tasks.build]
@@ -23,8 +25,7 @@ alias = "format"
 description = "Format code"
 run = [
 	"go mod tidy",
-	"gofmt -s -w .",
-	"goimports -w .",
+	"golangci-lint fmt",
 	"shfmt -w .",
 	"dprint fmt '**/*.{json,yaml,yml,md,jsonschema.json}'",
 ]
@@ -65,12 +66,6 @@ run = "go run ./tools/schemagen/schemagen.go"
 [tasks.update-readme-toc]
 description = "Update the TOC in the README"
 run = ["mdtoc --inplace --max-depth=5 README.md"]
-
-[tool_alias]
-dprint = "github:dprint/dprint"
-golangci-lint = "aqua:golangci-lint"
-git-cliff = "github:orhun/git-cliff"
-goreleaser = "aqua:goreleaser/goreleaser"
 
 [settings]
 # Conflicts with bun, and we don't use it anyways.

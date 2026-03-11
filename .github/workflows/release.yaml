@@ -46,10 +46,7 @@ jobs:
           fetch-depth: 0
           fetch-tags: true
       - uses: jdx/mise-action@v3
-        with:
-          experimental: true
-        env:
-          GH_TOKEN: ${{ github.token }}
+        with: {}
       - name: Get Go directories
         id: go
         run: |
@@ -90,14 +87,12 @@ jobs:
         run: |-
           git tag -a "${{ steps.next_version.outputs.version }}" -m "Release ${{ steps.next_version.outputs.version }}"
       - name: Generate CHANGELOG
+        env: {}
         run: |-
           mise run changelog-release
       - name: Create release artifacts and Github Release
-        uses: goreleaser/goreleaser-action@v7
-        with:
-          distribution: goreleaser
-          version: v${{ steps.goreleaser.outputs.version }}
-          args: release --release-notes CHANGELOG.md --clean
+        run: |-
+          goreleaser release --release-notes CHANGELOG.md --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ## <<Stencil::Block(goreleaseEnvVars)>>
