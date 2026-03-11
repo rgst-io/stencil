@@ -71,9 +71,7 @@ func useModule(filePathOrModulePath string) error {
 	if tmf, err := configuration.LoadTemplateRepositoryManifest(mfPath); err == nil {
 		isReplacement = true
 		moduleName = tmf.Name
-	}
-
-	if !isReplacement {
+	} else {
 		moduleName = filePathOrModulePath
 		spl := strings.SplitN(moduleName, "@", 2)
 		if len(spl) != 1 {
