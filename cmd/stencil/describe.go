@@ -1,4 +1,4 @@
-// Copyright (C) 2024 stencil contributors
+// Copyright (C) 2026 stencil contributors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -79,8 +79,9 @@ func describeFile(filePath string, out io.Writer) error {
 
 	// check if the file exists on disk before we try to find
 	// it in the lockfile
-	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		return fmt.Errorf("file %q does not exist", filePath)
+	var exists bool
+	if _, err := os.Stat(filePath); err == nil {
+		exists = true
 	}
 
 	relativeFilePath, err := cleanPath(filePath)
@@ -91,9 +92,15 @@ func describeFile(filePath string, out io.Writer) error {
 	for _, f := range l.Files {
 		if f.Name == relativeFilePath {
 			fmt.Fprintf(out, "%s was created by module https://%s (template: %s)\n", f.Name, f.Module, f.Template)
+			if !exists {
+				fmt.Fprintf(out,
+					"This file no longer exists, to prune it (and others), run: stencil lockfile prune\n",
+				)
+			}
 			return nil
 		}
 	}
 
-	return fmt.Errorf("file %q isn't created by stencil", filePath)
+	fmt.Fprintf(out, "%s wasn't created by stencil\n", filePath)
+	return nil
 }
