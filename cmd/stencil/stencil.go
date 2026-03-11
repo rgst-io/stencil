@@ -114,6 +114,7 @@ func NewStencil(log slogext.Logger) *cli.Command {
 			NewUpgradeCommand(log),
 			NewLockfileCommand(log),
 			NewModuleCommand(log),
+			NewUseCommand(),
 		},
 	}
 }
