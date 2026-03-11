@@ -73,6 +73,10 @@ func useModule(filePathOrModulePath string) error {
 		moduleName = tmf.Name
 	} else {
 		moduleName = filePathOrModulePath
+		if strings.HasPrefix("/", moduleName) {
+			return fmt.Errorf("module name cannot start with a / unless using a replacement")
+		}
+
 		spl := strings.SplitN(moduleName, "@", 2)
 		if len(spl) != 1 {
 			moduleVer = spl[1]
