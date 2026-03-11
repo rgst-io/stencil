@@ -107,6 +107,7 @@ winget:
     repository:
       owner: rgst-io
       name: winget-pkgs
+      token: "{{ .Env.WINGET_GITHUB_TOKEN }}"
       branch: "stencil-{{.Version}}"
       pull_request:
         enabled: false # Disabled until we add the package first
