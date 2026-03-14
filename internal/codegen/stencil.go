@@ -31,9 +31,9 @@ import (
 	"time"
 
 	"github.com/go-git/go-billy/v5/util"
-	"github.com/jaredallard/cmdexec"
 	"github.com/jaredallard/slogext"
 	"github.com/pkg/errors"
+	"go.rgst.io/jaredallard/cmdexec/v2"
 	"go.rgst.io/stencil/v2/internal/modules"
 	"go.rgst.io/stencil/v2/internal/modules/nativeext"
 	"go.rgst.io/stencil/v2/internal/version"

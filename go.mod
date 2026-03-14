@@ -16,7 +16,6 @@ require (
 	github.com/hashicorp/go-hclog v1.6.3
 	github.com/hashicorp/go-plugin v1.7.0
 	github.com/jaredallard/archives v1.0.3
-	github.com/jaredallard/cmdexec v1.4.1
 	github.com/jaredallard/slogext v1.0.1
 	github.com/jaredallard/vcs v1.0.1
 	github.com/mitchellh/hashstructure/v2 v2.0.2
@@ -27,6 +26,7 @@ require (
 	github.com/samber/lo v1.53.0
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
 	github.com/urfave/cli/v3 v3.7.0
+	go.rgst.io/jaredallard/cmdexec/v2 v2.0.0
 	go.yaml.in/yaml/v3 v3.0.4
 	gotest.tools/v3 v3.5.2
 	sigs.k8s.io/yaml v1.6.0
@@ -65,6 +65,7 @@ require (
 	github.com/hashicorp/yamux v0.1.2 // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/jamespfennell/xz v0.1.2 // indirect
+	github.com/jaredallard/cmdexec v1.3.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.6.0 // indirect
 	github.com/klauspost/compress v1.18.4 // indirect

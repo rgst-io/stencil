@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jaredallard/cmdexec"
 	"github.com/jaredallard/slogext"
 	"github.com/urfave/cli/v3"
+	"go.rgst.io/jaredallard/cmdexec/v2"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"gotest.tools/v3/assert"
 )
