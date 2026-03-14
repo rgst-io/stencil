@@ -24,8 +24,8 @@ import (
 	"context"
 
 	gogit "github.com/go-git/go-git/v5"
-	vcsgit "github.com/jaredallard/vcs/git"
-	"github.com/jaredallard/vcs/resolver"
+	vcsgit "go.rgst.io/jaredallard/vcs/v2/git"
+	"go.rgst.io/jaredallard/vcs/v2/resolver"
 	"go.rgst.io/stencil/v2/internal/modules"
 	"go.rgst.io/stencil/v2/internal/version"
 	"go.rgst.io/stencil/v2/pkg/configuration"

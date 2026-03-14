@@ -21,7 +21,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/jaredallard/slogext"
+	"go.rgst.io/jaredallard/slogext/v2"
 )
 
 // entrypoint is the main entrypoint for the stencil CLI. It is

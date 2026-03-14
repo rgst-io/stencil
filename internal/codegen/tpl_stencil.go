@@ -28,8 +28,8 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/osfs"
-	"github.com/jaredallard/slogext"
 	"github.com/puzpuzpuz/xsync/v4"
+	"go.rgst.io/jaredallard/slogext/v2"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 )
 

@@ -24,7 +24,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jaredallard/slogext"
+	"go.rgst.io/jaredallard/slogext/v2"
 	"go.rgst.io/stencil/v2/internal/modules"
 	"go.rgst.io/stencil/v2/internal/modules/modulestest"
 	"go.rgst.io/stencil/v2/pkg/configuration"

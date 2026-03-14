@@ -19,7 +19,7 @@
 package apiv1
 
 import (
-	"github.com/jaredallard/slogext"
+	"go.rgst.io/jaredallard/slogext/v2"
 )
 
 // rpcTransportServer implements a rpc backed implementation

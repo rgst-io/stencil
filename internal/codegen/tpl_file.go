@@ -27,7 +27,7 @@ import (
 	"time"
 
 	"github.com/go-git/go-billy/v5/osfs"
-	"github.com/jaredallard/slogext"
+	"go.rgst.io/jaredallard/slogext/v2"
 	"go.rgst.io/stencil/v2/pkg/stencil"
 )
 

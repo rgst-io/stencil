@@ -31,11 +31,11 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/jaredallard/archives"
-	"github.com/jaredallard/slogext"
-	"github.com/jaredallard/vcs/releases"
-	"github.com/jaredallard/vcs/resolver"
 	"github.com/rogpeppe/go-internal/lockedfile"
+	"go.rgst.io/jaredallard/archives/v2"
+	"go.rgst.io/jaredallard/slogext/v2"
+	"go.rgst.io/jaredallard/vcs/v2/releases"
+	"go.rgst.io/jaredallard/vcs/v2/resolver"
 	"go.rgst.io/stencil/v2/internal/modules/nativeext/apiv1"
 )
 

@@ -32,9 +32,9 @@ import (
 
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/osfs"
-	"github.com/jaredallard/vcs/git"
-	"github.com/jaredallard/vcs/resolver"
 	"github.com/pkg/errors"
+	"go.rgst.io/jaredallard/vcs/v2/git"
+	"go.rgst.io/jaredallard/vcs/v2/resolver"
 	"go.rgst.io/stencil/v2/internal/modules/nativeext"
 	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"

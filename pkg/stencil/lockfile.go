@@ -26,7 +26,7 @@ import (
 	"slices"
 	"sort"
 
-	"github.com/jaredallard/vcs/resolver"
+	"go.rgst.io/jaredallard/vcs/v2/resolver"
 	"go.rgst.io/stencil/v2/internal/yaml"
 )
 

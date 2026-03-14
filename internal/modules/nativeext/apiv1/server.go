@@ -22,7 +22,7 @@ package apiv1
 import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
-	"github.com/jaredallard/slogext"
+	"go.rgst.io/jaredallard/slogext/v2"
 )
 
 // NewHandshake returns a plugin.HandshakeConfig for

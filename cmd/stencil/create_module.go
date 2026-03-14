@@ -17,8 +17,8 @@
 package main
 
 import (
-	"github.com/jaredallard/slogext"
 	"github.com/urfave/cli/v3"
+	"go.rgst.io/jaredallard/slogext/v2"
 )
 
 // NewCreateModuleCommand returns a new urfave/cli.Command for the

@@ -22,7 +22,7 @@ import (
 	"net/rpc"
 
 	"github.com/hashicorp/go-plugin"
-	"github.com/jaredallard/slogext"
+	"go.rgst.io/jaredallard/slogext/v2"
 )
 
 // ExtensionPlugin is the high level plugin used by go-plugin

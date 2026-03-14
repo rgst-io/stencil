@@ -23,7 +23,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/jaredallard/slogext"
+	"go.rgst.io/jaredallard/slogext/v2"
 	"go.rgst.io/stencil/v2/internal/modules"
 )
 

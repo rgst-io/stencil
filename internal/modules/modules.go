@@ -29,8 +29,8 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/jaredallard/slogext"
-	"github.com/jaredallard/vcs/resolver"
+	"go.rgst.io/jaredallard/slogext/v2"
+	"go.rgst.io/jaredallard/vcs/v2/resolver"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 )
 
@@ -155,7 +155,7 @@ func resolutionError(err error, importPath string, history []history) error {
 	//
 	// Note that "git" is hardcoded here because this module resolver
 	// still uses git for credentials as opposed to the
-	// [github.com/jaredallard/vcs/token] library used elsewhere. This
+	// [go.rgst.io/jaredallard/vcs/v2/token] library used elsewhere. This
 	// will be adjusted in the future.
 	if strings.Contains(err.Error(), "failed to get remote branches") {
 		helpMessage := []string{

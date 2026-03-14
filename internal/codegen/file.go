@@ -22,8 +22,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/jaredallard/slogext"
 	"github.com/pkg/errors"
+	"go.rgst.io/jaredallard/slogext/v2"
 )
 
 // _ ensures that we implement the os.FileInfo interface

@@ -36,4 +36,4 @@ The fields available are:
   `stencil.Include` or `module.Call`. Present only for included
   templates and contains the value supplied by the caller.
 
-[*resolver.Version]: https://pkg.go.dev/github.com/jaredallard/vcs/resolver#Version
+[*resolver.Version]: https://pkg.go.dev/go.rgst.io/jaredallard/vcs/v2/resolver#Version

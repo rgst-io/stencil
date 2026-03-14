@@ -21,7 +21,7 @@ package apiv1
 import (
 	"net/rpc"
 
-	"github.com/jaredallard/slogext"
+	"go.rgst.io/jaredallard/slogext/v2"
 )
 
 // _ is a compile time assertion we implement the interface
