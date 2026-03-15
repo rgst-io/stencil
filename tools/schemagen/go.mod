@@ -1,12 +1,12 @@
 module go.rgst.io/stencil/v2/tools/schemagen
 
-go 1.25
+go 1.26
 
 replace go.rgst.io/stencil/v2 => ../..
 
 require (
 	github.com/invopop/jsonschema v0.13.0
-	go.rgst.io/stencil/v2 v2.0.0-00010101000000-000000000000
+	go.rgst.io/stencil/v2 v2.15.3
 )
 
 require (
@@ -16,7 +16,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
-	go.yaml.in/yaml/v2 v2.4.3 // indirect
+	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
