@@ -38,6 +38,8 @@ import (
 	"go.rgst.io/stencil/v2/internal/modules/nativeext"
 	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
+
+	"github.com/dependabot/dependabot-core/go_modules/helpers/importresolver"
 )
 
 // Module is a stencil module that contains template files.
@@ -79,9 +81,22 @@ func uriIsLocal(uri string) bool {
 
 // uriForModule returns the URI for a module. If replacement is an
 // empty string, the default URI is used.
-func uriForModule(name, replacement string) string {
+func uriForModule(_ context.Context, name, replacement string) string {
 	if replacement == "" {
-		return "https://" + name
+		defaultURI := "https://" + name
+
+		remoteInf, err := importresolver.VCSRemoteForImport(&importresolver.Args{
+			Import: name,
+		})
+		if err != nil {
+			return defaultURI
+		}
+
+		remote, ok := remoteInf.(string)
+		if !ok {
+			return defaultURI
+		}
+		return remote
 	}
 
 	return replacement
@@ -115,12 +130,13 @@ func New(ctx context.Context, uri string, opts NewModuleOpts) (*Module, error) {
 	}
 
 	// Handle local modules if the URI is a local file path
-	uri = uriForModule(opts.ImportPath, uri)
+	uri = uriForModule(ctx, opts.ImportPath, uri)
 	if uriIsLocal(uri) {
 		opts.Version = &resolver.Version{
 			Virtual: "local",
 		}
 	}
+
 	if opts.Version == nil {
 		return nil, fmt.Errorf("version must be specified for module %q", opts.ImportPath)
 	}
