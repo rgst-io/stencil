@@ -10,6 +10,7 @@ require (
 	github.com/chainguard-dev/git-urls v1.0.2
 	github.com/codeglyph/go-dotignore/v2 v2.1.0
 	github.com/davecgh/go-spew v1.1.1
+	github.com/dependabot/dependabot-core/go_modules/helpers v0.0.0-20260319192609-6fe6ea9020b9
 	github.com/go-git/go-billy/v5 v5.8.0
 	github.com/go-git/go-git/v5 v5.17.0
 	github.com/google/go-cmp v0.7.0
@@ -52,7 +53,6 @@ require (
 	github.com/clipperhouse/uax29/v2 v2.7.0 // indirect
 	github.com/cloudflare/circl v1.6.3 // indirect
 	github.com/cyphar/filepath-securejoin v0.6.1 // indirect
-	github.com/dependabot/dependabot-core/go_modules/helpers v0.0.0-20260319192609-6fe6ea9020b9 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
