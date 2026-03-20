@@ -195,7 +195,7 @@ func FetchModules(ctx context.Context, opts *ModuleResolveOptions) ([]*Module, e
 		mod := resolveList[0]
 		importPath := mod.conf.Name
 		wantedVerCriteria := criteriaForVersionString(mod.conf.Version)
-		uri := uriForModule(importPath, opts.Manifest.Replacements[importPath])
+		uri := uriForModule(ctx, importPath, opts.Manifest.Replacements[importPath])
 
 		opts.Log.With("module", importPath).With("criteria", wantedVerCriteria).Debug("Resolving module")
 

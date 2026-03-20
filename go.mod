@@ -1,6 +1,6 @@
 module go.rgst.io/stencil/v2
 
-go 1.26
+go 1.26.0
 
 require (
 	github.com/BurntSushi/toml v1.6.0
@@ -10,6 +10,7 @@ require (
 	github.com/chainguard-dev/git-urls v1.0.2
 	github.com/codeglyph/go-dotignore/v2 v2.1.0
 	github.com/davecgh/go-spew v1.1.1
+	github.com/dependabot/dependabot-core/go_modules/helpers v0.0.0-20260319192609-6fe6ea9020b9
 	github.com/go-git/go-billy/v5 v5.8.0
 	github.com/go-git/go-git/v5 v5.17.0
 	github.com/google/go-cmp v0.7.0
@@ -37,6 +38,7 @@ require (
 	charm.land/log/v2 v2.0.0 // indirect
 	dario.cat/mergo v1.0.2 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
+	github.com/Masterminds/vcs v1.13.3 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.4.0 // indirect
 	github.com/VividCortex/ewma v1.2.0 // indirect
