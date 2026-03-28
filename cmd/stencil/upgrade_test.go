@@ -64,6 +64,10 @@ func writeML(t *testing.T, mf *configuration.Manifest, lock *stencil.Lockfile, d
 // TestCanUpgradeModules tests that the upgrade command can upgrade
 // modules in a project.
 func TestCanUpgradeModules(t *testing.T) {
+	if os.Getenv("CI") == "true" {
+		t.Skip("Mise+Go are breaking in CI")
+	}
+
 	tmpDir := t.TempDir()
 
 	cmd := NewUpgradeCommand(slogext.NewTestLogger(t))
