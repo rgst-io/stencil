@@ -2,5 +2,11 @@ name: stencil
 arguments:
   org: rgst-io
   license: Apache-2.0
+  goarch:
+    - amd64
+    - arm64
+    - "386"
+    - arm
+    - ppc64
 modules:
-  - name: github.com/rgst-io/stencil-golang
+  - name: go.rgst.io/rgst-io/stencil-golang

@@ -1,62 +1,70 @@
-version: v2.14.3-0.20260311183105-a544d6843a18
+version: v2.15.4-0.20260327051021-4a03839e3269+dirty
 modules:
     - name: github.com/rgst-io/stencil-golang
       url: https://github.com/rgst-io/stencil-golang
       version:
         commit: afbbc78e8d88c388061fb7889995b5796fd55579
         tag: v2.3.5
+    - name: go.rgst.io/rgst-io/stencil-golang
+      url: https://git.rgst.io/rgst-io/stencil-golang
+      version:
+        commit: f62238f0af5106b9ead06f4bad965b1133f9b473
+        tag: v4.0.0
 files:
     - name: .cliff.toml
       template: .cliff.toml.tpl
-      module: github.com/rgst-io/stencil-golang
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .dprint.json
-      template: .dprint.json.tpl
-      module: github.com/rgst-io/stencil-golang
+      template: .dprint.json
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .editorconfig
-      template: .editorconfig.tpl
-      module: github.com/rgst-io/stencil-golang
+      template: .editorconfig
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .gitattributes
       template: .gitattributes.tpl
-      module: github.com/rgst-io/stencil-golang
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .github/scripts/get-next-version.sh
-      template: .github/scripts/get-next-version.sh.tpl
-      module: github.com/rgst-io/stencil-golang
+      template: .github/scripts/get-next-version.sh
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .github/settings.yml
       template: .github/settings.yml.tpl
-      module: github.com/rgst-io/stencil-golang
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .github/workflows/release.yaml
       template: .github/workflows/release.yaml.tpl
-      module: github.com/rgst-io/stencil-golang
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .github/workflows/tests.yaml
       template: .github/workflows/tests.yaml.tpl
-      module: github.com/rgst-io/stencil-golang
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .gitignore
       template: .gitignore.tpl
-      module: github.com/rgst-io/stencil-golang
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .golangci.yml
       template: .golangci.yml.tpl
-      module: github.com/rgst-io/stencil-golang
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .goreleaser.yaml
       template: .goreleaser.yaml.tpl
-      module: github.com/rgst-io/stencil-golang
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .mise.toml
       template: .mise.toml.tpl
-      module: github.com/rgst-io/stencil-golang
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .mise/tasks/changelog-release
-      template: .mise/tasks/changelog-release.tpl
-      module: github.com/rgst-io/stencil-golang
+      template: .mise/tasks/changelog-release
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .vscode/common.code-snippets
       template: .vscode/common.code-snippets.tpl
-      module: github.com/rgst-io/stencil-golang
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .vscode/extensions.json
-      template: .vscode/extensions.json.tpl
-      module: github.com/rgst-io/stencil-golang
+      template: .vscode/extensions.json
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: .vscode/settings.json
-      template: .vscode/settings.json.tpl
-      module: github.com/rgst-io/stencil-golang
+      template: .vscode/settings.json
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: CONTRIBUTING.md
       template: CONTRIBUTING.md.tpl
-      module: github.com/rgst-io/stencil-golang
+      module: go.rgst.io/rgst-io/stencil-golang
     - name: LICENSE
       template: LICENSE.tpl
-      module: github.com/rgst-io/stencil-golang
+      module: go.rgst.io/rgst-io/stencil-golang
+    - name: renovate.json
+      template: renovate.json
+      module: go.rgst.io/rgst-io/stencil-golang

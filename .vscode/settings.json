@@ -3,8 +3,7 @@
 	"go.formatTool": "goimports",
 	"go.useLanguageServer": true,
 	"go.alternateTools": {
-		"golangci-lint-v2": "golangci-lint",
-		"goimports": "golangci-lint fmt"
+		"golangci-lint-v2": "golangci-lint"
 	},
 	"files.trimTrailingWhitespace": true,
 	"editor.formatOnSave": true,

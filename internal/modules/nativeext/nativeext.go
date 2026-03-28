@@ -254,7 +254,9 @@ func (h *Host) downloadFromRemote(ctx context.Context, source, name string, vers
 	}
 	defer a.Close()
 
-	bin, err := archives.Pick(a, archives.PickFilterByName(filepath.Base(name)))
+	bin, err := archives.Pick(a, func(h *archives.Header) bool {
+		return h.Name == filepath.Base(name) || h.Name == "plugin"
+	})
 	if err != nil {
 		return "", fmt.Errorf("failed to grab binary from archive: %w", err)
 	}
