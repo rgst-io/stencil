@@ -8,8 +8,8 @@ modules:
     - name: go.rgst.io/rgst-io/stencil-golang
       url: https://git.rgst.io/rgst-io/stencil-golang
       version:
-        commit: f62238f0af5106b9ead06f4bad965b1133f9b473
-        tag: v4.0.0
+        commit: ab6ec92b1cda784e008b216ae07a55184a624b57
+        tag: v4.0.1
 files:
     - name: .cliff.toml
       template: .cliff.toml.tpl
