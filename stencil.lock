@@ -1,10 +1,5 @@
 version: v2.15.4-0.20260327051021-4a03839e3269+dirty
 modules:
-    - name: github.com/rgst-io/stencil-golang
-      url: https://github.com/rgst-io/stencil-golang
-      version:
-        commit: afbbc78e8d88c388061fb7889995b5796fd55579
-        tag: v2.3.5
     - name: go.rgst.io/rgst-io/stencil-golang
       url: https://git.rgst.io/rgst-io/stencil-golang
       version:
