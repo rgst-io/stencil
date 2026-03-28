@@ -66,14 +66,19 @@ func generateTemplateRepository(name string, hasNativeExt bool) *configuration.T
 
 // generateStencilYaml generates a stencil.yaml manifest based on the
 // provided input.
-func generateStencilYaml(name string, hasNativeExt bool) *configuration.Manifest {
+func generateStencilYaml(name string, hasNativeExt bool) (*configuration.Manifest, error) {
+	spl := strings.Split(name, "/")
+	if len(spl) < 3 {
+		return nil, fmt.Errorf("failed to determine org argument")
+	}
+
 	mf := &configuration.Manifest{
 		Name: path.Base(name),
 		Modules: []*configuration.TemplateRepository{{
-			Name: "github.com/rgst-io/stencil-module",
+			Name: "go.rgst.io/rgst-io/stencil-module",
 		}},
 		Arguments: map[string]any{
-			"org": strings.Split(strings.TrimPrefix(name, "github.com/"), "/")[0],
+			"org": strings.Split(strings.TrimPrefix(name, spl[0]), "/")[0],
 		},
 	}
 
@@ -85,7 +90,7 @@ func generateStencilYaml(name string, hasNativeExt bool) *configuration.Manifest
 		mf.Arguments["library"] = true
 	}
 
-	return mf
+	return mf, nil
 }
 
 // NewModuleCreateCommand returns a new [cli.Command] for the module
@@ -118,17 +123,6 @@ func NewModuleCreateCommand(log slogext.Logger) *cli.Command {
 
 			hasNativeExt := c.Bool("native-extension")
 
-			// stencil-golang requires Github right now, so it doesn't make
-			// sense to generate broken templates on some other VCS provider.
-			// Note that you can still have template modules on, say, Gitlab,
-			// but we just can't generate them (yet!).
-			//
-			// TODO(jaredallard): We support forgejo now, for instance, so we
-			// should remove this.
-			if !strings.HasPrefix(moduleName, "github.com/") {
-				return fmt.Errorf("currently, only github based modules are supported")
-			}
-
 			allowedFiles := map[string]struct{}{
 				".git": {},
 			}
@@ -145,8 +139,17 @@ func NewModuleCreateCommand(log slogext.Logger) *cli.Command {
 				}
 			}
 
+			if !strings.Contains(moduleName, "github.com") {
+				log.Warn("Detect non-Github repository. Make sure to set 'vcs' and 'vcs_host'")
+			}
+
 			// create stencil.yaml
-			if err := encodeToFile(generateStencilYaml(moduleName, hasNativeExt), stencilManifestName); err != nil {
+			yml, err := generateStencilYaml(moduleName, hasNativeExt)
+			if err != nil {
+				return err
+			}
+
+			if err := encodeToFile(yml, stencilManifestName); err != nil {
 				return fmt.Errorf("failed to serialize %s: %w", stencilManifestName, err)
 			}
 
@@ -164,7 +167,7 @@ func NewModuleCreateCommand(log slogext.Logger) *cli.Command {
 			log.Info("Created module successfully", "module", moduleName)
 			log.Info("- Ensure that 'stencil.yaml' is configured to your liking (e.g., license)")
 			log.Info("- For configuration options provided by stencil-golang, see the docs:")
-			log.Info("  https://github.com/rgst-io/stencil-golang")
+			log.Info("  https://go.rgst.io/rgst-io/stencil-golang")
 			return nil
 		},
 	}
