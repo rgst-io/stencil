@@ -1,0 +1,8 @@
+name: module_ignore
+arguments:
+  skip:
+    type: boolean
+    default: false
+  delete:
+    type: boolean
+    default: false
