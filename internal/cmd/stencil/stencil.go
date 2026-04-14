@@ -390,10 +390,17 @@ func (c *Command) runWithModules(ctx context.Context, mods []*modules.Module) er
 			continue
 		}
 
-		var err error
-		c.ignore, err = stencil.LoadIgnoreFromReader(bytes.NewReader(ignore.Bytes()))
-		if err != nil {
-			return fmt.Errorf("failed to read generated %s: %w", stencil.StencilIgnoreName, err)
+		switch {
+		case ignore.Skipped:
+			// Do nothing when skipped (allows removing ownership)
+		case ignore.Deleted:
+			c.ignore = nil
+		default:
+			var err error
+			c.ignore, err = stencil.LoadIgnoreFromReader(bytes.NewReader(ignore.Bytes()))
+			if err != nil {
+				return fmt.Errorf("failed to read generated %s: %w", stencil.StencilIgnoreName, err)
+			}
 		}
 	}
 

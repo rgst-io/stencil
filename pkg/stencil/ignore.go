@@ -64,5 +64,9 @@ func LoadIgnore(path string) (*Ignore, error) {
 	}
 	defer f.Close()
 
-	return LoadIgnoreFromReader(f)
+	ignore, err := LoadIgnoreFromReader(f)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load %q: %w", path, err)
+	}
+	return ignore, nil
 }
