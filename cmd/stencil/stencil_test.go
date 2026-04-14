@@ -8,6 +8,7 @@ import (
 	"go.rgst.io/jaredallard/slogext/v2"
 	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
+	"go.rgst.io/stencil/v2/pkg/stencil"
 	"gotest.tools/v3/assert"
 )
 
@@ -25,8 +26,8 @@ func TestStencilKeepsIgnoredFiles(t *testing.T) {
 
 	tmpDir := t.TempDir()
 
-	assert.NilError(t, os.WriteFile(filepath.Join(tmpDir, ".stencilignore"), []byte("go.mod"), 0o644),
-		"expected write to .stencilignore to not fail")
+	assert.NilError(t, os.WriteFile(filepath.Join(tmpDir, stencil.StencilIgnoreName), []byte("go.mod"), 0o644),
+		"expected write to %s to not fail", stencil.StencilIgnoreName)
 
 	assert.NilError(t, os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte("hello, world!"), 0o644),
 		"expected write to go.mod to not fail")

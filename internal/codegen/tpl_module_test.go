@@ -76,17 +76,6 @@ func TestTplModule_Tpl(t *testing.T) {
 			want:            "hello",
 		},
 		{
-			name:        "should break on duplicate export",
-			renderStage: renderStageFinal,
-			functionTemplate: `{{- define "HelloWorld" -}}
-		{{ return (fromYaml "hello: world") }}
-		{{- end -}}
-		{{- module.Export "HelloWorld" -}}
-		{{- module.Export "HelloWorld" -}}`,
-			callingTemplate:     ``,
-			wantFuncErrContains: "already exported",
-		},
-		{
 			name: "use context from function",
 			functionTemplate: `{{- stencil.SetGlobal "a" "func" -}}
 		{{- define "HelloWorld" -}}

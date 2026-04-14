@@ -169,7 +169,7 @@ func (s *Stencil) GenerateLockfile(tpls []*Template) *stencil.Lockfile {
 // provided to stencil at creation time, returned is the templates
 // that were produced and their associated files.
 func (s *Stencil) Render(ctx context.Context, log slogext.Logger) ([]*Template, error) {
-	tplfiles, err := s.getTemplates(ctx, log)
+	tpls, err := s.getTemplates(ctx, log)
 	if err != nil {
 		return nil, err
 	}
@@ -184,14 +184,14 @@ func (s *Stencil) Render(ctx context.Context, log slogext.Logger) ([]*Template, 
 
 	// Add the templates to their modules template to allow them to be able to access
 	// functions declared in the same module
-	for _, t := range tplfiles {
+	for _, t := range tpls {
 		log.Debugf("Parsing template %s", t.ImportPath())
 		if err := t.Parse(s); err != nil {
 			return nil, errors.Wrapf(err, "failed to parse template %q", t.ImportPath())
 		}
 	}
 
-	// Render until we limit or state is stable
+	// Render until we hit the limit or state is stable
 	var lastHash uint64
 	var i int
 	for {
@@ -200,14 +200,14 @@ func (s *Stencil) Render(ctx context.Context, log slogext.Logger) ([]*Template, 
 		}
 
 		log.Debug("Render stage", "iteration", i)
-		for _, t := range tplfiles {
+		for _, t := range tpls {
 			log.Debugf("Render template %s", t.ImportPath())
 			if err := t.Render(s, vals); err != nil {
 				return nil, errors.Wrapf(err, "failed to render template %q", t.ImportPath())
 			}
 
-			// Don't keep files, we only need the shared state modifications.
-			t.Files = nil
+			// We don't need the files.
+			t.Reset()
 		}
 
 		// Calculate the hash of the shared state
@@ -231,15 +231,11 @@ func (s *Stencil) Render(ctx context.Context, log slogext.Logger) ([]*Template, 
 		return nil, err
 	}
 
-	tpls := make([]*Template, 0)
-	for _, t := range tplfiles {
+	for _, t := range tpls {
 		log.Debugf("Final render of template %s", t.ImportPath())
 		if err := t.Render(s, vals); err != nil {
 			return nil, errors.Wrapf(err, "failed to render template %q", t.ImportPath())
 		}
-
-		// append the rendered template to our list of templates processed
-		tpls = append(tpls, t)
 	}
 
 	return tpls, nil
