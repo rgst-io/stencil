@@ -60,7 +60,7 @@ func LoadIgnore(path string) (*Ignore, error) {
 	//nolint:gosec // Why: By design.
 	f, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open %q: %w", path, err)
 	}
 	defer f.Close()
 
