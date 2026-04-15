@@ -8,6 +8,7 @@ import (
 	"go.rgst.io/jaredallard/slogext/v2"
 	"go.rgst.io/stencil/v2/internal/yaml"
 	"go.rgst.io/stencil/v2/pkg/configuration"
+	"go.rgst.io/stencil/v2/pkg/stencil"
 	"gotest.tools/v3/assert"
 )
 
@@ -25,8 +26,8 @@ func TestStencilKeepsIgnoredFiles(t *testing.T) {
 
 	tmpDir := t.TempDir()
 
-	assert.NilError(t, os.WriteFile(filepath.Join(tmpDir, ".stencilignore"), []byte("go.mod"), 0o644),
-		"expected write to .stencilignore to not fail")
+	assert.NilError(t, os.WriteFile(filepath.Join(tmpDir, stencil.StencilIgnoreName), []byte("go.mod"), 0o644),
+		"expected write to %s to not fail", stencil.StencilIgnoreName)
 
 	assert.NilError(t, os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte("hello, world!"), 0o644),
 		"expected write to go.mod to not fail")
@@ -50,4 +51,72 @@ func TestStencilKeepsIgnoredFiles(t *testing.T) {
 	goModContent, err := os.ReadFile(filepath.Join(tmpDir, "go.mod"))
 	assert.NilError(t, err, "expected read of go.mod to not fail")
 	assert.Equal(t, string(goModContent), "hello, world!", "expected go.mod to remain unchanged")
+}
+
+// TestStencilGeneratedIgnore ensures that if a template outputs
+// .stencilignore that it is read and respected in the same run.
+func TestStencilGeneratedIgnore(t *testing.T) {
+	cmd := NewStencil(slogext.NewTestLogger(t))
+	assert.Assert(t, cmd != nil, "expected NewStencil() to not return nil")
+
+	cwd, err := os.Getwd()
+	assert.NilError(t, err, "expected getting cwd to not fail")
+
+	tmpDir := t.TempDir()
+
+	assert.NilError(t, os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte("hello, world!"), 0o644),
+		"expected write to go.mod to not fail")
+
+	manifest := &configuration.Manifest{
+		Name:         "test-123",
+		Arguments:    map[string]any{},
+		Modules:      []*configuration.TemplateRepository{{Name: "module_ignore"}},
+		Replacements: map[string]string{"module_ignore": filepath.Join(cwd, "testdata", "module_ignore")},
+	}
+	manifestBytes, err := yaml.Marshal(manifest)
+	assert.NilError(t, err, "expected manifest marshal to not fail")
+	assert.NilError(t, os.WriteFile(filepath.Join(tmpDir, "stencil.yaml"), manifestBytes, 0o755),
+		"expected write to stencil.yaml to not fail")
+
+	assert.NilError(t, testRunCommand(t, cmd, tmpDir, "--skip-post-run"), "expected stencil run to not fail")
+
+	goModContent, err := os.ReadFile(filepath.Join(tmpDir, "go.mod"))
+	assert.NilError(t, err, "expected read of go.mod to not fail")
+	assert.Equal(t, string(goModContent), "hello, world!", "expected go.mod to remain unchanged")
+}
+
+// TestStencilGeneratedIgnoreDelete tests that if we delete a
+// .stencilignore in templates that it gets deleted and ignored in the
+// same run of stencil.
+func TestStencilGeneratedIgnoreDelete(t *testing.T) {
+	cmd := NewStencil(slogext.NewTestLogger(t))
+	assert.Assert(t, cmd != nil, "expected NewStencil() to not return nil")
+
+	cwd, err := os.Getwd()
+	assert.NilError(t, err, "expected getting cwd to not fail")
+
+	tmpDir := t.TempDir()
+
+	assert.NilError(t, os.WriteFile(filepath.Join(tmpDir, stencil.StencilIgnoreName), []byte("go.mod"), 0o644),
+		"expected write to %s to not fail", stencil.StencilIgnoreName)
+
+	assert.NilError(t, os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte("hello, world!"), 0o644),
+		"expected write to go.mod to not fail")
+
+	manifest := &configuration.Manifest{
+		Name:         "test-123",
+		Arguments:    map[string]any{"delete": true},
+		Modules:      []*configuration.TemplateRepository{{Name: "module_ignore"}},
+		Replacements: map[string]string{"module_ignore": filepath.Join(cwd, "testdata", "module_ignore")},
+	}
+	manifestBytes, err := yaml.Marshal(manifest)
+	assert.NilError(t, err, "expected manifest marshal to not fail")
+	assert.NilError(t, os.WriteFile(filepath.Join(tmpDir, "stencil.yaml"), manifestBytes, 0o755),
+		"expected write to stencil.yaml to not fail")
+
+	assert.NilError(t, testRunCommand(t, cmd, tmpDir, "--skip-post-run"), "expected stencil run to not fail")
+
+	goModContent, err := os.ReadFile(filepath.Join(tmpDir, "go.mod"))
+	assert.NilError(t, err, "expected read of go.mod to not fail")
+	assert.Equal(t, string(goModContent), "module something\n", "expected go.mod to remain unchanged")
 }
