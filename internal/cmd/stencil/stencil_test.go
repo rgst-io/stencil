@@ -238,7 +238,7 @@ func TestValidateStencilVersionBadConstraint(t *testing.T) {
 	assert.NilError(t, err, "failed to resolve modules")
 
 	err = s.validateStencilVersion(mods, "2.0.0")
-	assert.Error(t, err, "improper constraint: invalid")
+	assert.Error(t, err, `improper constraint: "invalid"`)
 }
 
 func TestValidateStencilVersionConstraintValidationFailure(t *testing.T) {
