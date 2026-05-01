@@ -3,4 +3,4 @@ arguments:
   hello: "world"
 testing:
   validators:
-    - '[[ "$(cat hello.txt)" != "world" ]]'
+    - '[[ "$(cat hello.txt)" != "world" ]] || { echo "failed!" >&2; exit 1 }'
