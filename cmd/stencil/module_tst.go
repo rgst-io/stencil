@@ -129,6 +129,8 @@ func runTest(ctx context.Context, log slogext.Logger, dir string, t *Test) error
 
 	for _, validator := range mf.Testing.Validators {
 		cmd := cmdexec.CommandContext(ctx, "bash", "-euo", "pipefail", "-c", validator)
+		cmd.SetStderr(tlogbuf)
+		cmd.SetStdout(tlogbuf)
 		if err := cmd.Run(); err != nil {
 			fmt.Print(tlogbuf.String())
 			return fmt.Errorf("validator failed (%s): %w", cmd.String(), err)
