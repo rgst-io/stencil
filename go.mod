@@ -8,7 +8,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/caarlos0/go-version v0.2.2
 	github.com/chainguard-dev/git-urls v1.0.2
-	github.com/codeglyph/go-dotignore/v2 v2.1.0
+	github.com/codeglyph/go-dotignore/v2 v2.2.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/dependabot/dependabot-core/go_modules/helpers v0.0.0-20260430234536-a0a2daa5c1b9
 	github.com/go-git/go-billy/v5 v5.8.0
