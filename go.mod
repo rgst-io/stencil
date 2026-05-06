@@ -10,7 +10,7 @@ require (
 	github.com/chainguard-dev/git-urls v1.0.2
 	github.com/codeglyph/go-dotignore/v2 v2.2.0
 	github.com/davecgh/go-spew v1.1.1
-	github.com/dependabot/dependabot-core/go_modules/helpers v0.0.0-20260430234536-a0a2daa5c1b9
+	github.com/dependabot/dependabot-core/go_modules/helpers v0.0.0-20260506202051-b0090acfa61b
 	github.com/go-git/go-billy/v5 v5.9.0
 	github.com/go-git/go-git/v5 v5.19.0
 	github.com/google/go-cmp v0.7.0
