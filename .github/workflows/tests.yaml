@@ -46,9 +46,9 @@ jobs:
       - name: Download dependencies
         run: go mod download
       - name: Run go test
-        env: {}
+        env:
         ## <<Stencil::Block(gotestEnvVars)>>
-
+          GITHUB_TOKEN: ${{ env.REAL_GITHUB_TOKEN }}
         ## <</Stencil::Block>>
         run: gotestsum -- -coverprofile=cover.out ./...
 
