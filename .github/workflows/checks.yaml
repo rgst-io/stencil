@@ -21,7 +21,6 @@ env:
   REAL_GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_WRITE }}
   ## <</Stencil::Block>>
 
-
 jobs:
   check-generated-files-and-fmt:
     runs-on: ubuntu-latest
