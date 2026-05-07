@@ -355,7 +355,7 @@ func TestShouldErrorOnNonExistentRepo(t *testing.T) {
 		},
 		Log: newLogger(t),
 	})
-	assert.ErrorContains(t, err, "Repository not found",
+	assert.ErrorContains(t, err, "failed to resolve module 'github.com/rgst-io/i-am-not-a-real-repo'",
 		"expected GetModulesForProject() to error")
 }
 
