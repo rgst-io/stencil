@@ -355,8 +355,8 @@ func TestShouldErrorOnNonExistentRepo(t *testing.T) {
 		},
 		Log: newLogger(t),
 	})
-	//nolint:lll // Why: Error message is long.
-	assert.Error(t, err, "failed to resolve module 'github.com/rgst-io/i-am-not-a-real-repo': failed to get remote branches: exec failed (exit status 128): remote: Repository not found.\nfatal: repository 'https://github.com/rgst-io/i-am-not-a-real-repo/' not found\n\n\nThis error could be due to invalid credentials. Ensure your git configuration is correct.", "expected GetModulesForProject() to error")
+	assert.ErrorContains(t, err, "Repository not found",
+		"expected GetModulesForProject() to error")
 }
 
 func TestCanSetDeliminators(t *testing.T) {
