@@ -53,6 +53,7 @@ jobs:
         id: github-app
         with:
           # https://github.com/organizations/rgst-io/settings/apps/rgst-io-stencil-homebrew
+          github-api-url: https://api.github.com
           client-id: "Iv1.2217d15d6accb480"
           private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
           owner: rgst-io
