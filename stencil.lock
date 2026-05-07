@@ -1,10 +1,10 @@
-version: v2.15.4-0.20260327051021-4a03839e3269+dirty
+version: 2.16.0
 modules:
     - name: go.rgst.io/rgst-io/stencil-golang
       url: https://git.rgst.io/rgst-io/stencil-golang
       version:
-        commit: ab6ec92b1cda784e008b216ae07a55184a624b57
-        tag: v4.0.1
+        commit: 38b18b51a9de1b4d5c7c5c359c8b896814a26298
+        tag: v4.2.1
 files:
     - name: .cliff.toml
       template: .cliff.toml.tpl
@@ -61,5 +61,5 @@ files:
       template: LICENSE.tpl
       module: go.rgst.io/rgst-io/stencil-golang
     - name: renovate.json
-      template: renovate.json
+      template: renovate.json.tpl
       module: go.rgst.io/rgst-io/stencil-golang

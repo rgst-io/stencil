@@ -39,6 +39,8 @@ description = """Get the version number that would be released if a release was 
 Pass --rc to get the next release candidate version.
 """
 run = ["./.github/scripts/get-next-version.sh"]
+# Pinned to 3.4.0 until https://github.com/caarlos0/svu/issues/292 is
+# fixed.
 tools.svu = "3.4.0"
 
 [tasks.test]

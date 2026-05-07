@@ -27,26 +27,49 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
   cancel-in-progress: true
 
+env:
+  # When on VCS providers other than Github (e.g., forgejo), this is
+  # used to reflect a Github Token that actually has access to Github,
+  # unlike the token provided by act.
+  #
+  ## <<Stencil::Block(forgejoGithubToken)>>
+  REAL_GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_WRITE }}
+  ## <</Stencil::Block>>
+
+  # Forgejo's Action token does not have permissions to write to the
+  # package registry. For more information, see:
+  # https://codeberg.org/forgejo/forgejo/issues/6198
+  #
+  ## <<Stencil::Block(forgejoPackageToken)>>
+  FORGEJO_PACKAGE_TOKEN: ${{ secrets.FORGEJO_PACKAGES_WRITE }}
+  ## <</Stencil::Block>>
+
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       ## <<Stencil::Block(releaseSetup)>>
       - uses: actions/create-github-app-token@v3
-        id: homebrew-tap-github-app
+        id: github-app
         with:
           # https://github.com/organizations/rgst-io/settings/apps/rgst-io-stencil-homebrew
-          app-id: 885121
+          client-id: "Iv1.2217d15d6accb480"
           private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
           repositories: homebrew-tap
+      - name: import gpg key
+        env:
+          GPG_KEY: ${{ secrets.GPG_KEY }}
+        run: gpg --import <<<"$GPG_KEY"
+
       ## <</Stencil::Block>>
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           fetch-tags: true
       - uses: jdx/mise-action@v4
-        with: {}
+        with:
+          github_token: ${{ env.REAL_GITHUB_TOKEN }}
       - name: Get Go directories
         id: go
         run: |
@@ -67,13 +90,11 @@ jobs:
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v4
         with:
-          registry: ghcr.io
+          registry: git.rgst.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ env.FORGEJO_PACKAGE_TOKEN }}
       - name: Set up git user
         uses: fregante/setup-git-user@v2
-      - name: Download syft (SBOM)
-        uses: anchore/sbom-action/download-syft@v0
 
       # Bumping logic
       - name: Get next version
@@ -87,18 +108,22 @@ jobs:
         run: |-
           git tag -a "${{ steps.next_version.outputs.version }}" -m "Release ${{ steps.next_version.outputs.version }}"
       - name: Generate CHANGELOG
-        env: {}
+        env:
+          GITEA_TOKEN: ${{ github.token }}
         run: |-
           mise run changelog-release
       - name: Create release artifacts and Github Release
         run: |-
+          # forgejo's actions implementation sets this automatically,
+          # which we do not want.
+          unset GITHUB_TOKEN
           goreleaser release --release-notes CHANGELOG.md --clean
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITEA_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ## <<Stencil::Block(goreleaseEnvVars)>>
           BUILD_RC: ${{ github.event.inputs.rc }}
           FURY_PUSH_TOKEN: ${{ secrets.FURY_PUSH_TOKEN }}
-          HOMEBREW_TAP_GITHUB_TOKEN: ${{ steps.homebrew-tap-github-app.outputs.token }}
+          REAL_GITHUB_TOKEN: ${{ steps.github-app.outputs.token }}
           MACOS_SIGN_P12: ${{ secrets.MACOS_SIGN_P12 }}
           MACOS_SIGN_PASSWORD: ${{ secrets.MACOS_SIGN_PASSWORD }}
           MACOS_NOTARY_ISSUER_ID: ${{ secrets.MACOS_NOTARY_ISSUER_ID }}
@@ -106,8 +131,3 @@ jobs:
           MACOS_NOTARY_KEY: ${{ secrets.MACOS_NOTARY_KEY }}
           WINGET_GITHUB_TOKEN: ${{ secrets.WINGET_GITHUB_TOKEN }}
           ## <</Stencil::Block>>
-      - uses: actions/attest-build-provenance@v4
-        with:
-          # We attest all generated _archives_ because those are what we
-          # upload to Github Releases.
-          subject-path: dist/stencil_*.*, dist/checksums.txt

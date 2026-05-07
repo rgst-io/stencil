@@ -43,9 +43,26 @@ snapshot:
 changelog:
   use: git
 release:
+  gitea:
+    owner: rgst-io
+    name: stencil
   prerelease: "auto"
   footer: |-
-    **Full Changelog**: https://github.com/rgst-io/stencil/compare/{{ .PreviousTag }}...{{ .Tag }}
+    **Full Changelog**: https://git.rgst.io/rgst-io/stencil/compare/{{ .PreviousTag }}...{{ .Tag }}
+signs:
+  - id: default
+    args: [
+      "-u",
+      "6231C7895883FEB79F644387C5DC12A8D2565AD6",
+      "--output",
+      "${signature}",
+      "--detach-sign",
+      "${artifact}",
+    ]
+    artifacts: all
+gitea_urls:
+  api: https://git.rgst.io/api/v1
+  download: https://git.rgst.io
 
 ## <<Stencil::Block(extraReleaseOpts)>>
 # ---------- Packaging
@@ -104,7 +121,7 @@ winget:
     repository:
       owner: rgst-io
       name: winget-pkgs
-      token: "{{ .Env.WINGET_GITHUB_TOKEN }}"
+      token: "{{ .Env.REAL_GITHUB_TOKEN }}"
       branch: "stencil-{{.Version}}"
       pull_request:
         enabled: true
