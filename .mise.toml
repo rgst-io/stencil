@@ -39,7 +39,7 @@ description = """Get the version number that would be released if a release was 
 Pass --rc to get the next release candidate version.
 """
 run = ["./.github/scripts/get-next-version.sh"]
-tools.svu = "latest"
+tools.svu = "3.4.0"
 
 [tasks.test]
 description = "Run tests"
