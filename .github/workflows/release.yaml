@@ -55,8 +55,8 @@ jobs:
           # https://github.com/organizations/rgst-io/settings/apps/rgst-io-stencil-homebrew
           client-id: "Iv1.2217d15d6accb480"
           private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-          repositories: homebrew-tap
+          owner: rgst-io
+          repositories: stencil,winget-pkgs
       - name: import gpg key
         env:
           GPG_KEY: ${{ secrets.GPG_KEY }}
