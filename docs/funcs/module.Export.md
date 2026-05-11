@@ -9,7 +9,9 @@ order: 1016
 Export registers a function to allow it to be called by other templates.
 
 This is only able to be called in library templates and the function's
-name must start with a capital letter.
+name must start with a capital letter. Function names are also only
+eligible to be exported once, if a function is exported twice the second
+call will be a runtime error.
 
 The second argument to "module.Export" controls what "stencil", "file"
 and other template-scoped functions target. Valid options are "caller"

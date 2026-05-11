@@ -22,7 +22,6 @@
 package stencil
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -352,7 +351,7 @@ func (c *Command) Run(ctx context.Context) error {
 	}
 
 	if c.failIgnored && c.ignored {
-		return fmt.Errorf("files were ignored via %s", stencil.StencilIgnoreName)
+		return fmt.Errorf("files were ignored via .stencilignore")
 	}
 
 	return nil
@@ -372,36 +371,6 @@ func (c *Command) runWithModules(ctx context.Context, mods []*modules.Module) er
 	tpls, err := st.Render(ctx, c.log)
 	if err != nil {
 		return err
-	}
-
-	// Check if .stencilignore was generated, if so, re-read it.
-	for _, t := range tpls {
-		var ignore *codegen.File
-		for _, f := range t.Files {
-			if f.Name() != stencil.StencilIgnoreName {
-				continue
-			}
-
-			ignore = f
-			break
-		}
-		if ignore == nil {
-			// No .stencilignore, process the next
-			continue
-		}
-
-		switch {
-		case ignore.Skipped:
-			// Do nothing when skipped (allows removing ownership)
-		case ignore.Deleted:
-			c.ignore = nil
-		default:
-			var err error
-			c.ignore, err = stencil.LoadIgnoreFromReader(bytes.NewReader(ignore.Bytes()))
-			if err != nil {
-				return fmt.Errorf("failed to read generated %s: %w", stencil.StencilIgnoreName, err)
-			}
-		}
 	}
 
 	if err := c.writeFiles(st, tpls); err != nil {
@@ -434,9 +403,7 @@ func (c *Command) writeFiles(st *codegen.Stencil, tpls []*codegen.Template) erro
 						logFn = c.log.Error
 					}
 
-					logFn(fmt.Sprintf("  -> Skipped %s", fileName),
-						"reason", fmt.Sprintf("matched %s", stencil.StencilIgnoreName),
-					)
+					logFn(fmt.Sprintf("  -> Skipped %s", fileName), "reason", "matched .stencilignore")
 					if c.failIgnored {
 						c.ignored = true
 					}

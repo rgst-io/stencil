@@ -28,7 +28,6 @@ import (
 	"go.rgst.io/stencil/v2/internal/cmd/stencil"
 	"go.rgst.io/stencil/v2/internal/version"
 	"go.rgst.io/stencil/v2/pkg/configuration"
-	stencilpub "go.rgst.io/stencil/v2/pkg/stencil"
 )
 
 // Set the version printer to do nothing but print the version.
@@ -106,7 +105,7 @@ func NewStencil(log slogext.Logger) *cli.Command {
 			},
 			&cli.BoolFlag{
 				Name:  "fail-ignored",
-				Usage: fmt.Sprintf("Fails if there are ignored files via %s", stencilpub.StencilIgnoreName),
+				Usage: "Fails if there are ignored files via .stencilignore",
 			},
 		},
 		EnableShellCompletion: true,

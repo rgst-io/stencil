@@ -41,6 +41,10 @@ type TplModule struct {
 	log slogext.Logger
 }
 
+// exportChecks is a map of already exported functions to prevent
+// duplicate exports.
+var exportChecks = make(map[string]struct{})
+
 // executorScope is used by [TplModule.Export] to determine if the
 // function should receive the calling template's scope or use the
 // function's template's scope. See [TplModule.Export] for more
@@ -59,7 +63,9 @@ var (
 // templates.
 //
 // This is only able to be called in library templates and the
-// function's name must start with a capital letter.
+// function's name must start with a capital letter. Function names are
+// also only eligible to be exported once, if a function is exported
+// twice the second call will be a runtime error.
 //
 // The second argument to "module.Export" controls what "stencil",
 // "file" and other template-scoped functions target. Valid options are
@@ -86,6 +92,13 @@ var (
 func (tm *TplModule) Export(name string, scopeSli ...executorScope) (string, error) {
 	// We only allow functions to be exported before the final pass.
 	if tm.s.renderStage == renderStageFinal {
+		// In the final pass, though, check to make sure there's not dupes
+		checkName := fmt.Sprintf("%s.%s", tm.t.Module.Name, name)
+		if _, ok := exportChecks[checkName]; ok {
+			return "", fmt.Errorf("function %q in module %q was already exported", name, tm.t.Module.Name)
+		}
+		exportChecks[checkName] = struct{}{}
+
 		return "", nil
 	}
 

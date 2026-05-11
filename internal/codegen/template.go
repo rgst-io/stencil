@@ -68,7 +68,7 @@ type Template struct {
 	// not.
 	extraFiles []*File
 
-	// Module is the underlying module that owns this template
+	// Module is the underlying module that's creating this template
 	Module *modules.Module
 
 	// Path is the path of this template relative to the owning module
@@ -218,16 +218,4 @@ func (t *Template) Render(st *Stencil, vals *Values) error {
 	t.Files = append(t.Files, t.extraFiles...)
 
 	return nil
-}
-
-// Reset resets the state of this template to match what it was when it
-// was created. Note: If the underlying template was parsed (see
-// [Template.parsed]) it will still have been registered on the owning
-// module due to template module state.
-//
-// This is mostly useful for resetting the execution outputs of a
-// template.
-func (t *Template) Reset() {
-	t.Files = nil
-	t.extraFiles = nil
 }
