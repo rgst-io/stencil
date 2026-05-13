@@ -23,7 +23,7 @@ require (
 	github.com/rogpeppe/go-internal v1.14.1
 	github.com/samber/lo v1.53.0
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2
-	github.com/urfave/cli/v3 v3.8.0
+	github.com/urfave/cli/v3 v3.9.0
 	go.rgst.io/jaredallard/archives/v2 v2.0.0
 	go.rgst.io/jaredallard/cmdexec/v2 v2.0.0
 	go.rgst.io/jaredallard/slogext/v2 v2.0.0
