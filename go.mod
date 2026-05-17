@@ -26,7 +26,7 @@ require (
 	github.com/urfave/cli/v3 v3.9.0
 	go.rgst.io/jaredallard/archives/v2 v2.0.0
 	go.rgst.io/jaredallard/cmdexec/v2 v2.0.0
-	go.rgst.io/jaredallard/slogext/v2 v2.0.0
+	go.rgst.io/jaredallard/slogext/v2 v2.1.0
 	go.rgst.io/jaredallard/vcs/v2 v2.1.0
 	go.yaml.in/yaml/v3 v3.0.4
 	gotest.tools/v3 v3.5.2

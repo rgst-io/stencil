@@ -62,6 +62,8 @@ github.com/cloudflare/circl v1.6.3 h1:9GPOhQGF9MCYUeXyMYlqTR6a5gTrgR/fBLXvUgtVcg
 github.com/cloudflare/circl v1.6.3/go.mod h1:2eXP6Qfat4O/Yhh8BznvKnJ+uzEoTQ6jVKJRn81BiS4=
 github.com/codeglyph/go-dotignore/v2 v2.2.0 h1:9pza2HcxkSzOsihknLZCEAjOeeIPt9uqigbgdLq9qy8=
 github.com/codeglyph/go-dotignore/v2 v2.2.0/go.mod h1:cAH4uxaZ0Rsl33QT2c++wAnk7C8J2c8pik9U4H0+F9w=
+github.com/creack/pty v1.1.24 h1:bJrF4RRfyJnbTJqzRLHzcGaZK1NeM5kTC9jGgovnR1s=
+github.com/creack/pty v1.1.24/go.mod h1:08sCNb52WyoAwi2QDyzUCTgcvVFhUzewun7wtTfvcwE=
 github.com/cyphar/filepath-securejoin v0.6.1 h1:5CeZ1jPXEiYt3+Z6zqprSAgSWiggmpVyciv8syjIpVE=
 github.com/cyphar/filepath-securejoin v0.6.1/go.mod h1:A8hd4EnAeyujCJRrICiOWqjS1AX0a9kM5XL+NwKoYSc=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -281,8 +283,8 @@ go.rgst.io/jaredallard/archives/v2 v2.0.0 h1:u3flEzAojFL7rcShz8uFwPTDyhdR8VSwHC/
 go.rgst.io/jaredallard/archives/v2 v2.0.0/go.mod h1:gRutzzLw9XrllsJGuxU/an8SDQyNfmGOpRgQWC3xGc4=
 go.rgst.io/jaredallard/cmdexec/v2 v2.0.0 h1:Oq2MntfKkUIZZyRFG/P0Nrq9qWcsyEB1LltNG7UAdzc=
 go.rgst.io/jaredallard/cmdexec/v2 v2.0.0/go.mod h1:R1j1V7QXv6bnMQDquewrhuLCHGgnkG2Wpq2JktBjv1w=
-go.rgst.io/jaredallard/slogext/v2 v2.0.0 h1:E3Zu3Da4EyzyhF73k4/RYu76AVQBoyJP6s0qO4pQPDI=
-go.rgst.io/jaredallard/slogext/v2 v2.0.0/go.mod h1:0eyxOzYwF9CSAuNDsVrXrmFtvOK0YaNXXMMd3hZ4h2s=
+go.rgst.io/jaredallard/slogext/v2 v2.1.0 h1:BKpLULrYWY5lnRJ3mVPtynJkF4quxbmBUfYDYXGwrL4=
+go.rgst.io/jaredallard/slogext/v2 v2.1.0/go.mod h1:Lg76A2VZTGoFMNsPMALb3mzCSqIj2XdHSUJb2mKnTQA=
 go.rgst.io/jaredallard/vcs/v2 v2.1.0 h1:ovAxD6CgtlZZmkAIzIlROia+m8lpPH0oiUkLVljyIZY=
 go.rgst.io/jaredallard/vcs/v2 v2.1.0/go.mod h1:Z0o7j13nwN6fr5qlgVnvIxmSgcHhFzJIo8j2faRJijo=
 go.yaml.in/yaml/v2 v2.4.4 h1:tuyd0P+2Ont/d6e2rl3be67goVK4R6deVxCUX5vyPaQ=
