@@ -37,7 +37,7 @@ jobs:
         run: go mod download
       - name: Run go test
         env:
-        ## <<Stencil::Block(gotestEnvVars)>>
+          ## <<Stencil::Block(gotestEnvVars)>>
           COVERFILE: ./cover.out
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         ## <</Stencil::Block>>
