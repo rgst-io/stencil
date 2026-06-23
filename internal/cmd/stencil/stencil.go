@@ -403,8 +403,6 @@ func (c *Command) writeFiles(st *codegen.Stencil, tpls []*codegen.Template) erro
 					if c.failIgnored {
 						c.ignored = true
 					}
-
-					continue
 				}
 			}
 
