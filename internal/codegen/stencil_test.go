@@ -145,10 +145,10 @@ func TestBinaryRender(t *testing.T) {
 
 	wd, err := os.Getwd()
 	assert.NilError(t, err, "failed to get working directory")
-	td := os.TempDir()
-	err = os.Chdir(td)
-	assert.NilError(t, err, "failed to change working directory")
-	defer os.Chdir(wd)
+
+	td := t.TempDir()
+	t.Chdir(td)
+	defer t.Chdir(wd)
 
 	err = tpls[0].Files[0].Write(log, false)
 	assert.NilError(t, err, "failed to file out")

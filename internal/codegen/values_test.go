@@ -1,7 +1,6 @@
 package codegen
 
 import (
-	"os"
 	"testing"
 	"time"
 
@@ -15,14 +14,11 @@ import (
 	"go.rgst.io/stencil/v2/internal/version"
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"gotest.tools/v3/assert"
-	"gotest.tools/v3/env"
 )
 
 func TestValues(t *testing.T) {
-	tmpDir, err := os.MkdirTemp(t.TempDir(), "stencil-values-test")
-	assert.NilError(t, err, "expected os.MkdirTemp() not to fail")
-
-	env.ChangeWorkingDir(t, tmpDir)
+	tmpDir := t.TempDir()
+	t.Chdir(tmpDir)
 
 	r, err := gogit.PlainInit(tmpDir, false)
 	assert.NilError(t, err, "expected gogit.PlainInit() not to fail")

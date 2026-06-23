@@ -246,10 +246,10 @@ func TestTplFile_RemoveAll(t *testing.T) {
 
 	wd, err := os.Getwd()
 	assert.NilError(t, err, "failed to get working directory")
-	td := os.TempDir()
-	err = os.Chdir(td)
-	assert.NilError(t, err, "failed to change working directory")
-	defer os.Chdir(wd)
+
+	td := t.TempDir()
+	t.Chdir(td)
+	defer t.Chdir(wd)
 
 	os.MkdirAll("test", 0o755)
 	os.WriteFile("test/test.go", []byte("test"), 0o644)

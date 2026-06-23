@@ -64,10 +64,6 @@ func writeML(t *testing.T, mf *configuration.Manifest, lock *stencil.Lockfile, d
 // TestCanUpgradeModules tests that the upgrade command can upgrade
 // modules in a project.
 func TestCanUpgradeModules(t *testing.T) {
-	if os.Getenv("CI") == "true" {
-		t.Skip("Mise+Go are breaking in CI")
-	}
-
 	tmpDir := t.TempDir()
 
 	cmd := NewUpgradeCommand(slogext.NewTestLogger(t))
@@ -114,10 +110,6 @@ func TestCanUpgradeModules(t *testing.T) {
 // TestUpgradeIncludesNewModules tests that the upgrade command can install
 // new modules in a project.
 func TestUpgradeIncludesNewModules(t *testing.T) {
-	if os.Getenv("CI") == "true" {
-		t.Skip("Mise+Go are breaking in CI")
-	}
-
 	tmpDir := t.TempDir()
 
 	cmd := NewUpgradeCommand(slogext.NewTestLogger(t))
@@ -148,10 +140,6 @@ func TestUpgradeIncludesNewModules(t *testing.T) {
 // TestUpgradeReRunsStencil tests an upgrade command re-runs stencil
 // even when there is no new version.
 func TestUpgradeReRunsStencil(t *testing.T) {
-	if os.Getenv("CI") == "true" {
-		t.Skip("Mise+Go are breaking in CI")
-	}
-
 	tmpDir := t.TempDir()
 
 	cmd := NewUpgradeCommand(slogext.NewTestLogger(t))

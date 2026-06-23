@@ -51,6 +51,19 @@ type Module struct {
 	// Note: We don't currently support sharing templates across modules.
 	t *template.Template
 
+	// fs is underlying filesystem for this module
+	fs billy.Filesystem
+
+	// dirReplacementsRendered is a rendered list of dirReplacements from the manifest,
+	// ready to be used for immediate replacements.  It's a mapping of relative paths
+	// to just the replacement name for the last path segment.
+	dirReplacementsRendered map[string]string
+
+	// exportedFunctions is a mapping of functions that were exported by
+	// this module. It is used to prevent exporting the same function
+	// multiple times.
+	exportedFunctions map[string]struct{}
+
 	// Manifest is the module's manifest information/configuration
 	Manifest *configuration.TemplateRepositoryManifest
 
@@ -64,14 +77,6 @@ type Module struct {
 
 	// Version is the version of the module to use.
 	Version *resolver.Version
-
-	// fs is underlying filesystem for this module
-	fs billy.Filesystem
-
-	// dirReplacementsRendered is a rendered list of dirReplacements from the manifest,
-	// ready to be used for immediate replacements.  It's a mapping of relative paths
-	// to just the replacement name for the last path segment.
-	dirReplacementsRendered map[string]string
 }
 
 // uriIsLocal returns true if the URI is a local file path
@@ -142,11 +147,13 @@ func New(ctx context.Context, uri string, opts NewModuleOpts) (*Module, error) {
 	}
 
 	m := Module{
-		t:       template.New(opts.ImportPath).Funcs(sprig.TxtFuncMap()),
-		Name:    opts.ImportPath,
-		URI:     uri,
-		Version: opts.Version,
-		fs:      opts.FS,
+		t:                       template.New(opts.ImportPath).Funcs(sprig.TxtFuncMap()),
+		Name:                    opts.ImportPath,
+		URI:                     uri,
+		Version:                 opts.Version,
+		fs:                      opts.FS,
+		exportedFunctions:       make(map[string]struct{}),
+		dirReplacementsRendered: make(map[string]string),
 	}
 
 	mani, err := m.getManifest(ctx)
@@ -274,4 +281,16 @@ func (m *Module) ApplyDirReplacements(path string) string {
 		}
 	}
 	return strings.Join(pp, string(os.PathSeparator))
+}
+
+// ExportFunction marks a function as being exported. Note that it does
+// not actually export the function, which is handled by the template
+// logic instead.
+func (m *Module) ExportFunction(name string) error {
+	if _, ok := m.exportedFunctions[name]; ok {
+		return fmt.Errorf("function %q was already exported", name)
+	}
+
+	m.exportedFunctions[name] = struct{}{}
+	return nil
 }

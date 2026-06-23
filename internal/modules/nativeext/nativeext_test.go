@@ -2,7 +2,6 @@ package nativeext_test
 
 import (
 	"context"
-	"os"
 	"testing"
 
 	"go.rgst.io/jaredallard/slogext/v2"
@@ -16,19 +15,8 @@ import (
 // extension host, and then finally execute a template function provided
 // by the extension.
 func TestCanImportNativeExtension(t *testing.T) {
-	if os.Getenv("CI") == "true" {
-		originalGITHUB := os.Getenv("GITHUB_TOKEN")
-		originalGH := os.Getenv("GH_TOKEN")
-
-		assert.NilError(t, os.Unsetenv("GITHUB_TOKEN"))
-		assert.NilError(t, os.Unsetenv("GH_TOKEN"))
-
-		// restore later
-		t.Cleanup(func() {
-			assert.NilError(t, os.Setenv("GITHUB_TOKEN", originalGITHUB))
-			assert.NilError(t, os.Setenv("GH_TOKEN", originalGH))
-		})
-	}
+	t.Setenv("GITHUB_TOKEN", "")
+	t.Setenv("GH_TOKEN", "")
 
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()

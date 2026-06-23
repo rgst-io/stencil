@@ -79,6 +79,7 @@ func parseBlocks(filePath string, sourceTemplate *Template) (map[string]*blockIn
 // nolint:funlen // Why: Will refactor in the future.
 func parseBlocksInner(r io.ReadSeeker, filePath string, sourceTemplate *Template) (map[string]*blockInfo, error) {
 	blocks := make(map[string]*blockInfo)
+
 	var curBlock *blockInfo
 	scanner := bufio.NewScanner(r)
 	for i := 0; scanner.Scan(); i++ {
@@ -187,6 +188,9 @@ func parseBlocksInner(r io.ReadSeeker, filePath string, sourceTemplate *Template
 		} else {
 			curBlock.Contents = line
 		}
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("failed to parse blocks: %w", err)
 	}
 
 	if curBlock != nil {

@@ -6,7 +6,6 @@ import (
 
 	"go.rgst.io/stencil/v2/pkg/configuration"
 	"gotest.tools/v3/assert"
-	"gotest.tools/v3/env"
 )
 
 func ExampleValidateName() {
@@ -40,7 +39,7 @@ func ExampleLoadManifest() {
 }
 
 func TestShouldSupportServiceYaml(t *testing.T) {
-	env.ChangeWorkingDir(t, "testdata/interop/service-if-not-found")
+	t.Chdir("testdata/interop/service-if-not-found")
 
 	sm, err := configuration.LoadDefaultManifest()
 	assert.NilError(t, err)
@@ -49,7 +48,7 @@ func TestShouldSupportServiceYaml(t *testing.T) {
 }
 
 func TestShouldUseStencilOverServiceYaml(t *testing.T) {
-	env.ChangeWorkingDir(t, "testdata/interop/stencil-over-service")
+	t.Chdir("testdata/interop/stencil-over-service")
 
 	sm, err := configuration.LoadDefaultManifest()
 	assert.NilError(t, err)
@@ -58,7 +57,7 @@ func TestShouldUseStencilOverServiceYaml(t *testing.T) {
 }
 
 func TestLoadDefaultTemplateRepositoryManifestShouldLoad(t *testing.T) {
-	env.ChangeWorkingDir(t, "testdata/tr-default")
+	t.Chdir("testdata/tr-default")
 
 	sm, err := configuration.LoadDefaultTemplateRepositoryManifest()
 	assert.NilError(t, err)
