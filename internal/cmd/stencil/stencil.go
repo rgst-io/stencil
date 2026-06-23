@@ -393,17 +393,13 @@ func (c *Command) runWithModules(ctx context.Context, mods []*modules.Module) er
 func (c *Command) writeFiles(st *codegen.Stencil, tpls []*codegen.Template) error {
 	c.log.Infof("Writing template(s) to disk")
 	for _, tpl := range tpls {
-		for i := range tpl.Files {
-			fileName := tpl.Files[i].Name()
+		for _, f := range tpl.Files {
 			if c.ignore != nil {
 				//nolint:errcheck // Why: We treat error as not matching.
-				if matches, _ := c.ignore.Matches(fileName); matches {
-					logFn := c.log.Warn
-					if c.failIgnored {
-						logFn = c.log.Error
-					}
+				if matches, _ := c.ignore.Matches(f.Name()); matches {
+					f.Skipped = true
+					f.SkippedReason = "matched .stencilignore"
 
-					logFn(fmt.Sprintf("  -> Skipped %s", fileName), "reason", "matched .stencilignore")
 					if c.failIgnored {
 						c.ignored = true
 					}
@@ -412,7 +408,7 @@ func (c *Command) writeFiles(st *codegen.Stencil, tpls []*codegen.Template) erro
 				}
 			}
 
-			if err := tpl.Files[i].Write(c.log, c.dryRun); err != nil {
+			if err := f.Write(c.log, c.dryRun); err != nil {
 				return err
 			}
 		}
