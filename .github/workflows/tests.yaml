@@ -1,5 +1,3 @@
-# TODO(jaredallard): Deviated from stencil-golang.
-# Removed golangci-lint because we put it in linters.yaml
 name: tests
 on:
   push:
@@ -14,9 +12,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}
   cancel-in-progress: true
 
-env:
-  COVERFILE: coverage.out
-
 jobs:
   gotest:
     name: go test
@@ -24,10 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: jdx/mise-action@v4
-        with:
-          experimental: true
-        env:
-          GH_TOKEN: ${{ github.token }}
+        with: {}
       - name: Get Go directories
         id: go
         run: |
@@ -43,13 +35,16 @@ jobs:
           key: ${{ runner.os }}-go-mod-cache-${{ hashFiles('go.sum') }}
       - name: Download dependencies
         run: go mod download
-      - name: Run Go tests
+      - name: Run go test
         env:
+        ## <<Stencil::Block(gotestEnvVars)>>
+          COVERFILE: ./cover.out
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        ## <</Stencil::Block>>
         run: mise run coverage
       - name: Upload test coverage
         uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ${{ env.COVERFILE }}
+          files: ./cover.out
           fail_ci_if_error: true

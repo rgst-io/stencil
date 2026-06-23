@@ -35,6 +35,9 @@ linters:
         SPDX-License-Identifier: Apache-2.0
     lll:
       line-length: 140
+  ## <<Stencil::Block(customLinterSettings)>>
+
+  ## <</Stencil::Block>>
 
   # Inverted configuration with enable-all and disable is not scalable
   # during updates of golangci-lint.
@@ -58,10 +61,14 @@ linters:
     - nakedret
     - staticcheck
     - revive
+    - usetesting
     - unconvert
     - unparam
     - unused
     - whitespace
+  ## <<Stencil::Block(customLinters)>>
+
+  ## <</Stencil::Block>>
 
   # Excluding configuration per-path, per-linter, per-text and per-source
   exclusions:
@@ -86,6 +93,9 @@ linters:
         text: 'Error return value of `(.*\.Close|fmt\.F.*)` is not checked'
       - path: '(.+)\.go$'
         text: "G104: Errors unhandled" # Duplicates errcheck.
+## <<Stencil::Block(customExclusions)>>
+
+## <</Stencil::Block>>
 
 # formatter settings
 formatters:
