@@ -1,3 +1,9 @@
+> [!WARNING]
+> This repository has been migrated to Forgejo and can be found at:
+> https://git.rgst.io/rgst-io/stencil
+
+----
+
 <div align="center">
   <a href="https://stencil.rgst.io">
     <img src=".github/images/stencil.png" alt="stencil" width="300" />
